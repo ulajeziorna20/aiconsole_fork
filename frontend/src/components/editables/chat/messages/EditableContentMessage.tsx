@@ -27,6 +27,7 @@ interface EditableContentMessageProps {
   handleRemoveClick?: () => void;
   handleAcceptedContent: (content: string) => void;
   className?: string;
+  hideControls?: boolean;
 }
 
 export function EditableContentMessage({
@@ -36,6 +37,7 @@ export function EditableContentMessage({
   language,
   handleAcceptedContent,
   handleRemoveClick,
+  hideControls,
   className,
 }: EditableContentMessageProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -88,6 +90,7 @@ export function EditableContentMessage({
       {!isStreaming && (
         <MessageControls
           isEditing={isEditing}
+          hideControls={hideControls}
           onCancelClick={handleCancelEditClick}
           onEditClick={handleEditClick}
           onSaveClick={handleSaveClick}

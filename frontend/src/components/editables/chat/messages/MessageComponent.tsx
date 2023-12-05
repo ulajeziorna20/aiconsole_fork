@@ -46,6 +46,7 @@ export function MessageComponent({ message, group }: MessageProps) {
         isStreaming={message.is_streaming}
         handleAcceptedContent={handleSaveClick}
         handleRemoveClick={handleRemoveClick}
+        hideControls
       >
         <div className="flex flex-col gap-2">
           {(message.content || message.is_streaming) && (
