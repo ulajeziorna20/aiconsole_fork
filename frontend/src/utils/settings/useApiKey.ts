@@ -45,7 +45,7 @@ export const useApiKey = () => {
   const showApiError = () => {
     showNotification({
       title: 'Error',
-      message: 'Invalid Open AI API key.',
+      message: 'Invalid Open AI API key. Make sure that your API key has access to GPT-4',
       variant: 'error',
     });
   };
