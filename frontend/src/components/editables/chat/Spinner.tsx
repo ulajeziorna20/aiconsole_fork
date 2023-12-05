@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Icon } from '@/components/common/icons/Icon';
 import { Settings } from 'lucide-react';
 
 export function Spinner() {
-  return <Settings className="animate-spin h-5 w-5" />;
+  return <Icon icon={Settings} width={20} height={20} className="animate-spin" />;
 }

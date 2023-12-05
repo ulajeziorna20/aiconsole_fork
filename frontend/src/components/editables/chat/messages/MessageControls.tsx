@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Icon } from '@/components/common/icons/Icon';
 import { Trash, Pencil, Check, X } from 'lucide-react';
 interface MessageControlsProps {
   isEditing?: boolean;
@@ -35,24 +36,24 @@ export function MessageControls({
       {isEditing ? (
         <>
           <button>
-            <Check onClick={onSaveClick} className="h-4 w-4 text-green" />{' '}
+            <Icon icon={Check} onClick={onSaveClick} className="text-green" />{' '}
           </button>
           <button>
-            <X onClick={onCancelClick} className="h-4 w-4 text-red" />{' '}
+            <Icon icon={X} onClick={onCancelClick} className="text-red" />{' '}
           </button>
         </>
       ) : (
         <>
           {onSaveClick && onEditClick && onCancelClick ? (
             <button onClick={onEditClick}>
-              <Pencil className="h-4 w-4 pointer-events-none" />{' '}
+              <Icon icon={Pencil} className="pointer-events-none" />{' '}
             </button>
           ) : (
             <div className="h-4 w-4"></div>
           )}
           {onRemoveClick && (
             <button onClick={onRemoveClick}>
-              <Trash className="h-4 w-4" />{' '}
+              <Icon icon={Trash} />{' '}
             </button>
           )}
         </>

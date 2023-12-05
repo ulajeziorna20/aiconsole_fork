@@ -23,6 +23,7 @@ import { useProjectContextMenu } from '@/utils/projects/useProjectContextMenu';
 import { PlusIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { Icon } from '../common/icons/Icon';
 
 const { getItem: checkIfChanged } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -60,7 +61,7 @@ export function ProjectTopBarElements() {
         </div>
 
         <Button small classNames="ml-10" variant="secondary" onClick={showPlusMenu()} onContextMenu={showPlusMenu()}>
-          <PlusIcon />
+          <Icon icon={PlusIcon} />
           New
         </Button>
       </div>

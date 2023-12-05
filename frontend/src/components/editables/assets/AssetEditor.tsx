@@ -42,6 +42,7 @@ import { localStorageTyped } from '@/utils/common/localStorage';
 import { usePrevious } from '@mantine/hooks';
 import { useAssets } from '@/utils/editables/useAssets';
 import { CheckCheck } from 'lucide-react';
+import { Icon } from '@/components/common/icons/Icon';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -416,7 +417,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                   </div>
                   <div className="flex items-center gap-[10px] ml-auto">
                     <Button disabled={disableSubmit} onClick={handleSaveClick} active={isSavedButtonLabel}>
-                      {submitButtonLabel} {isSavedButtonLabel ? <CheckCheck /> : null}
+                      {submitButtonLabel} {isSavedButtonLabel ? <Icon icon={CheckCheck} /> : null}
                     </Button>
                   </div>
                 </>

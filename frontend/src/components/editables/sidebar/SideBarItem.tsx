@@ -27,6 +27,7 @@ import { useAssets } from '@/utils/editables/useAssets';
 import { convertNameToId } from '@/utils/editables/convertNameToId';
 import { useChat } from '@/utils/editables/useChat';
 import showNotification from '@/utils/common/showNotification';
+import { Icon } from '@/components/common/icons/Icon';
 
 const SideBarItem = ({
   editableObjectType,
@@ -55,7 +56,7 @@ const SideBarItem = ({
     }
   }, [isContextMenuVisible]);
 
-  const Icon = getEditableObjectIcon(editableObject);
+  const EditableIcon = getEditableObjectIcon(editableObject);
 
   const [inputText, setInputText] = useState(editableObject.name);
 
@@ -181,6 +182,7 @@ const SideBarItem = ({
           {({ isActive }) => (
             <>
               <Icon
+                icon={EditableIcon}
                 className={cn(
                   'min-w-[24px] min-h-[24px] w-[24px] h-[24px]',
                   editableObjectType === 'chat' && 'text-chat',
@@ -202,13 +204,11 @@ const SideBarItem = ({
                 <p className="text-[14px] leading-[18.2px] group-hover:text-white truncate">{editableObject.name}</p>
               )}
               <div className="flex gap-[10px] ml-auto items-center">
-                <MoreVertical
-                  className={cn(
-                    'w-4 h-4 min-h-[16px] min-w-[16px] ml-auto hidden group-hover:text-white group-hover:block',
-                    {
-                      block: isShowingContext,
-                    },
-                  )}
+                <Icon
+                  icon={MoreVertical}
+                  className={cn('min-h-[16px] min-w-[16px] ml-auto hidden group-hover:text-white group-hover:block', {
+                    block: isShowingContext,
+                  })}
                   onClick={handleMoreIconClick}
                 />
               </div>

@@ -24,7 +24,7 @@ import { cn } from '@/utils/common/cn';
 import showNotification from '@/utils/common/showNotification';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
-import { ReplyIcon, SendHorizonalIcon, SquareIcon } from 'lucide-react';
+import { ReplyIcon, SendHorizonalIcon, SquareIcon, ArrowDown } from 'lucide-react';
 import { useEffect } from 'react';
 import { useParams, useSearchParams, unstable_useBlocker as useBlocker } from 'react-router-dom';
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
@@ -33,8 +33,8 @@ import { QuestionMarkIcon } from '../../common/icons/QuestionMarkIcon';
 import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
-import { ArrowDown } from 'lucide-react';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
+import { Icon } from '@/components/common/icons/Icon';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -66,7 +66,7 @@ const ScrollToBottomButton = () => {
       )}
       onClick={() => scrollToBottom()}
     >
-      <ArrowDown />
+      <Icon icon={ArrowDown} />
     </button>
   );
 };

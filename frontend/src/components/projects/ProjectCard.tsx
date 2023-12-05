@@ -20,6 +20,7 @@ import { useRecentProjectsStore } from '@/store/projects/useRecentProjectsStore'
 import { MessageSquare, X } from 'lucide-react';
 import { MouseEvent, useState } from 'react';
 import { useProjectStore } from '../../store/projects/useProjectStore';
+import { Icon } from '../common/icons/Icon';
 
 interface ProjectCardProps {
   name: string;
@@ -66,14 +67,14 @@ export function ProjectCard({ name, path, chatHistory }: ProjectCardProps) {
           onMouseLeave={() => setDeleteHovered(false)}
           onClick={deleteProject}
         >
-          <X className="scale-150" />
+          <Icon icon={X} className="scale-150" />
         </Button>
       </div>
 
       {chatHistory.map((command, index) => (
         // make it single line and end with  ...
         <div key={index} className="flex flex-row items-center gap-2 mb-[10px] text-[15px]">
-          <MessageSquare className="flex-none w-4 h-4 opacity-50" />
+          <Icon icon={MessageSquare} className="flex-none opacity-50" />
           <div className="flex-grow truncate">{command} </div>
         </div>
       ))}

@@ -16,6 +16,7 @@
 
 import { Button } from '@/components/common/Button';
 import { Tooltip } from '@/components/common/Tooltip';
+import { Icon } from '@/components/common/icons/Icon';
 import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { cn } from '@/utils/common/cn';
 import { LucideIcon } from 'lucide-react';
@@ -99,7 +100,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
         <Tooltip label={actionLabel} position="top-end" offset={10}>
           <div>
             <Button variant="primary" iconOnly={true} onClick={handleSendMessage} classNames={cn('p-2', {})}>
-              <ActionIcon className="w-6 h-6" />
+              <Icon icon={ActionIcon} width={24} height={24} className="w-6 h-6" />
             </Button>
           </div>
         </Tooltip>
