@@ -22,6 +22,8 @@ Select the version suitable for your operating system:
 - [macOS (ARM)](https://github.com/10clouds/aiconsole/releases)
 - [Linux](https://github.com/10clouds/aiconsole/releases)
 
+**Important: To use the application, you need to provide your own OpenAI API key with GPT-4 access.**
+
 # Basic Flow of Work
 
 Imagine you want to send your daily calendar schedule to your girlfriend through iMessage.
