@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
-import { FolderOpen, FolderPlus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '../common/Button';
 import { ConfirmationModal } from '../common/ConfirmationModal';
 import { cn } from '@/utils/common/cn';
@@ -60,11 +60,11 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
       </ConfirmationModal>
 
       <Button small onClick={newProject}>
-        <FolderPlus /> New Project ...
+        Add your first project <Plus />
       </Button>
 
       <Button small variant="secondary" onClick={openProject}>
-        <FolderOpen /> Open Project ...
+        Open Project
       </Button>
     </div>
   );

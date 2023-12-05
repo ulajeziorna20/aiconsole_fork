@@ -23,26 +23,30 @@ interface RecentProjectsEmptyProps {
 }
 
 export function RecentProjectsEmpty({ openAiApiKey, isApiKeyValid }: RecentProjectsEmptyProps) {
+  const isApiKeySet = openAiApiKey && isApiKeyValid;
+
   return (
     <div className="flex justify-center items-center flex-col min-h-[100vh] px-[60px] relative">
       <div className="my-[180px]">
         <img src="favicon.png" className="shadows-lg w-[60px] h-[60px] mx-auto " alt="Logo" />
         <h1 className="text-[56px] text-center font-black text-white ">
-          Welcome to <span className=" text-primary">AIConsole!</span>
+          Welcome to <span className=" text-primary">AIConsole</span>
         </h1>
-        {openAiApiKey && isApiKeyValid ? (
-          <ProjectButtons className="relative flex justify-center gap-[20px] mt-[36px] z-10" />
+        {isApiKeySet ? (
+          <ProjectButtons className="relative flex justify-center gap-[20px] mt-5 py-[10px] z-10" />
         ) : (
-          <div className="mb-[-40px] relative z-10">
+          <div className="mb-[-40px] max-w-[714px] relative z-10">
             <OpenAiApiKeyForm />
           </div>
         )}
       </div>
-      <img
-        src="recent-projects-empty-image.png"
-        className="relative z-0 mx-auto mt-[-200px] sm:mt-[-250px] lg:mt-[-300px] 2xl:mt-[-400px]"
-        alt="aiconsole chat image"
-      />
+      {isApiKeySet && (
+        <img
+          src="recent-projects-empty-image.png"
+          className="relative z-0 mx-auto mt-[-200px] sm:mt-[-250px] lg:mt-[-300px] 2xl:mt-[-400px]"
+          alt="aiconsole chat image"
+        />
+      )}
     </div>
   );
 }

@@ -39,22 +39,38 @@ const OpenAiApiKeyForm = () => {
   };
 
   return (
-    <>
-      <p className="mt-10 mb-4 text-lg text-center font-semibold text-white">
-        First, provide your OpenAI API key with GPT-4 access.
-      </p>
-      <div className="flex justify-center gap-5">
-        <input
-          className="border-white/20 ring-secondary/30 text-white bg-black flex-grow resize-none overflow-hidden rounded-3xl border px-4 py-2 focus:outline-none focus:ring-2"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="OpenAI API key..."
-        />
-        <Button small onClick={onFormSubmit} disabled={!inputText}>
-          {validating ? 'Validating...' : 'Submit'}
-        </Button>
+    <div>
+      <div className="p-10 border border-gray-600 rounded-[14px] my-[60px] flex flex-col gap-5 bg-top-elipse">
+        <p className="text-lg text-center font-semibold text-white">
+          To start, provide your OpenAI API key with GPT-4 access.
+        </p>
+        <div className="flex justify-center gap-5">
+          <input
+            className="border border-gray-500 ring-secondary/30 text-white bg-gray-800 flex-grow resize-none overflow-hidden rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="OpenAI API key..."
+          />
+          <Button small onClick={onFormSubmit} disabled={!inputText}>
+            {validating ? 'Validating...' : 'Add API key'}
+          </Button>
+        </div>
       </div>
-    </>
+
+      <div className="flex flex-col text-center h-[102px] justify-between">
+        <p className="text-[15px] leading-6	text-gray-400">
+          To get your own OpenAI API key you need to raise a $1 dollar payment by setting up your payment method in
+          OpenAI settings pannel.
+        </p>
+        <a
+          className="text-gray-300 underline"
+          href="https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4"
+          target="_blank"
+        >
+          How can I access GPT-4? | OpenAI Help Center
+        </a>
+      </div>
+    </div>
   );
 };
 
