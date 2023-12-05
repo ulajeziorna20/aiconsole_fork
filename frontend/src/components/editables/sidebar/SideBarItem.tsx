@@ -159,7 +159,7 @@ const SideBarItem = ({
   };
 
   return (
-    <div ref={popoverRef} onContextMenu={handleContextMenu} className="max-w-[275px]">
+    <div ref={popoverRef} onContextMenu={handleContextMenu} className="max-w-[275px] mb-[5px]">
       <div
         className={cn(
           forced && editableObjectType === 'agent' && 'text-agent',
