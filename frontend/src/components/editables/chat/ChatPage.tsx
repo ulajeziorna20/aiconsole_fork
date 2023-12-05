@@ -26,7 +26,7 @@ import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { ReplyIcon, SendHorizonalIcon, SquareIcon } from 'lucide-react';
 import { useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, unstable_useBlocker as useBlocker } from 'react-router-dom';
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
 import { v4 as uuidv4 } from 'uuid';
 import { QuestionMarkIcon } from '../../common/icons/QuestionMarkIcon';
@@ -34,6 +34,7 @@ import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
 import { ArrowDown } from 'lucide-react';
+import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -92,6 +93,10 @@ export function ChatPage() {
   const appendFilePathToCommand = useChatStore((state) => state.appendFilePathToCommand);
   const { showContextMenu } = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
   const { setChat, renameChat } = useChat();
+
+  const blocker = useBlocker(isAnalysisRunning || isExecutionRunning);
+
+  const { reset, proceed, state: blockerState } = blocker || {};
 
   useEffect(() => {
     const stopEvent = (e: Event) => {
@@ -259,6 +264,17 @@ export function ChatPage() {
             actionLabel={actionButtonLabel}
             onSubmit={actionButtonAction}
           />
+
+          <ConfirmationModal
+            confirmButtonText="Yes"
+            cancelButtonText="No"
+            opened={blockerState === 'blocked'}
+            onClose={reset}
+            onConfirm={proceed || null}
+            title="Are you sure you want to exit this chat?"
+          >
+            {`The response is being generated.\nClosing the window cancels the process.`}
+          </ConfirmationModal>
         </div>
       </div>
     </div>

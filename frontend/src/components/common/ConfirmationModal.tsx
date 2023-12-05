@@ -99,7 +99,7 @@ export function ConfirmationModal({
         }}
       >
         <div>
-          <Modal.Body className="w-full mb-8 text-center">{children}</Modal.Body>
+          <Modal.Body className="w-full mb-8 text-center whitespace-pre-line">{children}</Modal.Body>
           <div className="flex justify-center items-center gap-4">
             <Button variant="secondary" bold small onClick={close}>
               {cancelButtonText}
