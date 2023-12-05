@@ -20,6 +20,7 @@ export default {
       },
       backgroundImage: {
         'recent-bg': "url('/bg1.png')",
+        'top-elipse': "url('/elipse-top.png')",
       },
       boxShadow: {
         dark: '0px 20px 40px 0px rgba(0, 0, 0, 0.25)',
