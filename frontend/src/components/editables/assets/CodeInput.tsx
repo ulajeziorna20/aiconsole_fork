@@ -78,9 +78,11 @@ export function CodeInput({
   // as ref on first click/focus event as we can't pass ref to editor's textarea.
 
   const handleEditorBoxClick = useCallback(({ target }: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const isFocused = target === document.activeElement;
+    if (isFocused) return;
+
     if (!textareaRef.current) {
       const textarea = (target as HTMLDivElement).querySelector('textarea');
-
       if (textarea) {
         textareaRef.current = textarea;
         textarea.focus();
@@ -134,7 +136,7 @@ export function CodeInput({
         className={cn(className, 'font-mono text-sm overflow-y-auto bg-black/20 border border-transparent rounded', {
           'border-primary/50 ': focus,
         })}
-        onClick={focus ? undefined : handleEditorBoxClick}
+        onClick={handleEditorBoxClick}
       >
         <Editor
           value={value}
