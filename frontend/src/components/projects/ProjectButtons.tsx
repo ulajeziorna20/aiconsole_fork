@@ -19,6 +19,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '../common/Button';
 import { ConfirmationModal } from '../common/ConfirmationModal';
 import { cn } from '@/utils/common/cn';
+import { Icon } from '../common/icons/Icon';
 
 interface ProjectButtonsProps {
   className?: string;
@@ -60,7 +61,7 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
       </ConfirmationModal>
 
       <Button small onClick={newProject}>
-        Add your first project <Plus />
+        Add your first project <Icon icon={Plus} />
       </Button>
 
       <Button small variant="secondary" onClick={openProject}>

@@ -36,6 +36,7 @@ import { duotoneDark as vs2015 } from 'react-syntax-highlighter/dist/cjs/styles/
 import { Button } from '../../../common/Button';
 import { EditableContentMessage } from './EditableContentMessage';
 import { ToolOutput } from './ToolOutput';
+import { Icon } from '@/components/common/icons/Icon';
 
 interface MessageProps {
   group: AICMessageGroup;
@@ -113,20 +114,22 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
       >
         <div className="flex flex-row gap-2 items-center ">
           <div className="flex-grow flex flex-row gap-3 items-center">
-            {shouldDisplaySpinner && <Loader className="animate-spin h-5 w-5" />}
+            {shouldDisplaySpinner && <Icon icon={Loader} width={20} height={20} className="animate-spin" />}
             {!shouldDisplaySpinner && !isError && tool_call.output === undefined && (
-              <CircleDashedIcon className="h-5 w-5 text-success" />
+              <Icon icon={CircleDashedIcon} width={20} height={20} className="text-success" />
             )}
             {!shouldDisplaySpinner && !isError && tool_call.output !== undefined && (
-              <CheckCircle2Icon className="h-5 w-5 text-success" />
+              <Icon icon={CheckCircle2Icon} width={20} height={20} className="text-success" />
             )}
-            {!shouldDisplaySpinner && isError && <AlertCircleIcon className="h-5 w-5 text-danger" />}
+            {!shouldDisplaySpinner && isError && (
+              <Icon icon={AlertCircleIcon} width={20} height={20} className="text-danger" />
+            )}
 
             <span className="font-semibold"> {tool_call.headline ? tool_call.headline : 'Task'}</span>
           </div>
 
-          {!folded && <ChevronUp className="h-5 w-5" />}
-          {folded && <ChevronDown className="h-5 w-5" />}
+          {!folded && <Icon icon={ChevronUp} width={20} height={20} />}
+          {folded && <Icon icon={ChevronDown} width={20} height={20} />}
         </div>
       </div>
 
@@ -153,13 +156,13 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
               {isViableForRunningCode(tool_call.id) && !tool_call.is_streaming && (
                 <div className="flex gap-4 pt-2 mt-2">
                   <Button variant="status" statusColor="green" small onClick={handleRunClick}>
-                    <Play />
+                    <Icon icon={Play} />
                     Run
                   </Button>
 
                   {!alwaysExecuteCode && (
                     <Button onClick={handleAlwaysRunClick} variant="status" statusColor="purple" small>
-                      <Infinity />
+                      <Icon icon={Infinity} />
                       Always Run
                     </Button>
                   )}

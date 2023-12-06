@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
+import { Icon } from '../common/icons/Icon';
 
 // TODO: implement other features from figma like api for azure, user profile and tutorial
 export const GlobalSettingsModal = () => {
@@ -82,6 +83,7 @@ export const GlobalSettingsModal = () => {
       withCloseButton={false}
       padding={25}
       fullScreen
+      keepMounted={false}
       styles={{
         header: {
           backgroundColor: '#111111',
@@ -93,36 +95,29 @@ export const GlobalSettingsModal = () => {
         },
       }}
     >
-      <div className="flex justify-between items-center px-[5px] pb-[26px] pt-[1px] ">
+      <div className="flex justify-between items-center px-[5px] pb-[26px] pt-[1px] pr-[100px]">
         <img src={`favicon.svg`} className="h-[48px] w-[48px] cursor-pointer filter" />
         <Button variant="secondary" onClick={close} small>
-          <X />
+          <Icon icon={X} />
           Close
         </Button>
       </div>
       <div className="h-[calc(100vh-125px)] max-w-[720px] mx-auto">
         <h3 className="uppercase p-[30px] text-gray-400 text-[14px] leading-[21px] text-center mb-[40px]">Settings</h3>
         <div className="flex flex-col gap-[40px]">
-          {/* <h3 className="text-gray-400 text-[14px] leading-5">User settings</h3>
-        <div>
-          <img
-            src={`${getBaseURL()}/profile/user.jpg` || ''}
-            className="h-11 w-11 rounded-full border cursor-pointer shadow-md border-primary mb-3"
-          />
-        </div> */}
           <h3 className="text-gray-400 text-[14px] leading-5">System settings</h3>
           <div className="flex items-center gap-[30px]">
             <h4 className="text-gray-300 font-semibold text-[16px] leading-[19px]">Always run code</h4>
             <div className="flex items-center gap-[10px]">
               <Button statusColor={isAutoRun ? 'green' : 'base'} variant="status" onClick={() => setIsAutoRun(true)}>
-                <Check /> YES
+                <Icon icon={Check} /> YES
               </Button>
               <Button
                 statusColor={isAutoRun == false ? 'red' : 'base'}
                 variant="status"
                 onClick={() => setIsAutoRun(false)}
               >
-                <Ban /> NO
+                <Icon icon={Ban} /> NO
               </Button>
             </div>
           </div>

@@ -26,6 +26,7 @@ import { useMemo } from 'react';
 import { RadioCheckedIcon } from '@/components/common/icons/RadioCheckedIcon';
 import { noop } from '../common/noop';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
+import { Icon } from '@/components/common/icons/Icon';
 
 export const DISABLED_CSS_CLASSES = 'max-w-[400px] truncate !text-gray-400 pointer-events-none !cursor-default ';
 
@@ -36,10 +37,10 @@ const statusHelper = (status: AssetStatus, editableObject: Asset, editableObject
 
   const assetStatusIcon = (itemStatus: AssetStatus) => {
     if ((editableObject as Asset)?.status === itemStatus) {
-      return <RadioCheckedIcon classNames="w-4 h-4" />;
+      return <Icon icon={RadioCheckedIcon} />;
     }
 
-    return <Circle className="w-4 h-4" />;
+    return <Icon icon={Circle} />;
   };
 
   return {
@@ -117,7 +118,7 @@ export function useEditableObjectContextMenu({
     const content: ContextMenuContent = [
       {
         key: 'Rename',
-        icon: <Edit className="w-4 h-4" />,
+        icon: <Icon icon={Edit} />,
         title: 'Rename',
         hidden: !setIsEditing || (editableObject as Asset)?.defined_in === 'aiconsole',
         onClick: () => {
@@ -129,7 +130,7 @@ export function useEditableObjectContextMenu({
       },
       {
         key: 'Duplicate',
-        icon: <Copy className="w-4 h-4" />,
+        icon: <Icon icon={Copy} />,
         title: 'Duplicate',
         onClick: () => {
           navigate(
@@ -139,7 +140,7 @@ export function useEditableObjectContextMenu({
       },
       {
         key: 'Open',
-        icon: <File className="w-4 h-4" />,
+        icon: <Icon icon={File} />,
         title: 'Open',
         hidden: location.pathname === `/${editableObjectType}s/${editableObject.id}`,
         onClick: () => {
@@ -148,7 +149,7 @@ export function useEditableObjectContextMenu({
       },
       {
         key: 'reveal',
-        icon: <FolderOpenIcon className="w-4 h-4" />,
+        icon: <Icon icon={FolderOpenIcon} />,
         title: `Reveal in ${window.window?.electron?.getFileManagerName()}`,
         hidden: !canOpenFinderForEditable(editableObject),
         onClick: () => {
@@ -160,7 +161,7 @@ export function useEditableObjectContextMenu({
       { key: 'divider-delete', hidden: !hasDelete },
       {
         key: 'Delete',
-        icon: isDeleteRevert ? <Undo2 className="w-4 h-4" /> : <Trash className="w-4 h-4" />,
+        icon: isDeleteRevert ? <Icon icon={Undo2} /> : <Icon icon={Trash} />,
         title: isDeleteRevert ? 'Revert' : 'Delete',
         hidden: !hasDelete,
         onClick: () => handleDelete(editableObject.id),

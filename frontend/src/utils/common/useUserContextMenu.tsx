@@ -18,6 +18,7 @@ import { useOpenSettings } from '@/utils/settings/useOpenSettings';
 import { useContextMenu } from '@/utils/common/useContextMenu';
 import { Settings } from 'lucide-react';
 import { ContextMenuItemOptions } from 'mantine-contextmenu';
+import { Icon } from '@/components/common/icons/Icon';
 
 export function useUserContextMenu() {
   const { showContextMenu, hideContextMenu, isContextMenuVisible } = useContextMenu();
@@ -28,7 +29,7 @@ export function useUserContextMenu() {
       ...content,
       {
         key: 'Settings',
-        icon: <Settings className="w-4 h-4" />,
+        icon: <Icon icon={Settings} />,
         title: 'Settings',
         onClick: () => {
           openSettings();

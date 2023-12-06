@@ -18,6 +18,7 @@ import { useContextMenu } from '@/utils/common/useContextMenu';
 import { XIcon } from 'lucide-react';
 import { ProjectsAPI } from '@/api/api/ProjectsAPI';
 import { localStorageTyped } from '../common/localStorage';
+import { Icon } from '@/components/common/icons/Icon';
 
 const { getItem: checkIfChanged } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -39,7 +40,7 @@ export function useProjectContextMenu() {
     return showContextMenu([
       {
         key: 'Close Project',
-        icon: <XIcon className="w-4 h-4" />,
+        icon: <Icon icon={XIcon} />,
         title: 'Close Project',
         onClick: handleBackToProjects,
       },
