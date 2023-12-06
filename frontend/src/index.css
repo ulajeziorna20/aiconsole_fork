@@ -160,6 +160,14 @@ body {
 }
 
 
+.message-gradient {
+  background: linear-gradient(150deg, #221C2C 2.06%, rgba(27, 24, 32, 0.00) 61.74%);
+}
+
+.guide-bg-shadow {
+  background: linear-gradient(0deg, #111 13.09%, rgba(17, 17, 17, 0.00) 99.9%);
+}
+
 .guide-gradient {
-  background: radial-gradient(265.78% 127.04% at 28.53% -25.58%, #221C2C 0%, #111 100%);
+  background: linear-gradient(122deg, #221C2C 16.45%, #111 67.82%);
 }

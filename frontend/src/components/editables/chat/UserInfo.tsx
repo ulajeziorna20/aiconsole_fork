@@ -60,12 +60,12 @@ export function UserInfo({ agentId, materialsIds, task }: { agentId: string; mat
         onContextMenu={agentId != 'user' ? showContextMenu() : showUserContextMenu()}
       >
         <AgentAvatar
-          agent_id={agentId}
+          agentId={agentId}
           title={`${agent?.name || agentId}${task ? ` tasked with:\n${task}` : ``}`}
           type="small"
         />
         <div
-          className="text-xs font-bold w-32 text-center overflow-ellipsis overflow-hidden whitespace-nowrap"
+          className="text-[15px] w-32 text-center text-gray-300 overflow-ellipsis overflow-hidden whitespace-nowrap"
           title={`${agent?.id} - ${agent?.usage}`}
         >
           {agent?.name || agent?.id}

@@ -102,7 +102,7 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
   };
 
   return (
-    <div className="rounded-md flex flex-col bg-gray-700 flex-grow mr-4 overflow-auto ">
+    <div className="rounded-md flex flex-col bg-gray-700 flex-grow overflow-auto ">
       <div
         className={cn(
           'cursor-pointer rounded-md  rounded-b-md px-[30px] py-[15px] border-2 border-gray-600 hover:text-gray-300 hover:border-gray-500 hover:bg-gray-600 transition-ease duration-100',
