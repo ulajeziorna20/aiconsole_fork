@@ -15,9 +15,11 @@
 // limitations under the License.
 
 import { Icon } from '@/components/common/icons/Icon';
+import { cn } from '@/utils/common/cn';
 import { Trash, Pencil, Check, X } from 'lucide-react';
 interface MessageControlsProps {
   isEditing?: boolean;
+  hideControls?: boolean;
   onSaveClick?: () => void;
   onEditClick?: () => void;
   onRemoveClick?: () => void;
@@ -26,6 +28,7 @@ interface MessageControlsProps {
 
 export function MessageControls({
   isEditing,
+  hideControls,
   onSaveClick,
   onCancelClick,
   onEditClick,
@@ -43,20 +46,26 @@ export function MessageControls({
           </button>
         </>
       ) : (
-        <>
-          {onSaveClick && onEditClick && onCancelClick ? (
-            <button onClick={onEditClick}>
-              <Icon icon={Pencil} className="pointer-events-none" />{' '}
-            </button>
-          ) : (
-            <div className="h-4 w-4"></div>
-          )}
-          {onRemoveClick && (
-            <button onClick={onRemoveClick}>
-              <Icon icon={Trash} />{' '}
-            </button>
-          )}
-        </>
+        <div className="min-w-[48px]">
+          <div
+            className={cn('flex flex-none gap-4 justify-end', {
+              'hidden group-hover:flex': hideControls,
+            })}
+          >
+            {onSaveClick && onEditClick && onCancelClick ? (
+              <button onClick={onEditClick}>
+                <Icon icon={Pencil} className="pointer-events-none" />{' '}
+              </button>
+            ) : (
+              <div className="h-4 w-4"></div>
+            )}
+            {onRemoveClick && (
+              <button onClick={onRemoveClick}>
+                <Icon icon={Trash} />{' '}
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

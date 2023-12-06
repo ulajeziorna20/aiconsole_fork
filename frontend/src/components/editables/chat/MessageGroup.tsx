@@ -23,7 +23,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
   return (
     <div
       className={cn(
-        'flex flex-row shadow-md border-t border-gray-900/50 py-10',
+        'group flex flex-row shadow-md border-t border-gray-900/50 py-10',
         group.role === 'user' ? 'bg-gray-800/20' : 'bg-gray-700/20',
       )}
     >
