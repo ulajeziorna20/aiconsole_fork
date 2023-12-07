@@ -22,12 +22,11 @@ import { MessageComponent } from './messages/MessageComponent';
 export function MessageGroup({ group }: { group: AICMessageGroup }) {
   return (
     <div
-      className={cn(
-        'group flex flex-row shadow-md border-t border-gray-900/50 py-10',
-        group.role === 'user' ? 'bg-gray-800/20' : 'bg-gray-700/20',
-      )}
+      className={cn('group flex flex-row shadow-md border-b border-gray-600 py-[30px] bg-gray-900 ', {
+        'message-gradient': group.role === 'assistant',
+      })}
     >
-      <div className="container flex mx-auto gap-5">
+      <div className="container flex mx-auto gap-[92px] max-w-[1084px]">
         <UserInfo agentId={group.agent_id} materialsIds={group.materials_ids} task={group.task} />
         <div className="flex-grow flex flex-col gap-5  overflow-auto">
           {group.messages.map((message) => (

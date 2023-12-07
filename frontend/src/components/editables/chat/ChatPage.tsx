@@ -24,7 +24,7 @@ import { cn } from '@/utils/common/cn';
 import showNotification from '@/utils/common/showNotification';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
-import { ReplyIcon, SendHorizonalIcon, SquareIcon, ArrowDown } from 'lucide-react';
+import { ReplyIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { useParams, useSearchParams, unstable_useBlocker as useBlocker } from 'react-router-dom';
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
@@ -33,8 +33,10 @@ import { QuestionMarkIcon } from '../../common/icons/QuestionMarkIcon';
 import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
+import { ArrowDown } from 'lucide-react';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
-import { Icon } from '@/components/common/icons/Icon';
+import { SendRotated } from '@/components/common/icons/SendRotated';
+import { SquareFill } from '@/components/common/icons/SquareFill';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -66,7 +68,7 @@ const ScrollToBottomButton = () => {
       )}
       onClick={() => scrollToBottom()}
     >
-      <Icon icon={ArrowDown} />
+      <ArrowDown />
     </button>
   );
 };
@@ -185,7 +187,7 @@ export function ChatPage() {
     if (hasAnyCommandInput) {
       return {
         label: 'Send',
-        icon: SendHorizonalIcon,
+        icon: SendRotated,
         action: async () => {
           await submitCommand(command);
           await newCommand();
@@ -213,7 +215,7 @@ export function ChatPage() {
 
       return {
         label: 'Stop ' + (isAnalysisRunning ? ' analysis' : ' generation'),
-        icon: SquareIcon,
+        icon: SquareFill,
         action: stopWork,
       };
     }
@@ -246,13 +248,7 @@ export function ChatPage() {
                 </div>
               )}
 
-              <div
-                className={cn('absolute  mb-[30px] px-[30px] flex flex-col gap-[10px] items-end bottom-0 right-0 ', {
-                  'w-full': isAnalysisRunning,
-                })}
-              >
-                {isAnalysisRunning ? <GuideMe /> : null}
-              </div>
+              {isAnalysisRunning ? <GuideMe /> : null}
             </ScrollToBottom>
           ) : (
             <div className="h-full overflow-y-auto flex flex-col"></div>

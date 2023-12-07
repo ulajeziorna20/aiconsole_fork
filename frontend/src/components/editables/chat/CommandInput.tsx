@@ -83,23 +83,22 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     <div
       className={cn(
         className,
-        'flex w-full flex-col p-4  bg-gray-800/90 border-t border-white/10 drop-shadow-2xl  z-50',
+        'flex w-full flex-col px-4 pt-[10px] pb-[30px]  bg-gray-900 border-t border-white/10 drop-shadow-2xl z-50 ',
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-end gap-[10px] max-w-[700px] w-full mx-auto">
         <TextareaAutosize
           ref={textAreaRef}
-          className="border-white/20 ring-secondary/30 bg-black flex-grow resize-none overflow-hidden rounded-3xl border px-4 py-2 focus:outline-none focus:ring-2"
+          className="max-h-[200px] overflow-y-auto border border-gray-500 placeholder:text-gray-400 bg-gray-800 text-[15px] text-white flex-grow resize-none overflow-hidden rounded-[8px]  px-[30px] py-[18px] hover:bg-gray-600 hover:placeholder:text-gray-300 focus:bg-gray-600 focus:border-gray-400 focus:outline-none transition duration-100"
           value={command}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder="Type a new command here..."
           rows={1}
-          style={{ boxSizing: 'border-box', transition: 'height 0.2s' }}
         />
         <Tooltip label={actionLabel} position="top-end" offset={10}>
           <div>
-            <Button variant="primary" iconOnly={true} onClick={handleSendMessage} classNames={cn('p-2', {})}>
+            <Button variant="primary" iconOnly={true} onClick={handleSendMessage} classNames={cn('p-[18px]', {})}>
               <Icon icon={ActionIcon} width={24} height={24} className="w-6 h-6" />
             </Button>
           </div>

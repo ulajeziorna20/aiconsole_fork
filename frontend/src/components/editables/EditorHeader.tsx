@@ -31,7 +31,7 @@ export function EditorHeader({
     <div
       onContextMenu={onContextMenu}
       onClick={() => setIsEditing(true)}
-      className="w-full flex-none flex flex-row gap-2 cursor-pointer p-4 border-b border-gray-600 bg-gray-700/20 shadow-md items-center overflow-clip "
+      className="w-full flex-none flex flex-row gap-[10px] cursor-pointer px-[20px] py-[13px] border-b border-gray-600 bg-gray-90 shadow-md items-center overflow-clip "
     >
       <Icon
         className={cn(
@@ -48,7 +48,7 @@ export function EditorHeader({
         setIsEditing={setIsEditing}
         className={'flex-grow truncate ' + (isChanged ? ' italic font-bold ' : '')}
       />
-      <div className="self-end min-w-fit">{children}</div>
+      <div className="self-end text-gray-400 text-[15px] min-w-fit">{children}</div>
     </div>
   );
 }

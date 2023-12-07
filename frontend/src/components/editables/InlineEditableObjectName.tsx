@@ -69,7 +69,7 @@ const InlineEditableObjectName = ({
           onChange={(e) => setInputText(e.target.value)} // Update input text as the user types
         />
       ) : (
-        <p className="leading-[18.2px] truncate">{editableObject.name}</p>
+        <p className="leading-[18.2px] text-white truncate">{editableObject.name}</p>
       )}
     </div>
   );

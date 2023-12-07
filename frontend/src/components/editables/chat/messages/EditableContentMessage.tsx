@@ -72,7 +72,7 @@ export function EditableContentMessage({
   return (
     <div className={cn('flex flex-row items-start overflow-auto', className)}>
       {isEditing ? (
-        <div className="bg-gray-700 rounded-md flex-grow">
+        <div className="bg-gray-700 rounded-md flex-grow ">
           <CodeInput
             className="resize-none border-0 bg-transparent w-full outline-none"
             value={content}
@@ -84,7 +84,7 @@ export function EditableContentMessage({
           />
         </div>
       ) : (
-        <div className="flex-grow overflow-auto">{children}</div>
+        <div className="flex-grow overflow-auto ">{children}</div>
       )}
 
       {!isStreaming && (

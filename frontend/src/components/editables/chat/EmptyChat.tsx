@@ -42,7 +42,7 @@ function EmptyChatAgentAvatar({ agent }: { agent: Agent }) {
           className="inline-block hover:text-secondary cursor-pointer"
           onContextMenu={showContextMenu()}
         >
-          <AgentAvatar agent_id={agent.id} type="large" />
+          <AgentAvatar agentId={agent.id} type="large" />
         </div>
       </Tooltip>
     </div>
