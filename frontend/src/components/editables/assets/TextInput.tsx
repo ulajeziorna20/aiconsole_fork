@@ -16,7 +16,7 @@
 
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { cn } from '@/utils/common/cn';
-import { Tooltip } from '@/components/common/Tooltip';
+import Tooltip from '@/components/common/Tooltip';
 
 const REQUIRED_ERROR_MESSAGE = 'This field is required.';
 
@@ -116,7 +116,7 @@ export function SimpleInput({
         {label}:
       </label>
       {withTooltip ? (
-        <Tooltip label={tootltipText} position="top-end" offset={{ mainAxis: 7 }}>
+        <Tooltip label={tootltipText} position="top" align="end" disableAnimation>
           {core}
         </Tooltip>
       ) : (

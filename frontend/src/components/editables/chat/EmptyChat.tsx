@@ -14,28 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React from 'react';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { Agent, Asset, AssetType } from '@/types/editables/assetTypes';
 import { getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { useProjectContextMenu } from '@/utils/projects/useProjectContextMenu';
-import { Tooltip } from '@mantine/core';
-import React from 'react';
 import { AgentAvatar } from './AgentAvatar';
 import { cn } from '@/utils/common/cn';
+import Tooltip from '@/components/common/Tooltip';
 
 function EmptyChatAgentAvatar({ agent }: { agent: Agent }) {
   const { showContextMenu } = useEditableObjectContextMenu({ editableObjectType: 'agent', editable: agent });
 
   return (
     <div className="inline-block m-2">
-      <Tooltip
-        label={agent.name}
-        position="bottom"
-        transitionProps={{ transition: 'slide-down', duration: 100 }}
-        withArrow
-      >
+      <Tooltip label={agent.name} position="bottom" withArrow>
         <div
           key={agent.id}
           onClick={showContextMenu()}
