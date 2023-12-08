@@ -33,6 +33,7 @@ export default {
       },
       boxShadow: {
         dark: '0px 20px 40px 0px rgba(0, 0, 0, 0.25)',
+        agent: '0px 0px 5px 0px #62ADF2;',
       },
       typography: (theme) => ({
         DEFAULT: {
