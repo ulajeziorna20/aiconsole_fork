@@ -15,11 +15,11 @@
 // limitations under the License.
 
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
-import { Tabs } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { AssetsSidebarTab } from './AssetsSidebarTab';
 import { ChatsSidebarTab } from './ChatsSidebarTab';
 import { ActiveTab, Tab } from './Tab';
+import * as Tabs from '@radix-ui/react-tabs';
 
 const TABS = [
   { label: 'Chats', key: 'chats' },
@@ -41,30 +41,23 @@ const SideBar = ({ initialTab }: { initialTab: string }) => {
     <div
       className={`min-w-[336px] w-[336px] h-full  bg-gray-900 pl-[30px] py-[20px] drop-shadow-md flex flex-col border-r  border-gray-600 `}
     >
-      <Tabs
-        value={activeTab}
-        onChange={setActiveTab}
-        color="#F1FF99"
-        classNames={{
-          list: 'before:border-gray-500',
-        }}
-      >
-        <Tabs.List grow justify="center" className="mb-[15px] mr-[30px]">
+      <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
+        <Tabs.List className="mb-[15px] mr-[30px]">
           {TABS.map(({ label, key }) => (
             <Tab key={key} value={key} label={label} activeTab={activeTab} />
           ))}
         </Tabs.List>
 
-        <Tabs.Panel value="chats">
+        <Tabs.Content value="chats">
           <ChatsSidebarTab />
-        </Tabs.Panel>
-        <Tabs.Panel value="materials">
+        </Tabs.Content>
+        <Tabs.Content value="materials">
           <AssetsSidebarTab assetType="material" assets={materials || []} />
-        </Tabs.Panel>
-        <Tabs.Panel value="agents">
+        </Tabs.Content>
+        <Tabs.Content value="agents">
           <AssetsSidebarTab assetType="agent" assets={agents} />
-        </Tabs.Panel>
-      </Tabs>
+        </Tabs.Content>
+      </Tabs.Root>
     </div>
   );
 };
