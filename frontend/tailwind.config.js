@@ -24,6 +24,14 @@ export default {
           '0%': { opacity: 0 },
           '100%': { opacity: 1 },
         },
+        overlayShow: {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        contentShow: {
+          from: { opacity: 0, transform: 'translate(-50%, -48%) scale(0.96)' },
+          to: { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+        },
         slideDownAndFade: {
           from: { opacity: 0, transform: 'translateY(40px)' },
           to: { opacity: 1, transform: 'translateY(0)' },
@@ -44,6 +52,8 @@ export default {
        animation: {
         'fadeInUp': 'fadeInUp .2s ease-in-out',
         'fadeIn': 'fadeIn .1s ease-in-out',
+        overlayShow: 'overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
+        contentShow: 'contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
         slideDownAndFade: 'slideDownAndFade 200ms cubic-bezier(0.16, 1, 0.3, 1)',
         slideLeftAndFade: 'slideLeftAndFade 200ms cubic-bezier(0.16, 1, 0.3, 1)',
         slideUpAndFade: 'slideUpAndFade 200ms cubic-bezier(0.16, 1, 0.3, 1)',
@@ -55,6 +65,7 @@ export default {
       backgroundImage: {
         'recent-bg': "url('/bg1.png')",
         'top-elipse': "url('/elipse-top.png')",
+        'primary-gradient': 'radial-gradient(circle at 50% -40%, rgba(173,122,255,1) -150%, rgba(26,26,26,1) 60%)'
       },
       boxShadow: {
         dark: '0px 20px 40px 0px rgba(0, 0, 0, 0.25)',
@@ -150,6 +161,7 @@ export default {
         red: '#CF4840',
         orange: '#CFA740',
         blue: '#62ADF2',
+        'primary-gradient': 'radial-gradient(circle at 50% -40%, rgba(173,122,255,1) -150%, rgba(26,26,26,1) 60%)'
       },
     },
   },
