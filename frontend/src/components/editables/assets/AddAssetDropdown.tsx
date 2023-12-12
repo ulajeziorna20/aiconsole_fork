@@ -59,7 +59,6 @@ export const AddAssetDropdown = () => {
 
   const handleClick = (path?: string) => () => {
     if (path) {
-      console.log(path);
       navigate(path);
     }
   };
