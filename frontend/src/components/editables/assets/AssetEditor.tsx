@@ -18,7 +18,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { unstable_useBlocker as useBlocker, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/common/Button';
-import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import { CodeInput } from '@/components/editables/assets/CodeInput';
 import { SimpleInput } from '@/components/editables/assets/TextInput';
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
@@ -43,6 +42,7 @@ import { usePrevious } from '@mantine/hooks';
 import { useAssets } from '@/utils/editables/useAssets';
 import { CheckCheck } from 'lucide-react';
 import { Icon } from '@/components/common/icons/Icon';
+import AlertDialog from '@/components/common/AlertDialog';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -423,14 +423,11 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                 </>
               )}
             </div>
-
-            <ConfirmationModal
-              confirmButtonText="Yes"
-              cancelButtonText="No"
-              opened={blockerState === 'blocked'}
+            <AlertDialog
+              title="Do you want to discard your changes and continue?"
+              isOpen={blockerState === 'blocked'}
               onClose={reset}
               onConfirm={confirmPageEscape}
-              title="Do you want to discard your changes and continue?"
             />
           </div>
         </div>
