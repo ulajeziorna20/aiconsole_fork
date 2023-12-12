@@ -3,7 +3,7 @@ import { cn } from '@/utils/common/cn';
 import { MATERIAL_CONTENT_TYPE_ICONS, getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
 import { Menu } from '@mantine/core';
 import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,46 +12,6 @@ const MaterialNoteIcon = MATERIAL_CONTENT_TYPE_ICONS['static_text'];
 const MaterialDynamicNoteIcon = MATERIAL_CONTENT_TYPE_ICONS['dynamic_text'];
 const MaterialPythonAPIIcon = MATERIAL_CONTENT_TYPE_ICONS['api'];
 const AgentIcon = getEditableObjectIcon('agent');
-
-const DROPDOWN_ITEMS = [
-  {
-    key: 'chat',
-    icon: <Icon icon={ChatIcon} className="w-6 h-6 !text-chat" />,
-    title: 'New chat',
-    path: `/chats/${uuidv4()}`,
-    withDivider: true,
-  },
-  {
-    key: 'agent',
-    icon: <Icon icon={AgentIcon} className="w-6 h-6 !text-agent" />,
-    title: 'New agent',
-    path: `/agents/new`,
-    withDivider: true,
-  },
-  {
-    key: 'materials',
-    title: 'Materials:',
-    disabled: true,
-  },
-  {
-    key: 'note',
-    icon: <Icon icon={MaterialNoteIcon} className="w-6 h-6 !text-material" />,
-    title: 'New note',
-    path: `/materials/new?type=static_text`,
-  },
-  {
-    key: 'dynamic_note',
-    icon: <Icon icon={MaterialDynamicNoteIcon} className="w-6 h-6 !text-material" />,
-    title: 'New dynamic note',
-    path: `/materials/new?type=dynamic_text`,
-  },
-  {
-    key: 'python_api',
-    icon: <Icon icon={MaterialPythonAPIIcon} className="w-6 h-6 !text-material" />,
-    title: 'New python API',
-    path: `/materials/new?type=api`,
-  },
-];
 
 export const AddAssetDropdown = () => {
   const [opened, setOpened] = useState(false);
@@ -62,6 +22,51 @@ export const AddAssetDropdown = () => {
       navigate(path);
     }
   };
+
+  const uuid = uuidv4();
+
+  const dropdownItems = useMemo(
+    () => [
+      {
+        key: 'chat',
+        icon: <Icon icon={ChatIcon} className="w-6 h-6 !text-chat" />,
+        title: 'New chat',
+        path: `/chats/${uuid}`,
+        withDivider: true,
+      },
+      {
+        key: 'agent',
+        icon: <Icon icon={AgentIcon} className="w-6 h-6 !text-agent" />,
+        title: 'New agent',
+        path: `/agents/new`,
+        withDivider: true,
+      },
+      {
+        key: 'materials',
+        title: 'Materials:',
+        disabled: true,
+      },
+      {
+        key: 'note',
+        icon: <Icon icon={MaterialNoteIcon} className="w-6 h-6 !text-material" />,
+        title: 'New note',
+        path: `/materials/new?type=static_text`,
+      },
+      {
+        key: 'dynamic_note',
+        icon: <Icon icon={MaterialDynamicNoteIcon} className="w-6 h-6 !text-material" />,
+        title: 'New dynamic note',
+        path: `/materials/new?type=dynamic_text`,
+      },
+      {
+        key: 'python_api',
+        icon: <Icon icon={MaterialPythonAPIIcon} className="w-6 h-6 !text-material" />,
+        title: 'New python API',
+        path: `/materials/new?type=api`,
+      },
+    ],
+    [uuid],
+  );
 
   return (
     <Menu
@@ -96,7 +101,7 @@ export const AddAssetDropdown = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {DROPDOWN_ITEMS.map(({ icon, title, path, key, disabled, withDivider }) => (
+        {dropdownItems.map(({ icon, title, path, key, disabled, withDivider }) => (
           <Menu.Item
             key={key}
             onClick={handleClick(path)}
