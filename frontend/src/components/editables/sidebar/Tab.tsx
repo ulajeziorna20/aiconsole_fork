@@ -1,26 +1,25 @@
 import { TabsValues } from '@/types/editables/assetTypes';
 import { cn } from '@/utils/common/cn';
-import { Tabs, TabsTabProps } from '@mantine/core';
+import * as Tabs from '@radix-ui/react-tabs';
 
-export type ActiveTab = TabsValues | string | null;
+export type ActiveTab = TabsValues | string;
 
-interface TabProps extends TabsTabProps {
+interface TabProps extends Tabs.TabsTriggerProps {
   value: string;
   activeTab: ActiveTab;
   label: string;
 }
 
 export const Tab = ({ value, activeTab, label }: TabProps) => (
-  <Tabs.Tab
+  <Tabs.Trigger
     value={value}
     className={cn(
-      'px-[26px] pt-[10px] pb-[25px] [&:first-letter:] tab-hover font-medium text-[14px] w-1/3 hover:bg-transparent overflow-hidden',
+      'pt-[10px] relative pb-[25px] [&:first-letter:] tab-hover font-medium text-[14px] w-1/3 hover:bg-transparent overflow-hidden border-b border-gray-500 after:content-[""] after:opacity-20 after:left-[50%] after:translate-x-[-50%] after:w-[35px] after:h-[30px] after:absolute after:bottom-[-8px] after:z-[99]  after:bg-yellow after:hidden',
       {
-        'text-white after:blur-[15px] after:opacity-20 after:w-[40px] after:h-[30px] after:absolute after:bottom-[-8px] after:z-[99] after:bg-yellow':
-          activeTab === value,
+        'text-white after:blur-[15px] border-yellow after:block': activeTab === value,
       },
     )}
   >
     {label}
-  </Tabs.Tab>
+  </Tabs.Trigger>
 );
