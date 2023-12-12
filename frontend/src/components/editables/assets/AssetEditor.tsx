@@ -30,7 +30,6 @@ import {
   MaterialContentType,
   RenderedMaterial,
 } from '@/types/editables/assetTypes';
-import showNotification from '@/utils/common/showNotification';
 import { convertNameToId } from '@/utils/editables/convertNameToId';
 import { MaterialContentNames, getMaterialContentName } from '@/utils/editables/getMaterialContentName';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
@@ -43,6 +42,7 @@ import { usePrevious } from '@mantine/hooks';
 import { useAssets } from '@/utils/editables/useAssets';
 import { CheckCheck } from 'lucide-react';
 import { Icon } from '@/components/common/icons/Icon';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -123,6 +123,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
+  const showToast = useToastsStore((state) => state.showToast);
   const [preview, setPreview] = useState<RenderedMaterial | undefined>(undefined);
   const [typeName, setTypeName] = useState<MaterialContentNames>('Material');
   const [showPreview, setShowPreview] = useState(false);
@@ -201,14 +202,14 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
       await updateStatusIfNecessary();
 
-      showNotification({
+      showToast({
         title: 'Saved',
         message: 'saved',
         variant: 'success',
       });
     } else if (lastSavedAsset && lastSavedAsset.id !== asset.id) {
       await renameAsset(lastSavedAsset.id, asset);
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',
@@ -217,7 +218,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       if (isAssetChanged) {
         await EditablesAPI.updateEditableObject(assetType, asset);
 
-        showNotification({
+        showToast({
           title: 'Saved',
           message: 'saved',
           variant: 'success',
@@ -239,7 +240,16 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       setSelectedAsset(newAsset);
       useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
     }
-  }, [asset, assetType, isAssetChanged, lastSavedAsset, setSelectedAsset, updateStatusIfNecessary, renameAsset]);
+  }, [
+    asset,
+    assetType,
+    isAssetChanged,
+    lastSavedAsset,
+    setSelectedAsset,
+    updateStatusIfNecessary,
+    renameAsset,
+    showToast,
+  ]);
 
   const handleDiscardChanges = () => {
     //set last selected asset to the same as selected asset

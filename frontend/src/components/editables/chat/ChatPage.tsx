@@ -21,7 +21,6 @@ import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { Chat } from '@/types/editables/chatTypes';
 import { cn } from '@/utils/common/cn';
-import showNotification from '@/utils/common/showNotification';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { ReplyIcon } from 'lucide-react';
@@ -37,6 +36,7 @@ import { ArrowDown } from 'lucide-react';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import { SendRotated } from '@/components/common/icons/SendRotated';
 import { SquareFill } from '@/components/common/icons/SquareFill';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -93,6 +93,7 @@ export function ChatPage() {
   const isProjectOpen = useProjectStore((state) => state.isProjectOpen);
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const appendFilePathToCommand = useChatStore((state) => state.appendFilePathToCommand);
+  const showToast = useToastsStore((state) => state.showToast);
   const { showContextMenu } = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
   const { setChat, renameChat } = useChat();
 
@@ -172,7 +173,7 @@ export function ChatPage() {
 
       await renameChat(newChat);
 
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',

@@ -20,12 +20,12 @@ import { ErrorEvent } from 'reconnecting-websocket/events';
 import { useChatStore } from '../../store/editables/chat/useChatStore';
 import { OutgoingWSMessage } from './outgoingMessages';
 import { IncomingWSMessage } from './incomingMessages';
-import showNotification from '@/utils/common/showNotification';
 import { useAPIStore } from '../../store/useAPIStore';
 import { useSettingsStore } from '../../store/settings/useSettingsStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { handleChatMessage } from './chat/handleChatMessage';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 export type WebSockeStore = {
   ws: ReconnectingWebSocket | null;
@@ -47,6 +47,7 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
 
     const getBaseHostWithPort = useAPIStore.getState().getBaseHostWithPort;
     const ws = new ReconnectingWebSocket(`ws://${getBaseHostWithPort()}/ws`);
+    const showToast = useToastsStore.getState().showToast;
 
     ws.onopen = () => {
       set({ ws });
@@ -65,14 +66,14 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
       switch (data.type) {
         case 'ErrorWSMessage':
           console.error(data.error);
-          showNotification({
+          showToast({
             title: 'Error',
             message: data.error,
             variant: 'error',
           });
           break;
         case 'NotificationWSMessage':
-          showNotification({
+          showToast({
             title: data.title,
             message: data.message,
           });
@@ -108,7 +109,7 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
           if (data.asset_type === 'agent') {
             useEditablesStore.getState().initAgents();
             if (!data.initial) {
-              showNotification({
+              showToast({
                 title: 'Agents updated',
                 message: `Loaded ${data.count} agents.`,
               });
@@ -118,7 +119,7 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
           if (data.asset_type === 'material') {
             useEditablesStore.getState().initMaterials();
             if (!data.initial) {
-              showNotification({
+              showToast({
                 title: 'Materials updated',
                 message: `Loaded ${data.count} materials.`,
               });
@@ -131,7 +132,7 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
           useEditablesStore.getState().initMaterials();
           useEditablesStore.getState().initAgents();
           if (!data.initial) {
-            showNotification({
+            showToast({
               title: 'Settings updated',
               message: `Loaded new settings.`,
             });

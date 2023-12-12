@@ -3,11 +3,12 @@ import { useMemo } from 'react';
 import { EditablesAPI } from '@/api/api/EditablesAPI';
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import { Asset, EditableObjectType } from '@/types/editables/assetTypes';
-import { showNotification } from '@mantine/notifications';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 export const useAssets = (assetType: EditableObjectType) => {
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
+  const showToast = useToastsStore((state) => state.showToast);
 
   const isAssetStatusChanged = useMemo(() => {
     if (!asset || !lastSavedAsset) {
@@ -21,7 +22,7 @@ export const useAssets = (assetType: EditableObjectType) => {
     if (isAssetStatusChanged && asset) {
       await EditablesAPI.setAssetStatus(assetType, asset.id, asset.status);
 
-      showNotification({
+      showToast({
         title: 'Status changed',
         message: `Status changed to ${asset.status}`,
         variant: 'success',

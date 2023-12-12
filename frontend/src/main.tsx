@@ -31,6 +31,7 @@ import { initStore } from './store/initStore.ts';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { Router } from './components/Router.tsx';
+import { ToastProvider } from './components/common/Toast.tsx';
 
 Sentry.init(
   {
@@ -44,7 +45,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <MantineProvider>
       <Notifications position="top-right" />
       <ContextMenuProvider>
-        <Router />
+        <ToastProvider>
+          <Router />
+        </ToastProvider>
       </ContextMenuProvider>
     </MantineProvider>
   </React.StrictMode>,
