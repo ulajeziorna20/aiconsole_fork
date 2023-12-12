@@ -13,7 +13,7 @@ const MaterialDynamicNoteIcon = MATERIAL_CONTENT_TYPE_ICONS['dynamic_text'];
 const MaterialPythonAPIIcon = MATERIAL_CONTENT_TYPE_ICONS['api'];
 const AgentIcon = getEditableObjectIcon('agent');
 
-const DROPDOWN_ITEMS = [
+const getDropdownItems = () => [
   {
     key: 'chat',
     icon: <Icon icon={ChatIcon} className="w-6 h-6 !text-chat" />,
@@ -59,9 +59,12 @@ export const AddAssetDropdown = () => {
 
   const handleClick = (path?: string) => () => {
     if (path) {
+      console.log(path);
       navigate(path);
     }
   };
+
+  const dropdownItems = getDropdownItems();
 
   return (
     <Menu
@@ -96,7 +99,7 @@ export const AddAssetDropdown = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {DROPDOWN_ITEMS.map(({ icon, title, path, key, disabled, withDivider }) => (
+        {dropdownItems.map(({ icon, title, path, key, disabled, withDivider }) => (
           <Menu.Item
             key={key}
             onClick={handleClick(path)}
