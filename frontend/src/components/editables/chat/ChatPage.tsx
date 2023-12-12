@@ -34,9 +34,9 @@ import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
 import { ArrowDown } from 'lucide-react';
-import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import { SendRotated } from '@/components/common/icons/SendRotated';
 import { SquareFill } from '@/components/common/icons/SquareFill';
+import AlertDialog from '@/components/common/AlertDialog';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -260,17 +260,14 @@ export function ChatPage() {
             actionLabel={actionButtonLabel}
             onSubmit={actionButtonAction}
           />
-
-          <ConfirmationModal
-            confirmButtonText="Yes"
-            cancelButtonText="No"
-            opened={blockerState === 'blocked'}
-            onClose={reset}
-            onConfirm={proceed || null}
+          <AlertDialog
             title="Are you sure you want to exit this chat?"
+            isOpen={blockerState === 'blocked'}
+            onClose={reset}
+            onConfirm={proceed}
           >
             {`The response is being generated.\nClosing the window cancels the process.`}
-          </ConfirmationModal>
+          </AlertDialog>
         </div>
       </div>
     </div>

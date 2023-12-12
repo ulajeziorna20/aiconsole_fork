@@ -44,6 +44,7 @@ interface ButtonProps {
   active?: boolean;
   classNames?: string;
   dataAutofocus?: boolean;
+  autoFocus?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   onMouseEnter?: MouseEventHandler<HTMLButtonElement>;
   onMouseLeave?: MouseEventHandler<HTMLButtonElement>;
@@ -64,6 +65,7 @@ export function Button({
   bold,
   active,
   classNames,
+  autoFocus,
   dataAutofocus,
   onContextMenu,
 }: ButtonProps) {
@@ -85,6 +87,7 @@ export function Button({
   };
   return (
     <button
+      autoFocus={autoFocus}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
