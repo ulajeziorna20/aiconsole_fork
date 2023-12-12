@@ -84,7 +84,6 @@ export const EmptyChat = () => {
   const activeSystemAgents = agents.filter((agent) => agent.status !== 'disabled' && agent.id !== 'user');
   const hasForcedMaterials = forcedMaterials.length > 0;
   const hasAiChoiceMaterials = aiChoiceMaterials.length > 0;
-
   return (
     <section className="flex flex-col items-center justify-center container mx-auto px-6 py-[80px] select-none">
       <img src="chat-page-glow.png" alt="glow" className="absolute top-[40px] -z-[1]" />
@@ -96,24 +95,30 @@ export const EmptyChat = () => {
       >
         {projectName}
       </h2>
-      <p className="mb-4 text-center text-[14px] text-gray-400">Agents in the project:</p>
-      <div className="flex items-center justify-center mb-8 ">
-        <SliderArrowLeft className="swiper-left text-gray-400 cursor-pointer" />
-        <Swiper
-          modules={[Navigation]}
-          navigation={{ nextEl: '.swiper-right', prevEl: '.swiper-left' }}
-          spaceBetween={0}
-          slidesPerView={MAX_ASSETS_TO_DISPLAY}
-          className="max-w-[700px]"
-        >
-          {activeSystemAgents.map((agent) => (
-            <SwiperSlide className="width-[110px]" key={agent.id}>
-              <EmptyChatAgentAvatar key={agent.id} agent={agent} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-        <SliderArrowRight className="swiper-right text-gray-400 cursor-pointer" />
-      </div>
+      {activeSystemAgents.length > 0 ? (
+        <>
+          <p className="mb-4 text-center text-[14px] text-gray-400">Agents in the project:</p>
+          <div className="flex items-center justify-center mb-8 w-full max-w-[700px] mx-auto">
+            <SliderArrowLeft className="swiper-left text-gray-400 cursor-pointer" />
+            <Swiper
+              modules={[Navigation]}
+              navigation={{ nextEl: '.swiper-right', prevEl: '.swiper-left' }}
+              spaceBetween={0}
+              centerInsufficientSlides
+              slidesPerView={MAX_ASSETS_TO_DISPLAY}
+              className="w-full"
+            >
+              {activeSystemAgents.map((agent) => (
+                <SwiperSlide className="width-[110px]" key={agent.id}>
+                  <EmptyChatAgentAvatar agent={agent} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            <SliderArrowRight className="swiper-right text-gray-400 cursor-pointer" />
+          </div>
+        </>
+      ) : null}
+
       <div className="max-w-[700px]">
         <p className="mb-4 text-center text-[14px] text-gray-400">Custom materials in the project:</p>
         {hasForcedMaterials && (

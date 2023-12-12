@@ -61,7 +61,7 @@ export const AddAssetDropdown = () => {
       {
         key: 'python_api',
         icon: <Icon icon={MaterialPythonAPIIcon} className="w-6 h-6 !text-material" />,
-        title: 'New python API',
+        title: 'New Python API',
         path: `/materials/new?type=api`,
       },
     ],
