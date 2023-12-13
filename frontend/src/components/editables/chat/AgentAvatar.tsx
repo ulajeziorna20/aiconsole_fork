@@ -20,7 +20,7 @@ export function AgentAvatar({ agentId, title, type, className }: AgentAvatarProp
       className={cn(className, 'rounded-full mb-[10px]  border shadow-md border-slate-800', {
         'w-20 h-20 ': type === 'large',
         'w-16 h-16': type === 'small',
-        'border-2 border-primary': agent?.status === 'forced',
+        'border border-agent shadow-agent': agent?.status === 'forced',
       })}
     />
   );

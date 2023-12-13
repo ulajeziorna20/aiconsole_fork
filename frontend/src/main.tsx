@@ -16,21 +16,11 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import * as Sentry from '@sentry/electron/renderer';
-import { init as reactInit } from '@sentry/react';
-
-import './index.css';
-
 import { initStore } from './store/initStore.ts';
 import { Router } from './components/Router.tsx';
 import { ToastProvider } from './components/common/Toast.tsx';
 
-Sentry.init(
-  {
-    dsn: import.meta.env.VITE_SENTRY_DSN || '',
-  },
-  reactInit,
-);
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
