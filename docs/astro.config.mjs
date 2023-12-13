@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://10clouds.github.io',
-	base: '/aiconsole-docs',
+	base: '/aiconsole',
 	integrations: [
 		starlight({
 			title: 'AIConsole Documentation',
