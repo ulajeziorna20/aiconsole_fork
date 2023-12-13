@@ -17,39 +17,75 @@
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import { Asset, AssetStatus, AssetType, EditableObject, EditableObjectType } from '@/types/editables/assetTypes';
 import { Circle, Copy, Edit, File, FolderOpenIcon, Trash, Undo2 } from 'lucide-react';
-import { ContextMenuContent } from 'mantine-contextmenu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { useContextMenu } from '../common/useContextMenu';
 import { useDeleteEditableObjectWithUserInteraction } from './useDeleteEditableObjectWithUserInteraction';
 import { useMemo } from 'react';
 import { RadioCheckedIcon } from '@/components/common/icons/RadioCheckedIcon';
 import { noop } from '../common/noop';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
-import { Icon } from '@/components/common/icons/Icon';
+import { ContextMenuItem, ContextMenuItems } from '@/types/common/contextMenu';
 
 export const DISABLED_CSS_CLASSES = 'max-w-[400px] truncate !text-gray-400 pointer-events-none !cursor-default ';
 
-const statusHelper = (status: AssetStatus, editableObject: Asset, editableObjectType: AssetType) => {
+const statusHelper = (
+  status: AssetStatus,
+  editableObject: Asset,
+  editableObjectType: AssetType,
+): Omit<ContextMenuItem, 'type' | 'title'> => {
   const handleClick = (status: AssetStatus) => () => {
     useAssetStore.getState().setAssetStatus(editableObjectType, editableObject.id, status);
   };
 
   const assetStatusIcon = (itemStatus: AssetStatus) => {
     if ((editableObject as Asset)?.status === itemStatus) {
-      return <Icon icon={RadioCheckedIcon} />;
+      return RadioCheckedIcon;
     }
 
-    return <Icon icon={Circle} />;
+    return Circle;
   };
 
+  const activeItemClass = editableObject.status === status ? 'text-white' : 'text-gray-400';
+
   return {
-    className: editableObject.status === status ? DISABLED_CSS_CLASSES : '!text-white',
+    className: activeItemClass,
+    iconClassName: activeItemClass,
     disabled: editableObject.status === status,
     icon: assetStatusIcon(status),
     hidden: !editableObject,
-    onClick: editableObject.status === status ? noop : handleClick(status),
+    action: editableObject.status === status ? noop : handleClick(status),
   };
+};
+
+const assetItems = (editableObjectType: EditableObjectType, editableObject: EditableObject): ContextMenuItems => {
+  if (editableObjectType === 'chat') return [];
+  const asset = editableObject as Asset;
+
+  return [
+    { type: 'separator', key: 'usage-separator' },
+    {
+      type: 'label',
+      title: 'Usage',
+    },
+
+    {
+      type: 'item',
+      title: 'Enforced',
+      ...statusHelper('forced', asset, editableObjectType),
+    },
+
+    {
+      type: 'item',
+      title: 'AI Choice',
+      ...statusHelper('enabled', asset, editableObjectType),
+    },
+
+    {
+      type: 'item',
+      title: 'Disabled',
+      ...statusHelper('disabled', asset, editableObjectType),
+    },
+  ];
 };
 
 export function useEditableObjectContextMenu({
@@ -61,7 +97,12 @@ export function useEditableObjectContextMenu({
   editable?: EditableObject;
   setIsEditing?: (isEditing: boolean) => void;
 }) {
-  const { showContextMenu, hideContextMenu, isContextMenuVisible } = useContextMenu();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const handleDelete = useDeleteEditableObjectWithUserInteraction(editableObjectType);
+  const canOpenFinderForEditable = useEditablesStore((state) => state.canOpenFinderForEditable);
+  const openFinderForEditable = useEditablesStore((state) => state.openFinderForEditable);
+
   const hasDelete = useMemo(
     () => (editableObjectType === 'chat' ? true : (editableObject as Asset)?.defined_in === 'project'),
     [editableObject, editableObjectType],
@@ -70,58 +111,19 @@ export function useEditableObjectContextMenu({
     () => (editableObjectType === 'chat' ? false : (editableObject as Asset)?.override),
     [editableObject, editableObjectType],
   );
-  const navigate = useNavigate();
-  const location = useLocation();
-  const handleDelete = useDeleteEditableObjectWithUserInteraction(editableObjectType);
-  const canOpenFinderForEditable = useEditablesStore((state) => state.canOpenFinderForEditable);
-  const openFinderForEditable = useEditablesStore((state) => state.openFinderForEditable);
 
-  function showContextMenuReplacement() {
+  function getMenuItems() {
     if (!editableObject) {
-      return noop;
+      return [];
     }
 
-    const assetItems = () => {
-      if (editableObjectType === 'chat') return [];
-      const asset = editableObject as Asset;
-
-      return [
-        { key: 'divider' },
-        {
-          key: 'usage',
-          title: 'Usage',
-          className: DISABLED_CSS_CLASSES,
-          disabled: true,
-          onClick: noop,
-        },
-
-        {
-          key: 'enforced',
-          title: 'Enforced',
-          ...statusHelper('forced', asset, editableObjectType),
-        },
-
-        {
-          key: 'ai choice',
-          title: 'AI Choice',
-          ...statusHelper('enabled', asset, editableObjectType),
-        },
-
-        {
-          key: 'Disabled',
-          title: 'Disabled',
-          ...statusHelper('disabled', asset, editableObjectType),
-        },
-      ];
-    };
-
-    const content: ContextMenuContent = [
+    const content: ContextMenuItems = [
       {
-        key: 'Rename',
-        icon: <Icon icon={Edit} />,
+        type: 'item',
+        icon: Edit,
         title: 'Rename',
         hidden: !setIsEditing || (editableObject as Asset)?.defined_in === 'aiconsole',
-        onClick: () => {
+        action: () => {
           if (!setIsEditing) {
             return;
           }
@@ -129,47 +131,49 @@ export function useEditableObjectContextMenu({
         },
       },
       {
-        key: 'Duplicate',
-        icon: <Icon icon={Copy} />,
+        type: 'item',
+        icon: Copy,
         title: 'Duplicate',
-        onClick: () => {
+        action: () => {
           navigate(
             `/${editableObjectType}s/${editableObjectType === 'chat' ? uuidv4() : 'new'}?copy=${editableObject.id}`,
           );
         },
       },
       {
-        key: 'Open',
-        icon: <Icon icon={File} />,
+        type: 'item',
+        icon: File,
         title: 'Open',
         hidden: location.pathname === `/${editableObjectType}s/${editableObject.id}`,
-        onClick: () => {
+        action: () => {
           navigate(`/${editableObjectType}s/${editableObject.id}`);
         },
       },
       {
-        key: 'reveal',
-        icon: <Icon icon={FolderOpenIcon} />,
+        type: 'item',
+        icon: FolderOpenIcon,
         title: `Reveal in ${window.window?.electron?.getFileManagerName()}`,
         hidden: !canOpenFinderForEditable(editableObject),
-        onClick: () => {
+        action: () => {
           openFinderForEditable(editableObject);
         },
       },
 
-      ...assetItems(),
-      { key: 'divider-delete', hidden: !hasDelete },
+      ...assetItems(editableObjectType, editableObject),
+      { type: 'separator', key: 'delete-separator', hidden: !hasDelete },
       {
-        key: 'Delete',
-        icon: isDeleteRevert ? <Icon icon={Undo2} /> : <Icon icon={Trash} />,
+        type: 'item',
+        icon: isDeleteRevert ? Undo2 : Trash,
         title: isDeleteRevert ? 'Revert' : 'Delete',
         hidden: !hasDelete,
-        onClick: () => handleDelete(editableObject.id),
+        action: () => handleDelete(editableObject.id),
       },
     ];
 
-    return showContextMenu(content);
+    return content;
   }
 
-  return { showContextMenu: showContextMenuReplacement, hideContextMenu, isContextMenuVisible };
+  const menuItems = getMenuItems();
+
+  return menuItems;
 }
