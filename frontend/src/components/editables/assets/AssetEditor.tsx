@@ -42,6 +42,7 @@ import { usePrevious } from '@mantine/hooks';
 import { useAssets } from '@/utils/editables/useAssets';
 import { CheckCheck } from 'lucide-react';
 import { Icon } from '@/components/common/icons/Icon';
+import { ContextMenu } from '../../common/ContextMenu';
 import AlertDialog from '@/components/common/AlertDialog';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
@@ -134,7 +135,10 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const [newPath, setNewPath] = useState<string>('');
   const isNew = id === 'new';
   const { updateStatusIfNecessary, isAssetStatusChanged, renameAsset } = useAssets(assetType);
-
+  const menuItems = useEditableObjectContextMenu({
+    editable: asset,
+    editableObjectType: assetType,
+  });
   const wasAssetChangedInitially = !isPrevAssetChanged && isAssetChanged;
   const wasAssetUpdate = isPrevAssetChanged && !isAssetChanged;
 
@@ -318,8 +322,6 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     setSelectedAsset({ ...asset, name: newName, id: convertNameToId(newName) });
   };
 
-  const { showContextMenu } = useEditableObjectContextMenu({ editable: asset, editableObjectType: assetType });
-
   const getSubmitButtonLabel = (): SubmitButtonLabels => {
     if (lastSavedAsset === undefined) {
       return hasCore ? SubmitButtonLabels.Overwrite : SubmitButtonLabels.Create;
@@ -351,14 +353,12 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
   return (
     <div className="flex flex-col w-full h-full max-h-full overflow-auto">
-      <EditorHeader
-        editable={asset}
-        onRename={handleRename}
-        isChanged={isAssetChanged}
-        onContextMenu={showContextMenu}
-      >
-        (Defined in {asset?.defined_in})
-      </EditorHeader>
+      <ContextMenu options={menuItems}>
+        <EditorHeader editable={asset} onRename={handleRename} isChanged={isAssetChanged}>
+          (Defined in {asset?.defined_in})
+        </EditorHeader>
+      </ContextMenu>
+
       <div className="flex-grow overflow-auto">
         <div className="flex w-full h-full flex-col justify-between downlight">
           <div className="w-full h-full overflow-auto">

@@ -1,8 +1,9 @@
 import { LucideIcon, LucideProps } from 'lucide-react';
 
+export type IconElement = LucideIcon | ((props: React.SVGProps<SVGSVGElement>) => JSX.Element);
 interface IconProps extends LucideProps {
   className?: string;
-  icon: LucideIcon | ((props: React.SVGProps<SVGSVGElement>) => JSX.Element);
+  icon: IconElement;
 }
 
 export const Icon = ({
