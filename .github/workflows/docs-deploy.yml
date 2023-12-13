@@ -23,6 +23,7 @@ jobs:
         uses: withastro/action@v1
         with:
           path: ./docs
+          package-manager: yarn@latest
   deploy:
     needs: build
     runs-on: ubuntu-latest
