@@ -21,7 +21,6 @@ import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { Chat } from '@/types/editables/chatTypes';
 import { cn } from '@/utils/common/cn';
-import showNotification from '@/utils/common/showNotification';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { ReplyIcon } from 'lucide-react';
@@ -36,6 +35,7 @@ import { GuideMe } from './GuideMe';
 import { ArrowDown } from 'lucide-react';
 import { SendRotated } from '@/components/common/icons/SendRotated';
 import { SquareFill } from '@/components/common/icons/SquareFill';
+import { useToastsStore } from '@/store/common/useToastsStore';
 import { ContextMenu } from '@/components/common/ContextMenu';
 import AlertDialog from '@/components/common/AlertDialog';
 
@@ -94,6 +94,7 @@ export function ChatPage() {
   const isProjectOpen = useProjectStore((state) => state.isProjectOpen);
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const appendFilePathToCommand = useChatStore((state) => state.appendFilePathToCommand);
+  const showToast = useToastsStore((state) => state.showToast);
   const menuItems = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
   const { setChat, renameChat } = useChat();
 
@@ -173,7 +174,7 @@ export function ChatPage() {
 
       await renameChat(newChat);
 
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',

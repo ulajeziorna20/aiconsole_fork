@@ -26,8 +26,8 @@ import { MoreVertical } from 'lucide-react';
 import { useAssets } from '@/utils/editables/useAssets';
 import { convertNameToId } from '@/utils/editables/convertNameToId';
 import { useChat } from '@/utils/editables/useChat';
-import showNotification from '@/utils/common/showNotification';
 import { Icon } from '@/components/common/icons/Icon';
+import { useToastsStore } from '@/store/common/useToastsStore';
 import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
 
 const SideBarItem = ({
@@ -43,6 +43,8 @@ const SideBarItem = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isShowingContext, setIsShowingContext] = useState(false);
   const [blockBlur, setBlockBlur] = useState(false);
+
+  const showToast = useToastsStore((state) => state.showToast);
 
   const { renameAsset } = useAssets(editableObjectType);
   const menuItems = useEditableObjectContextMenu({
@@ -102,7 +104,7 @@ const SideBarItem = ({
           navigate(`/${editableObjectType}s/${newId}`);
         }
       }
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',

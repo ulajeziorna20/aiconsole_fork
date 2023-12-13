@@ -18,11 +18,13 @@ import { useState } from 'react';
 
 import { Button } from '../common/Button';
 import { useApiKey } from '@/utils/settings/useApiKey';
-import showNotification from '@/utils/common/showNotification';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 const OpenAiApiKeyForm = () => {
   const [inputText, setInputText] = useState('');
   const { validating, setApiKey, saveOpenAiApiKey } = useApiKey();
+
+  const showToast = useToastsStore((state) => state.showToast);
 
   const onFormSubmit = async () => {
     const successfulySet = await setApiKey(inputText);
@@ -30,7 +32,7 @@ const OpenAiApiKeyForm = () => {
     if (successfulySet) {
       setInputText('');
       saveOpenAiApiKey(inputText);
-      showNotification({
+      showToast({
         title: 'Success',
         message: 'Open AI API key was successfully set.',
         variant: 'success',

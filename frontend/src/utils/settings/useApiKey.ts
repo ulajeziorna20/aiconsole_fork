@@ -16,13 +16,14 @@
 
 import { useSettingsStore } from '@/store/settings/useSettingsStore';
 import { useState } from 'react';
-import showNotification from '../common/showNotification';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 export const useApiKey = () => {
   const [validating, setValidating] = useState(false);
   const isApiKeyValid = useSettingsStore((state) => state.isApiKeyValid);
   const validateApiKey = useSettingsStore((state) => state.validateApiKey);
   const saveOpenAiApiKey = useSettingsStore((state) => state.saveOpenAiApiKey);
+  const showToast = useToastsStore((state) => state.showToast);
 
   const setApiKey = async (key: string) => {
     if (validating) return false;
@@ -43,7 +44,7 @@ export const useApiKey = () => {
   };
 
   const showApiError = () => {
-    showNotification({
+    showToast({
       title: 'Error',
       message: 'Invalid Open AI API key. Make sure that your API key has access to GPT-4',
       variant: 'error',
