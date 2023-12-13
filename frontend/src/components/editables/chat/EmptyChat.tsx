@@ -14,6 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useRef, MouseEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { Agent, Asset, AssetType } from '@/types/editables/assetTypes';
@@ -22,53 +25,51 @@ import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuFo
 import { useProjectContextMenu } from '@/utils/projects/useProjectContextMenu';
 import { AgentAvatar } from './AgentAvatar';
 import { cn } from '@/utils/common/cn';
+import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
+import { SliderArrowLeft } from '@/components/common/icons/SliderArrowLeft';
+import { SliderArrowRight } from '@/components/common/icons/SliderArrowRight';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-import { SliderArrowLeft } from '@/components/common/icons/SliderArrowLeft';
-import { SliderArrowRight } from '@/components/common/icons/SliderArrowRight';
-import { useNavigate } from 'react-router-dom';
-
 function EmptyChatAgentAvatar({ agent }: { agent: Agent }) {
-  const { showContextMenu } = useEditableObjectContextMenu({ editableObjectType: 'agent', editable: agent });
+  const menuItems = useEditableObjectContextMenu({ editableObjectType: 'agent', editable: agent });
   const navigate = useNavigate();
 
   return (
-    <div
-      key={agent.id}
-      onClick={() => navigate(`/agents/${agent.id}`)}
-      className={cn(
-        'flex flex-col justify-center items-center text-gray-500  hover:text-gray-300 cursor-pointer min-w-[110px]',
-        {
-          'text-agent': agent.status === 'forced',
-        },
-      )}
-      onContextMenu={showContextMenu()}
-    >
-      <AgentAvatar agentId={agent.id} type="small" />
-      <p className="text-[15px] text-center">{agent.name}</p>
-    </div>
+    <ContextMenu options={menuItems}>
+      <div
+        key={agent.id}
+        onClick={() => navigate(`/agents/${agent.id}`)}
+        className={cn(
+          'flex flex-col justify-center items-center text-gray-500  hover:text-gray-300 cursor-pointer min-w-[110px]',
+          {
+            'text-agent': agent.status === 'forced',
+          },
+        )}
+      >
+        <AgentAvatar agentId={agent.id} type="small" />
+        <p className="text-[15px] text-center">{agent.name}</p>
+      </div>
+    </ContextMenu>
   );
 }
 
 function EmptyChatAssetLink({ assetType, asset }: { assetType: AssetType; asset: Asset }) {
-  const { showContextMenu } = useEditableObjectContextMenu({ editableObjectType: assetType, editable: asset });
+  const menuItems = useEditableObjectContextMenu({ editableObjectType: assetType, editable: asset });
   const navigate = useNavigate();
   const Icon = getEditableObjectIcon(asset);
 
   return (
-    <div
-      className="inline-block cursor-pointer"
-      onClick={() => navigate(`/materials/${asset.id}`)}
-      onContextMenu={showContextMenu()}
-    >
-      <div className="group py-2 flex items-center gap-[12px] text-[14px] text-gray-300 hover:text-white">
-        <Icon className="w-6 h-6 text-gray-500 group-hover:text-material" />
-        <p className="max-w-[160px] truncate">{asset.name}</p>
+    <ContextMenu options={menuItems}>
+      <div className="inline-block cursor-pointer" onClick={() => navigate(`/materials/${asset.id}`)}>
+        <div className="group py-2 flex items-center gap-[12px] text-[14px] text-gray-300 hover:text-white">
+          <Icon className="w-6 h-6 text-gray-500 group-hover:text-material" />
+          <p className="max-w-[160px] truncate">{asset.name}</p>
+        </div>
       </div>
-    </div>
+    </ContextMenu>
   );
 }
 
@@ -78,23 +79,32 @@ export const EmptyChat = () => {
   const projectName = useProjectStore((state) => state.projectName);
   const agents = useEditablesStore((state) => state.agents);
   const materials = useEditablesStore((state) => state.materials || []);
-  const { showContextMenu: showProjectContextMenu } = useProjectContextMenu();
-  const forcedMaterials = materials.filter((m) => m.status === 'forced');
+  const projectMenuItems = useProjectContextMenu();
   const aiChoiceMaterials = materials.filter((m) => m.status === 'enabled');
   const activeSystemAgents = agents.filter((agent) => agent.status !== 'disabled' && agent.id !== 'user');
+  const forcedMaterials = materials.filter((m) => m.status === 'forced');
+  const triggerRef = useRef<ContextMenuRef>(null);
   const hasForcedMaterials = forcedMaterials.length > 0;
   const hasAiChoiceMaterials = aiChoiceMaterials.length > 0;
+
+  const openContext = (event: MouseEvent) => {
+    if (triggerRef.current) {
+      triggerRef?.current.handleTriggerClick(event);
+    }
+  };
+
   return (
     <section className="flex flex-col items-center justify-center container mx-auto px-6 py-[80px] select-none">
       <img src="chat-page-glow.png" alt="glow" className="absolute top-[40px] -z-[1]" />
       <p className="text-[16px] text-gray-300 text-center mb-[15px]">Welcome to the project</p>
-      <h2
-        className="text-[36px] text-center font-black cursor-pointer uppercase text-white mb-[40px]"
-        onContextMenu={showProjectContextMenu()}
-        onClick={showProjectContextMenu()}
-      >
-        {projectName}
-      </h2>
+      <ContextMenu options={projectMenuItems} ref={triggerRef}>
+        <h2
+          className="text-[36px] text-center font-black cursor-pointer uppercase text-white mb-[40px]"
+          onClick={openContext}
+        >
+          {projectName}
+        </h2>
+      </ContextMenu>
       {activeSystemAgents.length > 0 ? (
         <>
           <p className="mb-4 text-center text-[14px] text-gray-400">Agents in the project:</p>

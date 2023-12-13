@@ -26,8 +26,9 @@ import { MoreVertical } from 'lucide-react';
 import { useAssets } from '@/utils/editables/useAssets';
 import { convertNameToId } from '@/utils/editables/convertNameToId';
 import { useChat } from '@/utils/editables/useChat';
-import showNotification from '@/utils/common/showNotification';
 import { Icon } from '@/components/common/icons/Icon';
+import { useToastsStore } from '@/store/common/useToastsStore';
+import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
 
 const SideBarItem = ({
   editableObjectType,
@@ -43,24 +44,19 @@ const SideBarItem = ({
   const [isShowingContext, setIsShowingContext] = useState(false);
   const [blockBlur, setBlockBlur] = useState(false);
 
+  const showToast = useToastsStore((state) => state.showToast);
+
   const { renameAsset } = useAssets(editableObjectType);
-  const { showContextMenu, isContextMenuVisible } = useEditableObjectContextMenu({
+  const menuItems = useEditableObjectContextMenu({
     editableObjectType: editableObjectType,
     editable: editableObject,
     setIsEditing,
   });
 
-  useEffect(() => {
-    if (!isContextMenuVisible) {
-      setIsShowingContext(false);
-    }
-  }, [isContextMenuVisible]);
-
   const EditableIcon = getEditableObjectIcon(editableObject);
 
   const [inputText, setInputText] = useState(editableObject.name);
 
-  const popoverRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -108,7 +104,7 @@ const SideBarItem = ({
           navigate(`/${editableObjectType}s/${newId}`);
         }
       }
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',
@@ -149,85 +145,93 @@ const SideBarItem = ({
     disabled = asset.status === 'disabled';
   }
 
-  function handleContextMenu(event: MouseEvent) {
-    setIsShowingContext(true);
-    showContextMenu()(event);
-  }
+  const triggerRef = useRef<ContextMenuRef>(null);
 
   const handleMoreIconClick = (event: MouseEvent) => {
-    event.stopPropagation();
-    handleContextMenu(event);
+    event.preventDefault();
+    if (triggerRef.current) {
+      triggerRef?.current.handleTriggerClick(event);
+    }
+  };
+
+  const handleOpenContextChange = (open: boolean) => {
+    setIsShowingContext(open);
   };
 
   return (
-    <div ref={popoverRef} onContextMenu={handleContextMenu} className="max-w-[275px] mb-[5px]">
-      <div
-        className={cn(
-          forced && editableObjectType === 'agent' && 'text-agent',
-          forced && editableObjectType === 'material' && 'text-material',
-          disabled && 'opacity-50',
-        )}
-      >
-        <NavLink
-          className={({ isActive, isPending }) => {
-            return cn(
-              'group flex items-center gap-[12px] overflow-hidden p-[9px] rounded-[8px] cursor-pointer relative  hover:bg-gray-700',
-              {
-                'bg-gray-700 text-white ': isActive || isPending || isShowingContext,
-              },
-            );
-          }}
-          to={`/${editableObjectType}s/${editableObject.id}`}
-        >
-          {({ isActive }) => (
-            <>
-              <Icon
-                icon={EditableIcon}
-                className={cn(
-                  'min-w-[24px] min-h-[24px] w-[24px] h-[24px]',
-                  editableObjectType === 'chat' && 'text-chat',
-                  editableObjectType === 'agent' && 'text-agent',
-                  editableObjectType === 'material' && 'text-material',
-                )}
-              />
-              {/* TODO: add validation for empty input value */}
-              {isEditing ? (
-                <input
-                  className="font-normal outline-none border h-[24px] border-gray-400 text-[14px] p-[5px] w-full text-white bg-gray-600 focus:border-primary resize-none overflow-hidden rounded-[4px]  focus:outline-none"
-                  value={inputText}
-                  ref={inputRef}
-                  onBlur={handleBlur}
-                  onKeyDown={handleKeyDown}
-                  onChange={(e) => setInputText(e.target.value)}
-                />
-              ) : (
-                <p className="text-[14px] leading-[18.2px] group-hover:text-white truncate">{editableObject.name}</p>
-              )}
-              <div className="flex gap-[10px] ml-auto items-center">
-                <Icon
-                  icon={MoreVertical}
-                  className={cn('min-h-[16px] min-w-[16px] ml-auto hidden group-hover:text-white group-hover:block', {
-                    block: isShowingContext,
-                  })}
-                  onClick={handleMoreIconClick}
-                />
-              </div>
-              <div
-                className={cn(
-                  'absolute bottom-[-15px] hidden left-[0px] opacity-[0.3] blur-[10px]  h-[34px] w-[34px] group-hover:block',
-                  editableObjectType === 'chat' && 'fill-chat bg-chat',
-                  editableObjectType === 'agent' && 'fill-agent bg-agent',
-                  editableObjectType === 'material' && 'fill-material bg-material',
-                  {
-                    block: isActive,
-                  },
-                )}
-              />
-            </>
+    <ContextMenu options={menuItems} ref={triggerRef} onOpenChange={handleOpenContextChange}>
+      <div className="max-w-[275px] mb-[5px]">
+        <div
+          className={cn(
+            forced && editableObjectType === 'agent' && 'text-agent',
+            forced && editableObjectType === 'material' && 'text-material',
+            disabled && 'opacity-50',
           )}
-        </NavLink>
+        >
+          <NavLink
+            className={({ isActive, isPending }) => {
+              return cn(
+                'group flex items-center gap-[12px] overflow-hidden p-[9px] rounded-[8px] cursor-pointer relative  hover:bg-gray-700',
+                {
+                  'bg-gray-700 text-white ': isActive || isPending || isShowingContext,
+                },
+              );
+            }}
+            to={`/${editableObjectType}s/${editableObject.id}`}
+          >
+            {({ isActive }) => (
+              <>
+                <Icon
+                  icon={EditableIcon}
+                  className={cn(
+                    'min-w-[24px] min-h-[24px] w-[24px] h-[24px]',
+                    editableObjectType === 'chat' && 'text-chat',
+                    editableObjectType === 'agent' && 'text-agent',
+                    editableObjectType === 'material' && 'text-material',
+                  )}
+                />
+                {/* TODO: add validation for empty input value */}
+                {isEditing ? (
+                  <input
+                    className="font-normal outline-none border h-[24px] border-gray-400 text-[14px] p-[5px] w-full text-white bg-gray-600 focus:border-primary resize-none overflow-hidden rounded-[4px]  focus:outline-none"
+                    value={inputText}
+                    ref={inputRef}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    onChange={(e) => setInputText(e.target.value)}
+                  />
+                ) : (
+                  <p className="text-[14px] leading-[18.2px] group-hover:text-white truncate">{editableObject.name}</p>
+                )}
+                <div className="flex gap-[10px] ml-auto items-center">
+                  <Icon
+                    icon={MoreVertical}
+                    className={cn(
+                      'min-h-[16px] min-w-[16px] ml-auto hidden group-hover:text-white group-hover:block',
+                      {
+                        block: isShowingContext,
+                      },
+                    )}
+                    onClick={handleMoreIconClick}
+                  />
+                </div>
+                <div
+                  className={cn(
+                    'absolute bottom-[-15px] hidden left-[0px] opacity-[0.3] blur-[10px]  h-[34px] w-[34px] group-hover:block',
+                    editableObjectType === 'chat' && 'fill-chat bg-chat',
+                    editableObjectType === 'agent' && 'fill-agent bg-agent',
+                    editableObjectType === 'material' && 'fill-material bg-material',
+                    {
+                      block: isActive,
+                    },
+                  )}
+                />
+              </>
+            )}
+          </NavLink>
+        </div>
       </div>
-    </div>
+    </ContextMenu>
   );
 };
 

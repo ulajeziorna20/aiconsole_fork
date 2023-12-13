@@ -24,7 +24,7 @@ limitations under the License.
 @tailwind utilities;
 
 body {
-  --mantine-color-body: #191919;
+  background: #111111;
 }
 
 * {
@@ -119,14 +119,6 @@ body {
 .tab-hover:hover {
   border-color: #a6a6a6;
   transition: 0.3s all ease;
-}
-
-.context-menu-icon svg {
-  color: #737373;
-}
-
-.context-menu-icon:hover svg {
-  color: #ffffff;
 }
 
 .sidebar-typography h1 {

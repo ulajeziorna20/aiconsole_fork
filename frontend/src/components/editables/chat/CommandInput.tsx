@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { Button } from '@/components/common/Button';
-import { Tooltip } from '@/components/common/Tooltip';
+import Tooltip from '@/components/common/Tooltip';
 import { Icon } from '@/components/common/icons/Icon';
 import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { cn } from '@/utils/common/cn';
@@ -96,7 +96,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
           placeholder="Type a new command here..."
           rows={1}
         />
-        <Tooltip label={actionLabel} position="top-end" offset={10}>
+        <Tooltip label={actionLabel} position="top" align="end" sideOffset={10} disableAnimation>
           <div>
             <Button variant="primary" iconOnly={true} onClick={handleSendMessage} classNames={cn('p-[18px]', {})}>
               <Icon icon={ActionIcon} width={24} height={24} className="w-6 h-6" />

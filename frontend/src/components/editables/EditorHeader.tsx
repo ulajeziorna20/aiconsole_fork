@@ -1,6 +1,6 @@
 import { EditableObject } from '@/types/editables/assetTypes';
 import { getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
-import { MouseEventHandler, useState } from 'react';
+import { useState } from 'react';
 import InlineEditableObjectName from './InlineEditableObjectName';
 import { cn } from '@/utils/common/cn';
 import { getEditableObjectType } from '@/utils/editables/getEditableObjectType';
@@ -10,13 +10,11 @@ export function EditorHeader({
   onRename,
   children,
   isChanged,
-  onContextMenu,
 }: {
   editable?: EditableObject;
   onRename: (newName: string) => void;
   children?: React.ReactNode;
   isChanged?: boolean;
-  onContextMenu?: () => MouseEventHandler;
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -29,7 +27,6 @@ export function EditorHeader({
 
   return (
     <div
-      onContextMenu={onContextMenu}
       onClick={() => setIsEditing(true)}
       className="w-full flex-none flex flex-row gap-[10px] cursor-pointer px-[20px] py-[13px] border-b border-gray-600 bg-gray-90 shadow-md items-center overflow-clip "
     >

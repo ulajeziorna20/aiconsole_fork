@@ -17,9 +17,9 @@
 import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
 import { Plus } from 'lucide-react';
 import { Button } from '../common/Button';
-import { ConfirmationModal } from '../common/ConfirmationModal';
 import { cn } from '@/utils/common/cn';
 import { Icon } from '../common/icons/Icon';
+import AlertDialog from '../common/AlertDialog';
 
 interface ProjectButtonsProps {
   className?: string;
@@ -39,26 +39,22 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
 
   return (
     <div className={cn(className)}>
-      <ConfirmationModal
-        confirmButtonText="Yes"
-        cancelButtonText="No"
-        opened={isProjectDirectory === true && isNewProjectModalOpen && Boolean(tempPath)}
+      <AlertDialog
+        title="This folder already contains an AIConsole project"
+        isOpen={isProjectDirectory === true && isNewProjectModalOpen && Boolean(tempPath)}
         onClose={handleReset}
         onConfirm={openProjectConfirmation}
-        title={`This folder already contains an AIConsole project`}
       >
         Do you want to open it instead?
-      </ConfirmationModal>
-      <ConfirmationModal
-        confirmButtonText="Yes"
-        cancelButtonText="No"
-        opened={isProjectDirectory === false && isOpenProjectModalOpen && Boolean(tempPath)}
+      </AlertDialog>
+      <AlertDialog
+        title="There is no project in this directory"
+        isOpen={isProjectDirectory === false && isOpenProjectModalOpen && Boolean(tempPath)}
         onClose={handleReset}
         onConfirm={openProjectConfirmation}
-        title={`There is no project in this directory`}
       >
         Do you want to create one there instead?
-      </ConfirmationModal>
+      </AlertDialog>
 
       <Button small onClick={newProject}>
         Add your first project <Icon icon={Plus} />

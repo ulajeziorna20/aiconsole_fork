@@ -14,17 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useContextMenu } from '@/utils/common/useContextMenu';
 import { XIcon } from 'lucide-react';
 import { ProjectsAPI } from '@/api/api/ProjectsAPI';
 import { localStorageTyped } from '../common/localStorage';
-import { Icon } from '@/components/common/icons/Icon';
+import { ContextMenuItems } from '@/types/common/contextMenu';
 
 const { getItem: checkIfChanged } = localStorageTyped<boolean>('isAssetChanged');
 
 export function useProjectContextMenu() {
-  const { showContextMenu, hideContextMenu, isContextMenuVisible } = useContextMenu();
-
   const handleBackToProjects = () => {
     if (
       checkIfChanged() &&
@@ -36,16 +33,15 @@ export function useProjectContextMenu() {
     ProjectsAPI.closeProject();
   };
 
-  function showContextMenuReplacement() {
-    return showContextMenu([
-      {
-        key: 'Close Project',
-        icon: <Icon icon={XIcon} />,
-        title: 'Close Project',
-        onClick: handleBackToProjects,
-      },
-    ]);
-  }
+  const menuItems: ContextMenuItems = [
+    {
+      type: 'item',
+      key: 'Close Project',
+      icon: XIcon,
+      title: 'Close Project',
+      action: handleBackToProjects,
+    },
+  ];
 
-  return { showContextMenu: showContextMenuReplacement, hideContextMenu, isContextMenuVisible };
+  return menuItems;
 }

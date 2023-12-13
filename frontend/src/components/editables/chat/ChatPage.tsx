@@ -21,7 +21,6 @@ import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { Chat } from '@/types/editables/chatTypes';
 import { cn } from '@/utils/common/cn';
-import showNotification from '@/utils/common/showNotification';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { ReplyIcon } from 'lucide-react';
@@ -34,9 +33,11 @@ import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
 import { ArrowDown } from 'lucide-react';
-import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import { SendRotated } from '@/components/common/icons/SendRotated';
 import { SquareFill } from '@/components/common/icons/SquareFill';
+import { useToastsStore } from '@/store/common/useToastsStore';
+import { ContextMenu } from '@/components/common/ContextMenu';
+import AlertDialog from '@/components/common/AlertDialog';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -93,7 +94,8 @@ export function ChatPage() {
   const isProjectOpen = useProjectStore((state) => state.isProjectOpen);
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const appendFilePathToCommand = useChatStore((state) => state.appendFilePathToCommand);
-  const { showContextMenu } = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
+  const showToast = useToastsStore((state) => state.showToast);
+  const menuItems = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
   const { setChat, renameChat } = useChat();
 
   const blocker = useBlocker(isAnalysisRunning || isExecutionRunning);
@@ -172,7 +174,7 @@ export function ChatPage() {
 
       await renameChat(newChat);
 
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',
@@ -225,7 +227,10 @@ export function ChatPage() {
 
   return (
     <div className="flex flex-col w-full h-full max-h-full overflow-auto">
-      <EditorHeader editable={chat} onRename={handleRename} isChanged={false} onContextMenu={showContextMenu} />
+      <ContextMenu options={menuItems}>
+        <EditorHeader editable={chat} onRename={handleRename} isChanged={false} />
+      </ContextMenu>
+
       <div className="flex-grow overflow-auto">
         <div className="flex w-full h-full flex-col justify-between downlight">
           {!isProjectLoading && !loadingMessages ? ( // This is needed because of https://github.com/compulim/react-scroll-to-bottom/issues/61#issuecomment-1608456508
@@ -260,17 +265,14 @@ export function ChatPage() {
             actionLabel={actionButtonLabel}
             onSubmit={actionButtonAction}
           />
-
-          <ConfirmationModal
-            confirmButtonText="Yes"
-            cancelButtonText="No"
-            opened={blockerState === 'blocked'}
-            onClose={reset}
-            onConfirm={proceed || null}
+          <AlertDialog
             title="Are you sure you want to exit this chat?"
+            isOpen={blockerState === 'blocked'}
+            onClose={reset}
+            onConfirm={proceed}
           >
             {`The response is being generated.\nClosing the window cancels the process.`}
-          </ConfirmationModal>
+          </AlertDialog>
         </div>
       </div>
     </div>

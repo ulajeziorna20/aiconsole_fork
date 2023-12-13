@@ -15,10 +15,9 @@
 // limitations under the License.
 
 import { create } from 'zustand';
-
 import { Hooks } from 'ky';
 
-import showNotification from '@/utils/common/showNotification';
+import { useToastsStore } from '@/store/common/useToastsStore';
 
 type ErrorResponse = {
   detail?: string;
@@ -28,8 +27,9 @@ export const API_HOOKS: Hooks = {
   beforeError: [
     async (error) => {
       const res = (await error.response.json()) as ErrorResponse;
+      const showToast = useToastsStore.getState().showToast;
       console.error(res.detail || error.message);
-      showNotification({
+      showToast({
         title: 'Error',
         message: `${res.detail || error.message}`,
         variant: 'error',

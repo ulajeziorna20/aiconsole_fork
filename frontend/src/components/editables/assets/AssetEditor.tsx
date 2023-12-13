@@ -18,7 +18,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { unstable_useBlocker as useBlocker, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/common/Button';
-import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import { CodeInput } from '@/components/editables/assets/CodeInput';
 import { SimpleInput } from '@/components/editables/assets/TextInput';
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
@@ -30,7 +29,6 @@ import {
   MaterialContentType,
   RenderedMaterial,
 } from '@/types/editables/assetTypes';
-import showNotification from '@/utils/common/showNotification';
 import { convertNameToId } from '@/utils/editables/convertNameToId';
 import { MaterialContentNames, getMaterialContentName } from '@/utils/editables/getMaterialContentName';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
@@ -43,6 +41,9 @@ import { usePrevious } from '@mantine/hooks';
 import { useAssets } from '@/utils/editables/useAssets';
 import { CheckCheck } from 'lucide-react';
 import { Icon } from '@/components/common/icons/Icon';
+import { useToastsStore } from '@/store/common/useToastsStore';
+import { ContextMenu } from '../../common/ContextMenu';
+import AlertDialog from '@/components/common/AlertDialog';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -123,6 +124,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
+  const showToast = useToastsStore((state) => state.showToast);
   const [preview, setPreview] = useState<RenderedMaterial | undefined>(undefined);
   const [typeName, setTypeName] = useState<MaterialContentNames>('Material');
   const [showPreview, setShowPreview] = useState(false);
@@ -134,7 +136,10 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const [newPath, setNewPath] = useState<string>('');
   const isNew = id === 'new';
   const { updateStatusIfNecessary, isAssetStatusChanged, renameAsset } = useAssets(assetType);
-
+  const menuItems = useEditableObjectContextMenu({
+    editable: asset,
+    editableObjectType: assetType,
+  });
   const wasAssetChangedInitially = !isPrevAssetChanged && isAssetChanged;
   const wasAssetUpdate = isPrevAssetChanged && !isAssetChanged;
 
@@ -201,14 +206,14 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
       await updateStatusIfNecessary();
 
-      showNotification({
+      showToast({
         title: 'Saved',
         message: 'saved',
         variant: 'success',
       });
     } else if (lastSavedAsset && lastSavedAsset.id !== asset.id) {
       await renameAsset(lastSavedAsset.id, asset);
-      showNotification({
+      showToast({
         title: 'Renamed',
         message: 'renamed',
         variant: 'success',
@@ -217,7 +222,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       if (isAssetChanged) {
         await EditablesAPI.updateEditableObject(assetType, asset);
 
-        showNotification({
+        showToast({
           title: 'Saved',
           message: 'saved',
           variant: 'success',
@@ -239,7 +244,16 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       setSelectedAsset(newAsset);
       useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
     }
-  }, [asset, assetType, isAssetChanged, lastSavedAsset, setSelectedAsset, updateStatusIfNecessary, renameAsset]);
+  }, [
+    asset,
+    assetType,
+    isAssetChanged,
+    lastSavedAsset,
+    setSelectedAsset,
+    updateStatusIfNecessary,
+    renameAsset,
+    showToast,
+  ]);
 
   const handleDiscardChanges = () => {
     //set last selected asset to the same as selected asset
@@ -318,8 +332,6 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     setSelectedAsset({ ...asset, name: newName, id: convertNameToId(newName) });
   };
 
-  const { showContextMenu } = useEditableObjectContextMenu({ editable: asset, editableObjectType: assetType });
-
   const getSubmitButtonLabel = (): SubmitButtonLabels => {
     if (lastSavedAsset === undefined) {
       return hasCore ? SubmitButtonLabels.Overwrite : SubmitButtonLabels.Create;
@@ -351,14 +363,12 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
   return (
     <div className="flex flex-col w-full h-full max-h-full overflow-auto">
-      <EditorHeader
-        editable={asset}
-        onRename={handleRename}
-        isChanged={isAssetChanged}
-        onContextMenu={showContextMenu}
-      >
-        (Defined in {asset?.defined_in})
-      </EditorHeader>
+      <ContextMenu options={menuItems}>
+        <EditorHeader editable={asset} onRename={handleRename} isChanged={isAssetChanged}>
+          (Defined in {asset?.defined_in})
+        </EditorHeader>
+      </ContextMenu>
+
       <div className="flex-grow overflow-auto">
         <div className="flex w-full h-full flex-col justify-between downlight">
           <div className="w-full h-full overflow-auto">
@@ -423,14 +433,11 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                 </>
               )}
             </div>
-
-            <ConfirmationModal
-              confirmButtonText="Yes"
-              cancelButtonText="No"
-              opened={blockerState === 'blocked'}
+            <AlertDialog
+              title="Do you want to discard your changes and continue?"
+              isOpen={blockerState === 'blocked'}
               onClose={reset}
               onConfirm={confirmPageEscape}
-              title="Do you want to discard your changes and continue?"
             />
           </div>
         </div>

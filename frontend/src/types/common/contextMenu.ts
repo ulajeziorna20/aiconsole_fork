@@ -14,24 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useOpenSettings } from '@/utils/settings/useOpenSettings';
-import { Settings } from 'lucide-react';
-import { ContextMenuItems } from '@/types/common/contextMenu';
+import { IconElement } from '@/components/common/icons/Icon';
 
-export function useUserContextMenu() {
-  const openSettings = useOpenSettings();
+export type ContextItemType = 'label' | 'separator' | 'item';
 
-  const menuItems: ContextMenuItems = [
-    {
-      type: 'item',
-      key: 'Settings',
-      icon: Settings,
-      title: 'Settings',
-      action: () => {
-        openSettings();
-      },
-    },
-  ];
-
-  return menuItems;
+export interface ContextMenuItem {
+  type: ContextItemType;
+  key?: string;
+  title?: string;
+  icon?: IconElement;
+  disabled?: boolean;
+  action?: () => void;
+  hidden?: boolean;
+  className?: string;
+  iconClassName?: string;
 }
+
+export type ContextMenuItems = ContextMenuItem[];
