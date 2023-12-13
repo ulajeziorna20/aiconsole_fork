@@ -24,7 +24,7 @@ limitations under the License.
 @tailwind utilities;
 
 body {
-  --mantine-color-body: #191919;
+  background: #111111;
 }
 
 * {
