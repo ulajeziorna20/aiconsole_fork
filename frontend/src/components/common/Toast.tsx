@@ -18,7 +18,8 @@ import { ElementRef, ReactNode, forwardRef } from 'react';
 import * as ReactToast from '@radix-ui/react-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { ToastMessage, useToastsStore } from '@/store/common/useToastsStore';
+import { ToastMessage, ToastVariant, useToastsStore } from '@/store/common/useToastsStore';
+import { Icon } from './icons/Icon';
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const toasts = useToastsStore((state) => state.toasts);
@@ -42,6 +43,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const getStyles = (variant: ToastVariant) => {
+  switch (variant) {
+    case 'success':
+      return 'border-green';
+    case 'error':
+      return 'border-red';
+    case 'info':
+      return 'border-gray-400';
+  }
+};
+
 type ToastProps = ToastMessage & {
   onClose: () => void;
 };
@@ -50,17 +62,6 @@ const Toast = forwardRef<ElementRef<typeof ReactToast.Root>, ToastProps>(
   ({ title, message, variant = 'info', onClose }, forwardedRef) => {
     const WIDTH = 400;
     const MARGIN = 16;
-
-    const getStyles = () => {
-      switch (variant) {
-        case 'success':
-          return 'border-green';
-        case 'error':
-          return 'border-red';
-        case 'info':
-          return 'border-gray-400';
-      }
-    };
 
     return (
       <ReactToast.Root
@@ -94,14 +95,14 @@ const Toast = forwardRef<ElementRef<typeof ReactToast.Root>, ToastProps>(
           className="py-5 px-[15px] rounded-lg shadow-md bg-gray-700 text-white text-sm"
         >
           <div className="flex items-start justify-between overflow-hidden whitespace-nowrap bg-gray-700 text-sm text-white shadow-sm backdrop-blur">
-            <div className={`flex flex-col items-start pl-5 border-l-[3px] w-full truncate ${getStyles()}`}>
+            <div className={`flex flex-col items-start pl-5 border-l-[3px] w-full truncate ${getStyles(variant)}`}>
               <ReactToast.Title className="font-semibold text-base">{title}</ReactToast.Title>
               <ReactToast.Description className="text-[15px] w-full leading-6 text-gray-300 truncate">
                 {message}
               </ReactToast.Description>
             </div>
             <ReactToast.Close className=" text-gray-300 transition hover:text-gray-200 w-5 h-5">
-              <X className="h-4 w-4" />
+              <Icon icon={X} width={16} height={16} className="w-4 h-4" />
             </ReactToast.Close>
           </div>
         </motion.li>
