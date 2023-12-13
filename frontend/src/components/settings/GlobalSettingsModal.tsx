@@ -16,13 +16,13 @@
 
 import { useApiKey } from '@/utils/settings/useApiKey';
 import { useSettingsStore } from '@/store/settings/useSettingsStore';
-import { Modal } from '@mantine/core';
 import { Ban, Check, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../common/Button';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '../common/icons/Icon';
+import { Root, Portal, Content } from '@radix-ui/react-dialog';
+import { useDisclosure } from '@mantine/hooks';
 
 // TODO: implement other features from figma like api for azure, user profile and tutorial
 export const GlobalSettingsModal = () => {
@@ -34,19 +34,22 @@ export const GlobalSettingsModal = () => {
 
   const { validating, setApiKey, saveOpenAiApiKey } = useApiKey();
   const location = useLocation();
-  const isSettingsModalVisible = location.state?.isSettingsModalVisible;
+  const isSettingsModalVisible = useMemo(
+    () => location.state?.isSettingsModalVisible,
+    [location.state?.isSettingsModalVisible],
+  );
   const navigate = useNavigate();
-
-  const onClose = () => {
-    navigate(location.pathname, {
-      state: { ...location.state, isSettingsModalVisible: false },
-    });
-  };
 
   const handleOpen = () => {
     if (openAiApiKey) {
       setInputText(openAiApiKey);
     }
+  };
+
+  const onClose = () => {
+    navigate(location.pathname, {
+      state: { ...location.state, isSettingsModalVisible: false },
+    });
   };
 
   const [opened, { close, open }] = useDisclosure(isSettingsModalVisible, { onClose, onOpen: handleOpen });
@@ -75,69 +78,63 @@ export const GlobalSettingsModal = () => {
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={close}
-      centered
-      className="mantine-Modal-root"
-      withCloseButton={false}
-      padding={25}
-      fullScreen
-      keepMounted={false}
-      styles={{
-        header: {
-          backgroundColor: '#111111',
-          textAlign: 'center',
-        },
-        content: {
-          backgroundColor: '#111111',
-          color: '#fff',
-        },
-      }}
-    >
-      <div className="flex justify-between items-center px-[5px] pb-[26px] pt-[1px] pr-[100px]">
-        <img src={`favicon.svg`} className="h-[48px] w-[48px] cursor-pointer filter" />
-        <Button variant="secondary" onClick={close} small>
-          <Icon icon={X} />
-          Close
-        </Button>
-      </div>
-      <div className="h-[calc(100vh-125px)] max-w-[720px] mx-auto">
-        <h3 className="uppercase p-[30px] text-gray-400 text-[14px] leading-[21px] text-center mb-[40px]">Settings</h3>
-        <div className="flex flex-col gap-[40px]">
-          <h3 className="text-gray-400 text-[14px] leading-5">System settings</h3>
-          <div className="flex items-center gap-[30px]">
-            <h4 className="text-gray-300 font-semibold text-[16px] leading-[19px]">Always run code</h4>
-            <div className="flex items-center gap-[10px]">
-              <Button statusColor={isAutoRun ? 'green' : 'base'} variant="status" onClick={() => setIsAutoRun(true)}>
-                <Icon icon={Check} /> YES
-              </Button>
-              <Button
-                statusColor={isAutoRun == false ? 'red' : 'base'}
-                variant="status"
-                onClick={() => setIsAutoRun(false)}
-              >
-                <Icon icon={Ban} /> NO
+    <Root open={opened} onOpenChange={close}>
+      <Portal>
+        <Content asChild className="fixed">
+          <div className="w-full h-[100vh] left-0 right-0 bg-gray-900">
+            <div className="flex justify-between items-center px-[30px] py-[26px]">
+              <img src={`favicon.svg`} className="h-[48px] w-[48px] cursor-pointer filter" />
+              <Button variant="secondary" onClick={close} small>
+                <Icon icon={X} />
+                Close
               </Button>
             </div>
+
+            <div className="h-[calc(100%-100px)] max-w-[720px] mx-auto">
+              <h3 className="uppercase p-[30px] text-gray-400 text-[14px] leading-[21px] text-center mb-[40px]">
+                Settings
+              </h3>
+              <div className="flex flex-col gap-[40px]">
+                <h3 className="text-gray-400 text-[14px] leading-5">System settings</h3>
+                <div className="flex items-center gap-[30px]">
+                  <h4 className="text-gray-300 font-semibold text-[16px] leading-[19px]">Always run code</h4>
+                  <div className="flex items-center gap-[10px]">
+                    <Button
+                      statusColor={isAutoRun ? 'green' : 'base'}
+                      variant="status"
+                      onClick={() => setIsAutoRun(true)}
+                    >
+                      <Icon icon={Check} /> YES
+                    </Button>
+                    <Button
+                      statusColor={isAutoRun == false ? 'red' : 'base'}
+                      variant="status"
+                      onClick={() => setIsAutoRun(false)}
+                    >
+                      <Icon icon={Ban} /> NO
+                    </Button>
+                  </div>
+                </div>
+                <div className="border border-gray-600 rounded-[8px] p-[20px] flex items-center gap-[30px]">
+                  <h4 className="text-gray-300 font-semibold text-[16px] leading-[19px]">API</h4>
+                  <input
+                    className="border-gray-500 ring-secondary/30 text-gray-300 bg-gray-800 flex-grow resize-none overflow-hidden rounded-[8px] border px-4 py-2 focus:border-gray-300 focus:outline-none focus:text-white"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="OpenAI API key..."
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-[10px] py-[60px] mt-[40px]">
+                <Button variant="secondary" bold onClick={close}>
+                  Cancel
+                </Button>
+                <Button onClick={save}>{validating ? 'Validating...' : 'Save'}</Button>
+              </div>
+            </div>
           </div>
-          <div className="border border-gray-600 rounded-[8px] p-[20px] flex items-center gap-[30px]">
-            <h4 className="text-gray-300 font-semibold text-[16px] leading-[19px]">API</h4>
-            <input
-              className="border-gray-500 ring-secondary/30 text-gray-300 bg-gray-800 flex-grow resize-none overflow-hidden rounded-[8px] border px-4 py-2 focus:border-gray-300 focus:outline-none focus:text-white"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="OpenAI API key..."
-            />
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-[10px] py-[60px] mt-[40px]">
-          <Button variant="secondary" bold onClick={close}>
-            Cancel
-          </Button>
-          <Button onClick={save}>{validating ? 'Validating...' : 'Save'}</Button>
-        </div>
-      </div>
-    </Modal>
+        </Content>
+      </Portal>
+    </Root>
   );
 };
