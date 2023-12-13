@@ -44,6 +44,9 @@ export const ContextMenu = forwardRef<ContextMenuRef | undefined, ContextMenuPro
   ({ children, options, onOpenChange, triggerClassName }, ref) => {
     const triggerRef = useRef<HTMLDivElement>(null);
 
+    // RadixUI ContextMenu does not provide any option to open/control this component than by using onContextMenu event,
+    // soo, to be able to display context menu onClick we need to dispatch this event manually
+    // https://www.radix-ui.com/primitives/docs/components/context-menu#api-reference
     const handleTriggerClick = useCallback(
       (event: ReactMouseEvent) => {
         if (!ref) return;
