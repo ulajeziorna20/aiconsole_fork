@@ -21,13 +21,14 @@ import { useProjectContextMenu } from '@/utils/projects/useProjectContextMenu';
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { AddAssetDropdown } from '../editables/assets/AddAssetDropdown';
+import { ContextMenu } from '../common/ContextMenu';
 
 const { getItem: checkIfChanged } = localStorageTyped<boolean>('isAssetChanged');
 
 export function ProjectTopBarElements() {
   const projectName = useProjectStore((state) => state.projectName);
 
-  const { showContextMenu: showProjectContextMenu } = useProjectContextMenu();
+  const contextMenuItems = useProjectContextMenu();
 
   const handleBackToProjects = () => {
     if (
@@ -47,13 +48,14 @@ export function ProjectTopBarElements() {
           <button className="w-12 h-12" onClick={handleBackToProjects}>
             <img src="favicon.png" className="shadows-lg h-full w-full" alt="Logo" />
           </button>
-          <Link
-            to={`/chats/${uuidv4()}`}
-            className="h-11 text-grey-300 font-bold  text-lg text-gray-300 hover:animate-pulse cursor-pointer flex gap-2 items-center mr-[20px] uppercase"
-            onContextMenu={showProjectContextMenu()}
-          >
-            {projectName}
-          </Link>
+          <ContextMenu options={contextMenuItems}>
+            <Link
+              to={`/chats/${uuidv4()}`}
+              className="h-11 text-grey-300 font-bold  text-lg text-gray-300 hover:animate-pulse cursor-pointer flex gap-2 items-center mr-[20px] uppercase"
+            >
+              {projectName}
+            </Link>
+          </ContextMenu>
         </div>
         <AddAssetDropdown />
       </div>

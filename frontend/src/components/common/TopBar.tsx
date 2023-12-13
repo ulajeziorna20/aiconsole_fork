@@ -14,26 +14,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useRef, MouseEvent } from 'react';
 import { useUserContextMenu } from '../../utils/common/useUserContextMenu';
 import { getBaseURL } from '../../store/useAPIStore';
+import { ContextMenu, ContextMenuRef } from './ContextMenu';
 
 interface TopBarProps {
   variant?: 'recentProjects' | 'chat';
 }
 
 export function TopBar({ children }: React.PropsWithChildren<TopBarProps>) {
-  const { showContextMenu: showUserMenu } = useUserContextMenu();
+  const menuItems = useUserContextMenu();
+  const triggerRef = useRef<ContextMenuRef>(null);
+
+  const openContextMenu = (event: MouseEvent) => {
+    if (triggerRef.current) {
+      triggerRef?.current.handleTriggerClick(event);
+    }
+  };
 
   return (
     <div className="flex w-full px-[30px] py-[7px] border-b bg-transparent shadow-md border-gray-600 relative z-40 h-[101px]">
       <div className="flex gap-2 w-full items-center">
         {children}
-        <img
-          src={`${getBaseURL()}/profile/user.jpg` || ''}
-          className="h-11 w-11 ml-auto rounded-full border cursor-pointer shadow-md border-primary"
-          onClick={showUserMenu()}
-          onContextMenu={showUserMenu()}
-        />
+        <ContextMenu options={menuItems} ref={triggerRef} triggerClassName="ml-auto">
+          <img
+            src={`${getBaseURL()}/profile/user.jpg` || ''}
+            className="h-11 w-11  rounded-full border cursor-pointer shadow-md border-primary"
+            onClick={openContextMenu}
+          />
+        </ContextMenu>
       </div>
     </div>
   );

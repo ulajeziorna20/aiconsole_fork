@@ -36,6 +36,7 @@ import { ArrowDown } from 'lucide-react';
 import { SendRotated } from '@/components/common/icons/SendRotated';
 import { SquareFill } from '@/components/common/icons/SquareFill';
 import { useToastsStore } from '@/store/common/useToastsStore';
+import { ContextMenu } from '@/components/common/ContextMenu';
 import AlertDialog from '@/components/common/AlertDialog';
 
 // Electron adds the path property to File objects
@@ -94,7 +95,7 @@ export function ChatPage() {
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const appendFilePathToCommand = useChatStore((state) => state.appendFilePathToCommand);
   const showToast = useToastsStore((state) => state.showToast);
-  const { showContextMenu } = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
+  const menuItems = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
   const { setChat, renameChat } = useChat();
 
   const blocker = useBlocker(isAnalysisRunning || isExecutionRunning);
@@ -226,7 +227,10 @@ export function ChatPage() {
 
   return (
     <div className="flex flex-col w-full h-full max-h-full overflow-auto">
-      <EditorHeader editable={chat} onRename={handleRename} isChanged={false} onContextMenu={showContextMenu} />
+      <ContextMenu options={menuItems}>
+        <EditorHeader editable={chat} onRename={handleRename} isChanged={false} />
+      </ContextMenu>
+
       <div className="flex-grow overflow-auto">
         <div className="flex w-full h-full flex-col justify-between downlight">
           {!isProjectLoading && !loadingMessages ? ( // This is needed because of https://github.com/compulim/react-scroll-to-bottom/issues/61#issuecomment-1608456508

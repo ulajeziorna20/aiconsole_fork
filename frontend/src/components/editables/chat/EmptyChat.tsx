@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useRef, MouseEvent } from 'react';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { useProjectStore } from '@/store/projects/useProjectStore';
 import { Agent, Asset, AssetType } from '@/types/editables/assetTypes';
@@ -24,44 +24,44 @@ import { useProjectContextMenu } from '@/utils/projects/useProjectContextMenu';
 import { AgentAvatar } from './AgentAvatar';
 import { cn } from '@/utils/common/cn';
 import Tooltip from '@/components/common/Tooltip';
+import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
 
 function EmptyChatAgentAvatar({ agent }: { agent: Agent }) {
-  const { showContextMenu } = useEditableObjectContextMenu({ editableObjectType: 'agent', editable: agent });
+  const menuItems = useEditableObjectContextMenu({ editableObjectType: 'agent', editable: agent });
 
   return (
     <div className="inline-block m-2">
-      <Tooltip label={agent.name} position="bottom" withArrow>
-        <div
-          key={agent.id}
-          onClick={showContextMenu()}
-          className="inline-block hover:text-secondary cursor-pointer"
-          onContextMenu={showContextMenu()}
-        >
-          <AgentAvatar agentId={agent.id} type="large" />
-        </div>
-      </Tooltip>
+      <ContextMenu options={menuItems}>
+        <Tooltip label={agent.name} position="bottom" withArrow>
+          <div key={agent.id} className="inline-block hover:text-secondary cursor-pointer">
+            <AgentAvatar agentId={agent.id} type="large" />
+          </div>
+        </Tooltip>
+      </ContextMenu>
     </div>
   );
 }
 
 function EmptyChatAssetLink({ assetType, asset }: { assetType: AssetType; asset: Asset }) {
-  const { showContextMenu } = useEditableObjectContextMenu({ editableObjectType: assetType, editable: asset });
+  const menuItems = useEditableObjectContextMenu({ editableObjectType: assetType, editable: asset });
 
   const Icon = getEditableObjectIcon(asset);
 
   return (
-    <div className="inline-block cursor-pointer" onClick={showContextMenu()} onContextMenu={showContextMenu()}>
-      <div className="hover:text-secondary flex flex-row items-center gap-1 opacity-80 hover:opacity-100">
-        <Icon
-          className={cn(
-            'w-4 h-4 inline-block mr-1',
-            assetType === 'agent' && 'text-agent',
-            assetType === 'material' && 'text-material',
-          )}
-        />
-        {asset.name}
+    <ContextMenu options={menuItems}>
+      <div className="inline-block cursor-pointer">
+        <div className="hover:text-secondary flex flex-row items-center gap-1 opacity-80 hover:opacity-100">
+          <Icon
+            className={cn(
+              'w-4 h-4 inline-block mr-1',
+              assetType === 'agent' && 'text-agent',
+              assetType === 'material' && 'text-material',
+            )}
+          />
+          {asset.name}
+        </div>
       </div>
-    </div>
+    </ContextMenu>
   );
 }
 
@@ -69,20 +69,25 @@ export const EmptyChat = () => {
   const projectName = useProjectStore((state) => state.projectName);
   const agents = useEditablesStore((state) => state.agents);
   const materials = useEditablesStore((state) => state.materials || []);
-  const { showContextMenu: showProjectContextMenu } = useProjectContextMenu();
+  const projectMenuItems = useProjectContextMenu();
 
   const forcedMaterials = materials.filter((m) => m.status === 'forced');
+  const triggerRef = useRef<ContextMenuRef>(null);
+
+  const openContext = (event: MouseEvent) => {
+    if (triggerRef.current) {
+      triggerRef?.current.handleTriggerClick(event);
+    }
+  };
 
   return (
     <section className="flex flex-col items-center justify-center container mx-auto px-6 py-8">
-      <h2
-        className="text-4xl mb-8 text-center font-extrabold mt-20 cursor-pointer"
-        onContextMenu={showProjectContextMenu()}
-        onClick={showProjectContextMenu()}
-      >
-        <p className="p-2">Project</p>
-        <span className=" text-primary uppercase">{projectName}</span>
-      </h2>
+      <ContextMenu options={projectMenuItems} ref={triggerRef}>
+        <h2 className="text-4xl mb-8 text-center font-extrabold mt-20 cursor-pointer" onClick={openContext}>
+          <p className="p-2">Project</p>
+          <span className=" text-primary uppercase">{projectName}</span>
+        </h2>
+      </ContextMenu>
       <div className="font-bold mb-4 text-center opacity-50 text-sm uppercase">Agents</div>
       <div className="flex flex-row gap-2 mb-8 text-center">
         <div>

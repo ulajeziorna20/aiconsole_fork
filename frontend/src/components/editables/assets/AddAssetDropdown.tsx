@@ -1,7 +1,7 @@
 import { Icon } from '@/components/common/icons/Icon';
 import { cn } from '@/utils/common/cn';
 import { MATERIAL_CONTENT_TYPE_ICONS, getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
-import { Menu } from '@mantine/core';
+import { DropdownMenu, Trigger, Item, Content } from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -64,18 +64,8 @@ export const AddAssetDropdown = () => {
   };
 
   return (
-    <Menu
-      opened={opened}
-      onChange={setOpened}
-      width="target"
-      offset={0}
-      classNames={{
-        dropdown: cn('bg-gray-700 border-t-0 border-gray-800 p-0', {
-          'rounded-t-none ': opened,
-        }),
-      }}
-    >
-      <Menu.Target>
+    <DropdownMenu modal={false} open={opened} onOpenChange={setOpened}>
+      <Trigger asChild>
         <button
           className={cn(
             'group flex justify-center align-center gap-[12px] rounded-[8px] border border-gray-500 px-[16px] py-[10px] text-gray-300 text-[16px] font-semibold w-[200px] leading-[23px] hover:border-gray-300 transition duration-200 hover:text-gray-300',
@@ -93,14 +83,18 @@ export const AddAssetDropdown = () => {
             className="text-gray-500 ml-auto group-hover:text-gray-300 transition duration-200 w-[24px] h-[24px]"
           />
         </button>
-      </Menu.Target>
+      </Trigger>
 
-      <Menu.Dropdown>
+      <Content
+        className={cn('bg-gray-700 border-t-0 border-gray-800 p-0 w-[200px]', {
+          'rounded-t-none ': opened,
+        })}
+      >
         {DROPDOWN_ITEMS.map(({ icon, title, path, key, disabled, withDivider }) => (
-          <Menu.Item
+          <Item
             key={key}
             onClick={handleClick(path)}
-            className={cn('group flex p-0 rounded-none hover:bg-gray-600', {
+            className={cn('group flex p-0 rounded-none hover:bg-gray-600 hover:outline-none w-full cursor-pointer', {
               'pointer-events-none': disabled,
             })}
           >
@@ -116,9 +110,9 @@ export const AddAssetDropdown = () => {
               {icon}
               <p>{title}</p>
             </div>
-          </Menu.Item>
+          </Item>
         ))}
-      </Menu.Dropdown>
-    </Menu>
+      </Content>
+    </DropdownMenu>
   );
 };
