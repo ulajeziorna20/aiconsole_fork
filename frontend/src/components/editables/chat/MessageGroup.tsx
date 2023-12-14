@@ -26,9 +26,9 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
         'message-gradient': group.role === 'assistant',
       })}
     >
-      <div className="container flex mx-auto gap-[92px] max-w-[1084px]">
+      <div className="container flex mx-auto gap-[92px] max-w-[1104px]">
         <UserInfo agentId={group.agent_id} materialsIds={group.materials_ids} task={group.task} />
-        <div className="flex-grow flex flex-col gap-5  overflow-auto">
+        <div className="flex-grow flex flex-col gap-5  overflow-auto ">
           {group.messages.map((message) => (
             <MessageComponent key={message.id} message={message} group={group} />
           ))}

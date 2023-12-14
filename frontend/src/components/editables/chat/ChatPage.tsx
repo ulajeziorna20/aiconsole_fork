@@ -33,7 +33,6 @@ import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
 import { ArrowDown } from 'lucide-react';
 import { SendRotated } from '@/components/common/icons/SendRotated';
-import { SquareFill } from '@/components/common/icons/SquareFill';
 import { useToastsStore } from '@/store/common/useToastsStore';
 import { ContextMenu } from '@/components/common/ContextMenu';
 import AlertDialog from '@/components/common/AlertDialog';
