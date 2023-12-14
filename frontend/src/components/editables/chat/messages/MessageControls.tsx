@@ -37,7 +37,7 @@ export function MessageControls({
   return (
     <div
       className={cn('flex flex-none gap-4 px-4 self-start', {
-        'ml-[92px]': hideControls,
+        'ml-[92px] min-w-[100px]': hideControls,
       })}
     >
       {isEditing ? (

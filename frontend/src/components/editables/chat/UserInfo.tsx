@@ -33,7 +33,7 @@ function UserInfoMaterialLink({ materialId }: { materialId: string }) {
     <ContextMenu options={menuItems}>
       <Link to={`/materials/${materialId}`}>
         <div
-          className="w-32 opacity-80 text-xs text-center overflow-ellipsis overflow-hidden whitespace-nowrap pb-1 px-4"
+          className="w-32 opacity-80 text-xs text-center overflow-ellipsis overflow-hidden whitespace-nowrap pb-1 max-w-[120px] truncate"
           title={materialId}
         >
           {materialId}
@@ -66,7 +66,7 @@ export function UserInfo({ agentId, materialsIds, task }: { agentId: string; mat
   const menuItems = agentId !== 'user' ? editableMenuItems : userMenuItems;
 
   return (
-    <div className="flex-none items-center flex flex-col">
+    <div className="flex-none items-center flex flex-col max-w-[120px]">
       <ContextMenu options={menuItems} ref={triggerRef}>
         <Link
           to={agentId != 'user' ? `/agents/${agentId}` : ''}
@@ -79,7 +79,7 @@ export function UserInfo({ agentId, materialsIds, task }: { agentId: string; mat
             type="small"
           />
           <div
-            className="text-[15px] w-32 text-center text-gray-300 overflow-ellipsis overflow-hidden whitespace-nowrap"
+            className="text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap"
             title={`${agent?.id} - ${agent?.usage}`}
           >
             {agent?.name || agent?.id}

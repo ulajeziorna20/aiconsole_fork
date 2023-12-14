@@ -53,7 +53,7 @@ export function MessageComponent({ message, group }: MessageProps) {
       >
         <div className="flex flex-col gap-2">
           {(message.content || message.is_streaming) && (
-            <>
+            <div className="max-w-[700px]">
               {group.role !== 'user' && (
                 <div className="flex-grow">
                   <div className="prose prose-stone dark:prose-invert sidebar-typography w-full max-w-full">
@@ -134,7 +134,7 @@ export function MessageComponent({ message, group }: MessageProps) {
                   ))}
                 </div>
               )}
-            </>
+            </div>
           )}
 
           {message.tool_calls.map((toolCall) => (
