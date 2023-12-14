@@ -42,14 +42,14 @@ const Tooltip: React.FC<TooltipProps> = ({
         <ReactTooltip.Trigger asChild>{children}</ReactTooltip.Trigger>
         <ReactTooltip.Portal>
           <ReactTooltip.Content
-            className="data-[state=instant-open]:animate-fadeIn data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade select-none rounded-[4px] bg-gray-600 border border-gray-700 text-white px-3 py-2 text-sm leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+            className="data-[state=instant-open]:animate-fadeIn data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade select-none rounded-[8px] bg-gray-600 border border-gray-700 text-gray-200 text-[12px] px-5 py-3 text-sm leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
             sideOffset={sideOffset}
             side={position}
             align={align}
             data-state={disableAnimation ? 'instant-open' : 'delayed-open'}
           >
             {label}
-            {withArrow && <ReactTooltip.Arrow className="fill-gray-600" />}
+            {withArrow && <ReactTooltip.Arrow width={12} height={8} className="fill-gray-600" />}
           </ReactTooltip.Content>
         </ReactTooltip.Portal>
       </ReactTooltip.Root>
