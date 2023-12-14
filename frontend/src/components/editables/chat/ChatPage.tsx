@@ -23,12 +23,11 @@ import { Chat } from '@/types/editables/chatTypes';
 import { cn } from '@/utils/common/cn';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
-import { ReplyIcon } from 'lucide-react';
+import { Footprints, ReplyIcon, Square } from 'lucide-react';
 import { useEffect } from 'react';
 import { useParams, useSearchParams, unstable_useBlocker as useBlocker } from 'react-router-dom';
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
 import { v4 as uuidv4 } from 'uuid';
-import { QuestionMarkIcon } from '../../common/icons/QuestionMarkIcon';
 import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { GuideMe } from './GuideMe';
@@ -206,8 +205,8 @@ export function ChatPage() {
 
       if (isProcessesAreNotRunning && !isLastMessageFromUser) {
         return {
-          label: 'Ask for help',
-          icon: QuestionMarkIcon,
+          label: 'Are you stuck? Let me guide you',
+          icon: Footprints,
           action: () =>
             submitCommand(
               `I need help with using AIConsole, can you suggest what can I do from this point in the conversation?`,
@@ -217,7 +216,7 @@ export function ChatPage() {
 
       return {
         label: 'Stop ' + (isAnalysisRunning ? ' analysis' : ' generation'),
-        icon: SquareFill,
+        icon: Square,
         action: stopWork,
       };
     }
