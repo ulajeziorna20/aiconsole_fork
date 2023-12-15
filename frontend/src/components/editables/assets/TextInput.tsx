@@ -14,9 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ChangeEvent, useEffect, useRef } from 'react';
+import { ChangeEvent } from 'react';
 import { cn } from '@/utils/common/cn';
 import Tooltip from '@/components/common/Tooltip';
+import TextareaAutosize from 'react-textarea-autosize';
 
 const REQUIRED_ERROR_MESSAGE = 'This field is required.';
 
@@ -24,8 +25,8 @@ export type ErrorObject = {
   [key: string]: string | null;
 };
 
-interface SimpleInputProps {
-  label: string;
+interface TextInputProps {
+  label?: string;
   value: string;
   name: string;
   className?: string;
@@ -36,11 +37,13 @@ interface SimpleInputProps {
   errors?: ErrorObject;
   setErrors?: React.Dispatch<React.SetStateAction<ErrorObject>>;
   withTooltip?: boolean;
-  withResize?: boolean;
   tootltipText?: string;
+  horizontal?: boolean;
+  fullWidth?: boolean;
+  resize?: boolean;
 }
 
-export function SimpleInput({
+export function TextInput({
   label,
   value,
   className,
@@ -52,19 +55,11 @@ export function SimpleInput({
   errors,
   setErrors,
   withTooltip = false,
-  withResize = false,
+  horizontal,
   tootltipText,
-}: SimpleInputProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (textareaRef.current && withResize) {
-      textareaRef.current.style.height = '40px';
-      const scrollHeight = textareaRef.current.scrollHeight;
-      textareaRef.current.style.height = `${Math.min(scrollHeight, 80)}px`;
-    }
-  }, [value, withResize]);
-
+  fullWidth,
+  resize,
+}: TextInputProps) {
   const checkIfEmpty = (value: string) => {
     if (required && value.trim() === '') {
       setErrors?.((prevErrors) => ({
@@ -81,40 +76,46 @@ export function SimpleInput({
 
   const error = errors?.[name];
 
-  const handleBlur = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleBlur = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     checkIfEmpty(e.target.value);
   };
 
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     onChange(e.target.value);
     checkIfEmpty(e.target.value);
   };
 
-  const core = (
-    <textarea
-      disabled={disabled}
-      placeholder={placeholder}
-      id={label}
-      value={value}
-      onBlur={handleBlur}
-      onChange={handleChange}
-      ref={textareaRef}
-      className={cn(
-        className,
-        'resize-none flex-none h-10 bg-black/20 appearance-none border border-transparent rounded w-full py-2 px-3 leading-tight placeholder-gray-400 focus:outline-none focus:border-primary/50 focus:shadow-outline mt-1',
-        {
-          'opacity-[0.7] cursor-not-allowed': disabled,
-          'border-red-700 focus:border-red-700': error,
-        },
-      )}
-    ></textarea>
-  );
+  const textFieldProps = {
+    className: cn(
+      className,
+      'max-h-[120px] w-full overflow-y-auto border border-gray-500 placeholder:text-gray-400 bg-gray-800 text-[15px] text-white flex-grow resize-none rounded-[8px]  px-[20px] py-[12px] hover:bg-gray-600 hover:placeholder:text-gray-300 focus:bg-gray-600 focus:border-gray-400 focus:outline-none transition duration-100',
+    ),
+    value,
+    id: label,
+    onChange: handleChange,
+    disabled,
+    onBlur: handleBlur,
+    placeholder,
+  };
+
+  const textarea = <TextareaAutosize {...textFieldProps} rows={1} />;
+
+  const input = <input {...textFieldProps} />;
+
+  const core = resize ? textarea : input;
 
   return (
-    <div className="relative">
-      <label htmlFor={label} className="font-bold flex items-center gap-1 w-fit-content">
-        {label}:
-      </label>
+    <div
+      className={cn('flex gap-[20px] flex-col relative', {
+        'flex-row items-center': horizontal,
+        'w-full': fullWidth,
+      })}
+    >
+      {label ? (
+        <label htmlFor={label} className="font-semibold text-white text-[16px] flex items-center gap-1 w-fit-content">
+          {label}
+        </label>
+      ) : null}
       {withTooltip ? (
         <Tooltip label={tootltipText} position="top" align="end" disableAnimation>
           {core}

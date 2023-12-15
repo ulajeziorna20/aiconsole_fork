@@ -19,7 +19,7 @@ import { unstable_useBlocker as useBlocker, useNavigate, useParams, useSearchPar
 
 import { Button } from '@/components/common/Button';
 import { CodeInput } from '@/components/editables/assets/CodeInput';
-import { SimpleInput } from '@/components/editables/assets/TextInput';
+import { TextInput } from '@/components/editables/assets/TextInput';
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import {
   Agent,
@@ -396,16 +396,17 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                       </Button>{' '}
                     </div>
                   )}
-                  <SimpleInput
+                  <TextInput
                     label="Usage"
                     name="usage"
+                    placeholder="Write text here"
                     value={asset.usage}
                     onChange={(value) => setSelectedAsset({ ...asset, usage: value })}
                     withTooltip
-                    withResize
                     tootltipText={`Usage is used to help identify when this ${typeName} should be used. `}
+                    resize
                   />
-                  <div className="flex-grow flex flex-row w-full gap-4 overflow-clip">
+                  <div className="flex-grow flex flex-row w-full gap-2 overflow-clip">
                     <div className="flex-1 w-1/2">
                       {assetType === 'agent' ? (
                         <AgentContent agent={asset as Agent} />

@@ -94,7 +94,7 @@ export function Button({
       onContextMenu={onContextMenu}
       data-autofocus={dataAutofocus}
       className={cn(
-        'rounded-[36px]  px-[30px] py-[20px] outline-none w-[fit-content]  font-semibold flex items-center justify-center gap-2 max-h-[60px] border border-secondary button hover:bg-gray-600 hover:text-secondary  transition-colors duration-200 focus:bg-gray-600 focus:text-secondary',
+        'rounded-[36px]  px-[30px] py-[20px] outline-none w-[fit-content]  font-semibold flex items-center justify-center gap-2 max-h-[60px] border border-secondary button hover:bg-gray-600 hover:text-secondary  transition-colors duration-200 focus:bg-gray-600 focus:text-secondary min-w-fit',
         getVariant(),
         {
           'w-full': fullWidth,
