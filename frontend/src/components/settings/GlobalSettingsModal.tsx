@@ -23,6 +23,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from '../common/icons/Icon';
 import { Root, Portal, Content } from '@radix-ui/react-dialog';
 import { useDisclosure } from '@mantine/hooks';
+import { TextInput } from '../editables/assets/TextInput';
 
 // TODO: implement other features from figma like api for azure, user profile and tutorial
 export const GlobalSettingsModal = () => {
@@ -115,13 +116,14 @@ export const GlobalSettingsModal = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="border border-gray-600 rounded-[8px] p-[20px] flex items-center gap-[30px]">
-                  <h4 className="text-gray-300 font-semibold text-[16px] leading-[19px]">API</h4>
-                  <input
-                    className="border-gray-500 ring-secondary/30 text-gray-300 bg-gray-800 flex-grow resize-none overflow-hidden rounded-[8px] border px-4 py-2 focus:border-gray-300 focus:outline-none focus:text-white"
+                <div className="border border-gray-600 rounded-[8px] p-[20px]">
+                  <TextInput
                     value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
+                    onChange={setInputText}
+                    horizontal
                     placeholder="OpenAI API key..."
+                    label="API"
+                    name="api"
                   />
                 </div>
               </div>

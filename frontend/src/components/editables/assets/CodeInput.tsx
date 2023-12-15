@@ -104,8 +104,8 @@ export function CodeInput({
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
-      if ((event.target as HTMLElement)?.tagName.toUpperCase() === 'BUTTON') {
-        if (textareaRef.current) {
+      if (textareaRef.current?.contains(event.target as HTMLElement)) {
+        if (textareaRef.current && (!disabled || !readOnly)) {
           textareaRef.current.focus();
         }
 
@@ -115,7 +115,7 @@ export function CodeInput({
       setFocus(false);
       onBlur?.();
     },
-    [onBlur],
+    [disabled, onBlur, readOnly],
   );
 
   useClickOutside(editorBoxRef, handleClickOutside);
@@ -133,9 +133,14 @@ export function CodeInput({
           maxHeight,
           minHeight: maxHeight,
         }}
-        className={cn(className, 'font-mono text-sm overflow-y-auto bg-black/20 border border-transparent rounded', {
-          'border-primary/50 ': focus,
-        })}
+        className={cn(
+          className,
+          'border-gray-500  w-[calc(100%-8px)] font-mono text-sm overflow-y-auto bg-gray-800 border rounded-[8px]  transition duration-100',
+          {
+            'bg-gray-600 border-gray-400': focus,
+            'hover:bg-gray-600 hover:placeholder:text-gray-300': !disabled && !readOnly,
+          },
+        )}
         onClick={handleEditorBoxClick}
       >
         <Editor
@@ -147,13 +152,15 @@ export function CodeInput({
           highlight={(code) => onHighlight(code)}
           padding={10}
           className={cn(
-            'resize-none appearance-none border border-transparent rounded w-full leading-tight placeholder-gray-400 bottom-0 p-0 h-full',
+            'resize-none appearance-none border border-transparent w-full leading-tight placeholder-gray-400 bottom-0 p-0 h-full  placeholder:text-gray-400  text-[15px] text-white  rounded-[8px]  ',
             {
               'opacity-[0.7] ': disabled,
               'bg-transparent': transparent,
+              'pointer-events-none': disabled || readOnly,
             },
           )}
-          textareaClassName={cn('focus:!outline-none focus:!shadow-none h-full', {
+          preClassName="!px-[20px] !py-[12px] "
+          textareaClassName={cn('focus:!outline-none focus:!shadow-none h-full !px-[20px] !py-[12px] ', {
             'cursor-not-allowed': disabled,
           })}
         />

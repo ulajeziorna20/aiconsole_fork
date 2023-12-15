@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { Button } from '../common/Button';
 import { useApiKey } from '@/utils/settings/useApiKey';
 import { useToastsStore } from '@/store/common/useToastsStore';
+import { TextInput } from '../editables/assets/TextInput';
 
 const OpenAiApiKeyForm = () => {
   const [inputText, setInputText] = useState('');
@@ -46,13 +47,8 @@ const OpenAiApiKeyForm = () => {
         <p className="text-lg text-center font-semibold text-white">
           To start, provide your OpenAI API key with GPT-4 access.
         </p>
-        <div className="flex justify-center gap-5">
-          <input
-            className="border border-gray-500 ring-secondary/30 text-white bg-gray-800 flex-grow resize-none overflow-hidden rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="OpenAI API key..."
-          />
+        <div className="flex justify-center gap-5 w-full">
+          <TextInput fullWidth value={inputText} onChange={setInputText} placeholder="OpenAI API key..." name="api" />
           <Button small onClick={onFormSubmit} disabled={!inputText}>
             {validating ? 'Validating...' : 'Add API key'}
           </Button>
