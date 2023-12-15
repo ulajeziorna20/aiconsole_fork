@@ -15,11 +15,12 @@
 // limitations under the License.
 
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AssetsSidebarTab } from './AssetsSidebarTab';
 import { ChatsSidebarTab } from './ChatsSidebarTab';
-import { ActiveTab, Tab } from './Tab';
+import { Tab } from './Tab';
 import * as Tabs from '@radix-ui/react-tabs';
+import { useSidebarStore } from '@/store/common/useSidebarStore';
 
 const TABS = [
   { label: 'Chats', key: 'chats' },
@@ -30,12 +31,11 @@ const TABS = [
 const SideBar = ({ initialTab }: { initialTab: string }) => {
   const agents = useEditablesStore((state) => state.agents);
   const materials = useEditablesStore((state) => state.materials);
+  const { activeTab, setActiveTab } = useSidebarStore();
 
   useEffect(() => {
     setActiveTab(initialTab);
-  }, [initialTab]);
-
-  const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab);
+  }, [initialTab, setActiveTab]);
 
   return (
     <div

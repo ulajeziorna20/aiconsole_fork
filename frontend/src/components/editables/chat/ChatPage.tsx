@@ -23,7 +23,7 @@ import { Chat } from '@/types/editables/chatTypes';
 import { cn } from '@/utils/common/cn';
 import { useChat } from '@/utils/editables/useChat';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
-import { Footprints, ReplyIcon, Square } from 'lucide-react';
+import { ReplyIcon, Square } from 'lucide-react';
 import { useEffect } from 'react';
 import { useParams, useSearchParams, unstable_useBlocker as useBlocker } from 'react-router-dom';
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
@@ -36,6 +36,7 @@ import { SendRotated } from '@/components/common/icons/SendRotated';
 import { useToastsStore } from '@/store/common/useToastsStore';
 import { ContextMenu } from '@/components/common/ContextMenu';
 import AlertDialog from '@/components/common/AlertDialog';
+import { QuestionMarkIcon } from '@/components/common/icons/QuestionMarkIcon';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -184,7 +185,7 @@ export function ChatPage() {
   const hasAnyCommandInput = command.trim() !== '';
 
   const getActionButton = () => {
-    if (hasAnyCommandInput) {
+    if (hasAnyCommandInput || chat.message_groups.length === 0) {
       return {
         label: 'Send',
         icon: SendRotated,
@@ -205,7 +206,7 @@ export function ChatPage() {
       if (isProcessesAreNotRunning && !isLastMessageFromUser) {
         return {
           label: 'Are you stuck? Let me guide you',
-          icon: Footprints,
+          icon: QuestionMarkIcon,
           action: () =>
             submitCommand(
               `I need help with using AIConsole, can you suggest what can I do from this point in the conversation?`,

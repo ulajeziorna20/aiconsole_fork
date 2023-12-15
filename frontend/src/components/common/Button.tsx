@@ -42,6 +42,7 @@ interface ButtonProps {
   small?: boolean;
   bold?: boolean;
   active?: boolean;
+  transparent?: boolean;
   classNames?: string;
   dataAutofocus?: boolean;
   autoFocus?: boolean;
@@ -67,6 +68,7 @@ export function Button({
   classNames,
   autoFocus,
   dataAutofocus,
+  transparent,
   onContextMenu,
 }: ButtonProps) {
   const getVariant = () => {
@@ -105,6 +107,7 @@ export function Button({
             disabled,
           'font-semibold': bold,
           'opacity-30 pointer-events-none focus:bg-yellow focus:text-gray-900': active,
+          'bg-transparent': transparent,
         },
         classNames,
       )}
