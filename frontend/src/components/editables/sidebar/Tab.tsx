@@ -1,8 +1,6 @@
-import { TabsValues } from '@/types/editables/assetTypes';
+import { ActiveTab } from '@/store/common/useSidebarStore';
 import { cn } from '@/utils/common/cn';
 import * as Tabs from '@radix-ui/react-tabs';
-
-export type ActiveTab = TabsValues | string;
 
 interface TabProps extends Tabs.TabsTriggerProps {
   value: string;

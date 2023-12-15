@@ -80,12 +80,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
   }, [chat?.id]);
 
   return (
-    <div
-      className={cn(
-        className,
-        'flex w-full flex-col px-4 pt-[10px] pb-[30px]  bg-gray-900 border-t border-white/10 drop-shadow-2xl z-50 ',
-      )}
-    >
+    <div className={cn(className, 'flex w-full flex-col px-4 py-[20px]  bg-gray-900 z-50 ')}>
       <div className="flex items-end gap-[10px] max-w-[700px] w-full mx-auto">
         <TextareaAutosize
           ref={textAreaRef}

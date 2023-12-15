@@ -32,6 +32,9 @@ import { SliderArrowLeft } from '@/components/common/icons/SliderArrowLeft';
 import { SliderArrowRight } from '@/components/common/icons/SliderArrowRight';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { Button } from '@/components/common/Button';
+import { useChatStore } from '@/store/editables/chat/useChatStore';
+import { useSidebarStore } from '@/store/common/useSidebarStore';
 
 function EmptyChatAgentAvatar({ agent }: { agent: Agent }) {
   const menuItems = useEditableObjectContextMenu({ editableObjectType: 'agent', editable: agent });
@@ -43,7 +46,7 @@ function EmptyChatAgentAvatar({ agent }: { agent: Agent }) {
         key={agent.id}
         onClick={() => navigate(`/agents/${agent.id}`)}
         className={cn(
-          'flex flex-col justify-center items-center text-gray-500  hover:text-gray-300 cursor-pointer min-w-[110px]',
+          'flex flex-col justify-center items-center text-gray-400  hover:text-gray-300 cursor-pointer min-w-[110px]',
           {
             'text-agent': agent.status === 'forced',
           },
@@ -86,6 +89,8 @@ export const EmptyChat = () => {
   const triggerRef = useRef<ContextMenuRef>(null);
   const hasForcedMaterials = forcedMaterials.length > 0;
   const hasAiChoiceMaterials = aiChoiceMaterials.length > 0;
+  const submitCommand = useChatStore((state) => state.submitCommand);
+  const setActiveTab = useSidebarStore((state) => state.setActiveTab);
 
   const openContext = (event: MouseEvent) => {
     if (triggerRef.current) {
@@ -97,6 +102,11 @@ export const EmptyChat = () => {
     () => aiChoiceMaterials.length - MAX_ASSETS_TO_DISPLAY,
     [aiChoiceMaterials.length],
   );
+
+  const guideMe = () =>
+    submitCommand(
+      `I need help with using AIConsole, can you suggest what can I do from this point in the conversation?`,
+    );
 
   return (
     <section className="flex flex-col items-center justify-center container mx-auto px-6 py-[80px] select-none">
@@ -167,8 +177,16 @@ export const EmptyChat = () => {
           </div>
         )}
         {hasAiChoiceMaterials || hasForcedMaterials ? (
-          <p className=" text-gray-500 text-right text-[14px]">and {remainingAssetCount} more...</p>
+          <p
+            className=" text-gray-400 text-right text-[14px] cursor-pointer hover:text-gray-300"
+            onClick={() => setActiveTab('materials')}
+          >
+            and {remainingAssetCount} more...
+          </p>
         ) : null}
+        <Button classNames="mx-auto mt-[40px]" variant="secondary" transparent onClick={guideMe}>
+          Guide me
+        </Button>
       </div>
     </section>
   );
