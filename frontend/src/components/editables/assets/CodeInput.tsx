@@ -19,7 +19,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css';
 
 import { cn } from '@/utils/common/cn';
-import { FocusEvent, useCallback, useRef, useState } from 'react';
+import { FocusEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
 const DEFAULT_MAX_HEIGHT = 'calc(100% - 50px)';
@@ -35,6 +35,7 @@ interface CodeInputProps {
   readOnly?: boolean;
   transparent?: boolean;
   maxHeight?: string;
+  focused?: boolean;
 }
 
 export function CodeInput({
@@ -48,6 +49,7 @@ export function CodeInput({
   readOnly = false,
   transparent = false,
   maxHeight = DEFAULT_MAX_HEIGHT,
+  focused,
 }: CodeInputProps) {
   const [focus, setFocus] = useState(false);
   const editorBoxRef = useRef<HTMLDivElement | null>(null);
@@ -112,13 +114,22 @@ export function CodeInput({
         return;
       }
 
-      setFocus(false);
-      onBlur?.();
+      if (focus) {
+        setFocus(false);
+        onBlur?.();
+      }
     },
-    [disabled, onBlur, readOnly],
+    [disabled, focus, onBlur, readOnly],
   );
 
   useClickOutside(editorBoxRef, handleClickOutside);
+
+  useEffect(() => {
+    if (focused) {
+      setFocus(true);
+      textareaRef.current?.focus();
+    }
+  }, [focused]);
 
   return (
     <div className="h-full">
