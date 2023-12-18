@@ -14,20 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  Menu,
-  dialog,
-  IpcMainEvent,
-  MenuItemConstructorOptions,
-  shell,
-  ipcRenderer,
-} from 'electron';
-import { spawn } from 'child_process';
+import { app, BrowserWindow, ipcMain, Menu, dialog, IpcMainEvent, MenuItemConstructorOptions, shell } from 'electron';
+import { ChildProcess, spawn } from 'child_process';
 import path from 'path';
 import net from 'net';
+import { v4 as uuidv4 } from 'uuid';
+
+import { windowStateTracker } from './windowStateTracker';
 
 const LoadingStages = {
   Initializing: 30,
@@ -45,7 +38,7 @@ let mainWindow: BrowserWindow;
 
 type AIConsoleWindow = {
   browserWindow: BrowserWindow;
-  backendProcess?: any;
+  backendProcess?: ChildProcess;
   port?: number;
 };
 
@@ -53,7 +46,7 @@ const windowManager: {
   windows: AIConsoleWindow[];
   addWindow: (browserWindow: BrowserWindow) => void;
   removeWindow: (targetWindow: BrowserWindow) => void;
-  findBackendByWindow: (targetWindow: BrowserWindow) => any;
+  findBackendByWindow: (targetWindow: BrowserWindow) => ChildProcess;
 } = {
   windows: [],
   addWindow: (browserWindow) => {
@@ -143,9 +136,13 @@ async function findEmptyPort(startingFrom = 1024, endingAt = 65535) {
 }
 
 async function createWindow() {
+  const stateTracker = await windowStateTracker(!windowManager.windows.length ? 'main' : uuidv4());
+
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: stateTracker.width,
+    height: stateTracker.height,
+    x: stateTracker.x,
+    y: stateTracker.y,
     backgroundColor: '#111111',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -154,6 +151,8 @@ async function createWindow() {
     icon: '../assets/icon.png',
     show: false,
   });
+
+  stateTracker.track(mainWindow);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -171,6 +170,7 @@ async function createWindow() {
   mainWindow.on('closed', () => {
     const backendProcess = windowManager.findBackendByWindow(mainWindow);
     if (backendProcess) {
+      backendProcess.removeAllListeners();
       backendProcess.kill();
     }
     windowManager.removeWindow(mainWindow);
@@ -279,11 +279,6 @@ ipcMain.on('request-backend-port', async (event) => {
         `--origin=${MAIN_WINDOW_VITE_DEV_SERVER_URL}`,
       ]);
 
-      //close the app when backend process exits
-      window.backendProcess.on('exit', () => {
-        log(window.browserWindow, 'Backend process exited');
-      });
-
       window.backendProcess.on('error', (e: Error) => {
         error(window.browserWindow, `Error from backend process: ${e.message}`);
       });
@@ -307,6 +302,7 @@ ipcMain.on('request-backend-port', async (event) => {
       });
 
       window.backendProcess.on('exit', (code: string) => {
+        window.browserWindow.webContents.send('backend-exit');
         log(window.browserWindow, `FastAPI server exited with code ${code}`);
       });
 
@@ -325,7 +321,8 @@ app.whenReady().then(() => {
 
   app.on('will-quit', () => {
     windowManager.windows.forEach(({ backendProcess }) => {
-      backendProcess.kill();
+      backendProcess?.removeAllListeners();
+      backendProcess?.kill();
     });
   });
 
