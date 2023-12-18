@@ -17,7 +17,6 @@
 import { useRef, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { useUserContextMenu } from '@/utils/common/useUserContextMenu';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
@@ -44,7 +43,9 @@ function UserInfoMaterialLink({ materialId }: { materialId: string }) {
 }
 
 export function UserInfo({ agentId, materialsIds, task }: { agentId: string; materialsIds: string[]; task?: string }) {
-  const agent = useAssetStore((state) => state.getAsset('agent', agentId));
+  const agents = useEditablesStore((state) => state.agents) || [];
+  const agent = agents.find((m) => m.id === agentId);
+
   const editableMenuItems = useEditableObjectContextMenu({
     editableObjectType: 'agent',
     editable: agent || {
@@ -56,7 +57,7 @@ export function UserInfo({ agentId, materialsIds, task }: { agentId: string; mat
   const triggerRef = useRef<ContextMenuRef>(null);
 
   const openContext = (event: MouseEvent) => {
-    if (triggerRef.current) {
+    if (triggerRef.current && agentId === 'user') {
       triggerRef?.current.handleTriggerClick(event);
     }
   };
