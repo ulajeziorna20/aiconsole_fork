@@ -199,6 +199,7 @@ const SideBarItem = ({
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
                     onChange={(e) => setInputText(e.target.value)}
+                    autoFocus
                   />
                 ) : (
                   <p className="text-[14px] leading-[18.2px] group-hover:text-white truncate">{editableObject.name}</p>
