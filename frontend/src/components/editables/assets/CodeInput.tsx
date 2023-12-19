@@ -22,7 +22,8 @@ import { cn } from '@/utils/common/cn';
 import { FocusEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { Icon } from '@/components/common/icons/Icon';
-import { Maximize2 } from 'lucide-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
+import { CodeInputFullScreen } from './CodeInputFullScreen';
 
 const DEFAULT_MAX_HEIGHT = 'calc(100% - 60px)';
 
@@ -39,6 +40,7 @@ interface CodeInputProps {
   transparent?: boolean;
   maxHeight?: string;
   focused?: boolean;
+  withFullscreen?: boolean;
 }
 
 export function CodeInput({
@@ -54,8 +56,10 @@ export function CodeInput({
   maxHeight = DEFAULT_MAX_HEIGHT,
   labelContent,
   focused,
+  withFullscreen,
 }: CodeInputProps) {
   const [focus, setFocus] = useState(false);
+  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const editorBoxRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const onHighlight = (code: string) => {
@@ -99,7 +103,7 @@ export function CodeInput({
   }, []);
 
   const handleFocus = useCallback(({ target }: FocusEvent<HTMLDivElement> & FocusEvent<HTMLTextAreaElement>) => {
-    if (!textareaRef.current) {
+    if (!textareaRef.current || target !== textareaRef.current) {
       if (target) {
         textareaRef.current = target;
       }
@@ -135,13 +139,20 @@ export function CodeInput({
     }
   }, [focused]);
 
-  const maximize = () => {
-    console.log('max');
+  useEffect(() => {
+    if (!isFullscreenOpen) {
+      setFocus(false);
+      textareaRef.current?.blur();
+    }
+  }, [focused, isFullscreenOpen]);
+
+  const toggleFullscreen = () => {
+    setIsFullscreenOpen((prev) => !prev);
   };
 
-  return (
-    <div className="h-full">
-      {label && (
+  const codeInputCore = (fullScreen: boolean) => (
+    <div className="h-full relative">
+      {label && fullScreen && (
         <div className="font-semibold text-white mb-[10px] flex ">
           <label htmlFor={label} className="py-[12px]">
             {label}
@@ -157,7 +168,7 @@ export function CodeInput({
         }}
         className={cn(
           className,
-          'border-gray-500 w-[calc(100%-8px)] font-mono text-sm overflow-y-auto bg-gray-800 border rounded-[8px] transition duration-100 relative',
+          'border-gray-500 w-[calc(100%-8px)] font-mono text-sm overflow-y-auto bg-gray-800 border rounded-[8px] transition duration-100',
           {
             'bg-gray-600 border-gray-400': focus,
             'hover:bg-gray-600 hover:placeholder:text-gray-300': !disabled && !readOnly,
@@ -170,6 +181,7 @@ export function CodeInput({
           disabled={disabled || readOnly}
           textareaId={label}
           onValueChange={handleValueChange}
+          placeholder="Write some text"
           onFocus={handleFocus}
           highlight={(code) => onHighlight(code)}
           padding={10}
@@ -182,18 +194,36 @@ export function CodeInput({
             },
           )}
           preClassName="!px-[20px] !py-[12px] "
-          textareaClassName={cn('focus:!outline-none focus:!shadow-none h-full !px-[20px] !py-[12px] ', {
+          textareaClassName={cn('focus:!outline-none focus:!shadow-none h-full !px-[20px] !py-[12px] h-full', {
             'cursor-not-allowed': disabled,
           })}
         />
-        <Icon
-          icon={Maximize2}
-          width={24}
-          height={24}
-          className="absolute right-[20px] bottom-[20px] cursor-pointer"
-          onClick={maximize}
-        />
+
+        {withFullscreen ? (
+          <Icon
+            icon={isFullscreenOpen ? Minimize2 : Maximize2}
+            width={24}
+            height={24}
+            className={cn(`absolute right-[25px] bottom-[80px] cursor-pointer text-gray-300 hover:text-white`, {
+              'right-[25px] bottom-[20px]': fullScreen,
+            })}
+            onClick={toggleFullscreen}
+          />
+        ) : null}
       </div>
     </div>
   );
+
+  if (withFullscreen) {
+    return (
+      <>
+        {codeInputCore(withFullscreen)}
+        <CodeInputFullScreen setOpen={setIsFullscreenOpen} open={isFullscreenOpen}>
+          {codeInputCore(false)}
+        </CodeInputFullScreen>
+      </>
+    );
+  }
+
+  return codeInputCore(false);
 }

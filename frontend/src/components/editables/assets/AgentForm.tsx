@@ -8,6 +8,7 @@ import { Select } from '@/components/common/Select';
 import { useState } from 'react';
 import { HelperLabel } from './HelperLabel';
 import ImageUploader from '@/components/common/ImageUploader';
+import { CodeInputFullScreen } from './CodeInputFullScreen';
 
 const executionModes = [
   {
@@ -79,6 +80,7 @@ export const AgentForm = ({ agent }: AgentFormProps) => {
             label="System prompt"
             labelContent={<HelperLabel helperText="Add your system prompt if needed." className="py-[13px]" />}
             value={agent.system}
+            withFullscreen
             codeLanguage="markdown"
             // maxHeight={isCustomMode ? 'calc(100% - 120px)' : 'calc(100% - 200px)'}
             onChange={setAsset}
