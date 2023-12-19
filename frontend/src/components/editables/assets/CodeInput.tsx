@@ -19,14 +19,17 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css';
 
 import { cn } from '@/utils/common/cn';
-import { FocusEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { FocusEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useClickOutside } from '@/hooks/useClickOutside';
+import { Icon } from '@/components/common/icons/Icon';
+import { Maximize2 } from 'lucide-react';
 
-const DEFAULT_MAX_HEIGHT = 'calc(100% - 50px)';
+const DEFAULT_MAX_HEIGHT = 'calc(100% - 60px)';
 
 interface CodeInputProps {
   label?: string;
   value: string;
+  labelContent?: ReactNode;
   className?: string;
   onChange?: (value: string) => void;
   onBlur?: () => void;
@@ -49,6 +52,7 @@ export function CodeInput({
   readOnly = false,
   transparent = false,
   maxHeight = DEFAULT_MAX_HEIGHT,
+  labelContent,
   focused,
 }: CodeInputProps) {
   const [focus, setFocus] = useState(false);
@@ -131,12 +135,19 @@ export function CodeInput({
     }
   }, [focused]);
 
+  const maximize = () => {
+    console.log('max');
+  };
+
   return (
     <div className="h-full">
       {label && (
-        <label htmlFor={label} className="font-bold block mb-4">
-          {label}:
-        </label>
+        <div className="font-semibold text-white mb-[10px] flex ">
+          <label htmlFor={label} className="py-[12px]">
+            {label}
+          </label>{' '}
+          {labelContent}
+        </div>
       )}
       <div
         ref={editorBoxRef}
@@ -146,7 +157,7 @@ export function CodeInput({
         }}
         className={cn(
           className,
-          'border-gray-500  w-[calc(100%-8px)] font-mono text-sm overflow-y-auto bg-gray-800 border rounded-[8px]  transition duration-100',
+          'border-gray-500 w-[calc(100%-8px)] font-mono text-sm overflow-y-auto bg-gray-800 border rounded-[8px] transition duration-100 relative',
           {
             'bg-gray-600 border-gray-400': focus,
             'hover:bg-gray-600 hover:placeholder:text-gray-300': !disabled && !readOnly,
@@ -163,7 +174,7 @@ export function CodeInput({
           highlight={(code) => onHighlight(code)}
           padding={10}
           className={cn(
-            'resize-none appearance-none border border-transparent w-full leading-tight placeholder-gray-400 bottom-0 p-0 h-full  placeholder:text-gray-400  text-[15px] text-white  rounded-[8px]  ',
+            'resize-none appearance-none border border-transparent w-full leading-tight placeholder-gray-400 bottom-0 p-0 h-full  placeholder:text-gray-400  text-[15px] text-white  rounded-[8px]',
             {
               'opacity-[0.7] ': disabled,
               'bg-transparent': transparent,
@@ -174,6 +185,13 @@ export function CodeInput({
           textareaClassName={cn('focus:!outline-none focus:!shadow-none h-full !px-[20px] !py-[12px] ', {
             'cursor-not-allowed': disabled,
           })}
+        />
+        <Icon
+          icon={Maximize2}
+          width={24}
+          height={24}
+          className="absolute right-[20px] bottom-[20px] cursor-pointer"
+          onClick={maximize}
         />
       </div>
     </div>

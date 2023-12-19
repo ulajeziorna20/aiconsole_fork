@@ -14,10 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ChangeEvent } from 'react';
+import { ChangeEvent, ReactNode } from 'react';
 import { cn } from '@/utils/common/cn';
 import Tooltip from '@/components/common/Tooltip';
 import TextareaAutosize from 'react-textarea-autosize';
+import { HelperLabel } from './HelperLabel';
 
 const REQUIRED_ERROR_MESSAGE = 'This field is required.';
 
@@ -41,6 +42,10 @@ interface TextInputProps {
   horizontal?: boolean;
   fullWidth?: boolean;
   resize?: boolean;
+  helperText?: string;
+  learnMoreLink?: string;
+  labelChildren?: ReactNode;
+  hidden?: boolean;
 }
 
 export function TextInput({
@@ -59,6 +64,10 @@ export function TextInput({
   tootltipText,
   fullWidth,
   resize,
+  helperText,
+  learnMoreLink,
+  labelChildren,
+  hidden,
 }: TextInputProps) {
   const checkIfEmpty = (value: string) => {
     if (required && value.trim() === '') {
@@ -112,17 +121,22 @@ export function TextInput({
       })}
     >
       {label ? (
-        <label htmlFor={label} className="font-semibold text-white text-[16px] flex items-center gap-1 w-fit-content">
-          {label}
-        </label>
+        <div className="font-semibold text-white text-[16px] flex items-center gap-[30px] ">
+          <label htmlFor={label} className="min-w-fit">
+            {label}
+          </label>
+          {labelChildren}
+          {helperText ? <HelperLabel helperText={helperText} learnMoreLink={learnMoreLink} /> : null}
+        </div>
       ) : null}
-      {withTooltip ? (
+
+      {withTooltip && !hidden ? (
         <Tooltip label={tootltipText} position="top" align="end" disableAnimation>
           {core}
         </Tooltip>
-      ) : (
-        core
-      )}
+      ) : null}
+
+      {!withTooltip && !hidden ? core : null}
       {error && <div className="text-red-700 text-sm absolute right-0">{error}</div>}
     </div>
   );
