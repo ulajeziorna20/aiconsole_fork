@@ -17,6 +17,13 @@ class CustomGitHubPublisher extends GitHub {
       }
     }
 
+    // Modify the release data to create a pre-release
+    options.release = {
+      ...options.release,
+      prerelease: true,
+      draft: false,
+    };
+
     // Call the original publish method
     return super.publish(options);
   }
@@ -110,6 +117,7 @@ module.exports = {
         name: "aiconsole",
       },
       prerelease: true,
+      draft: false,
     }),
   ],
   plugins: [
@@ -130,7 +138,7 @@ module.exports = {
             config: "vite.preload.config.ts",
           },
           {
-            entry: "./src/loader.html", 
+            entry: "./src/loader.html",
           },
         ],
         renderer: [
