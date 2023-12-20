@@ -122,7 +122,7 @@ export const EmptyChat = () => {
       </ContextMenu>
       {activeSystemAgents.length > 0 ? (
         <>
-          <p className="mb-4 text-center text-[14px] text-gray-400">Agents in the project:</p>
+          <p className="mb-[11px] text-center text-[14px] text-gray-400">Agents in the project:</p>
           <div className="flex items-center justify-center mb-8 w-full max-w-[700px] mx-auto">
             <SliderArrowLeft className="swiper-left text-gray-400 cursor-pointer" />
             <Swiper
