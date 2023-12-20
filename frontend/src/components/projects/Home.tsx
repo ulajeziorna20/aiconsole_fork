@@ -27,6 +27,7 @@ export function Home() {
   const isApiKeyValid = useSettingsStore((state) => state.isApiKeyValid);
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const recentProjects = useRecentProjectsStore((state) => state.recentProjects);
+
   return (
     <div className="min-h-[100vh] bg-recent-bg bg-cover bg-top">
       <div>
@@ -53,6 +54,7 @@ export function Home() {
                 </div>
               </>
             ) : null}
+
             {!recentProjects.length || !openAiApiKey || !isApiKeyValid ? (
               <RecentProjectsEmpty openAiApiKey={openAiApiKey} isApiKeyValid={isApiKeyValid} />
             ) : null}
