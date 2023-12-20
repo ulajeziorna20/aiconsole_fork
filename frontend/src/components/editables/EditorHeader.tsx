@@ -37,7 +37,7 @@ export function EditorHeader({ editable, onRename, children, isChanged, editable
   }
 
   return (
-    <div onClick={() => setIsEditing(true)} className="flex border-b border-gray-600 ">
+    <div onClick={() => setIsEditing(true)} className="flex border-b border-gray-600 w-full">
       {editableObjectType !== 'chat' && lastUsedChat ? (
         <Button
           variant="tertiary"
@@ -47,7 +47,7 @@ export function EditorHeader({ editable, onRename, children, isChanged, editable
           <Icon icon={ArrowLeftToLine} /> Back
         </Button>
       ) : null}
-      <div className="px-[20px] py-[13px] w-full flex-none flex flex-row gap-[10px] cursor-pointer  bg-gray-90 shadow-md items-center overflow-clip relative">
+      <div className="px-[20px] py-[13px] w-[100%] flex flex-row gap-[10px] cursor-pointer  bg-gray-90 shadow-md items-center overflow-clip relative">
         <AssetIcon
           className={cn(
             'flex-none',
@@ -71,8 +71,8 @@ export function EditorHeader({ editable, onRename, children, isChanged, editable
           setIsEditing={setIsEditing}
           className={'flex-grow truncate ' + (isChanged ? ' italic font-bold ' : '')}
         />
+        <div className="self-end text-gray-400 text-[15px] min-w-fit">{children}</div>
       </div>
-      <div className="self-end text-gray-400 text-[15px] min-w-fit">{children}</div>
     </div>
   );
 }
