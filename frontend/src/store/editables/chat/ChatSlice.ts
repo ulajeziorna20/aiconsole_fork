@@ -25,12 +25,18 @@ import { ChatStore } from './useChatStore';
 export type ChatSlice = {
   chat?: Chat;
   saveCurrentChatHistory: () => Promise<void>;
+  lastUsedChat?: Chat;
+  setLastUsedChat: (chat: Chat) => void;
 };
 
 export const createChatSlice: StateCreator<ChatStore, [], [], ChatSlice> = (set, get) => ({
   chat: undefined,
   agent: undefined,
+  lastUsedChat: undefined,
   materials: [],
+  setLastUsedChat: (chat: Chat) => {
+    set({ lastUsedChat: chat });
+  },
   saveCurrentChatHistory: async () => {
     const chat = deepCopyChat(get().chat);
 

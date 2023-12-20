@@ -84,6 +84,7 @@ export function ChatPage() {
   const command = useChatStore((state) => state.commandHistory[state.commandIndex]);
 
   const chat = useChatStore((state) => state.chat);
+  const setLastUsedChat = useChatStore((state) => state.setLastUsedChat);
   const loadingMessages = useChatStore((state) => state.loadingMessages);
   const isAnalysisRunning = useChatStore((state) => state.isAnalysisRunning());
   const isExecutionRunning = useChatStore((state) => state.isExecutionRunning());
@@ -125,6 +126,12 @@ export function ChatPage() {
       document.removeEventListener('drop', handleDrop);
     };
   });
+
+  useEffect(() => {
+    if (chat) {
+      setLastUsedChat(chat);
+    }
+  }, [chat, setLastUsedChat]);
 
   // Acquire the initial object
   useEffect(() => {
@@ -227,7 +234,7 @@ export function ChatPage() {
   return (
     <div className="flex flex-col w-full h-full max-h-full overflow-auto">
       <ContextMenu options={menuItems}>
-        <EditorHeader editable={chat} onRename={handleRename} isChanged={false} />
+        <EditorHeader editableObjectType="chat" editable={chat} onRename={handleRename} isChanged={false} />
       </ContextMenu>
 
       <div className="flex-grow overflow-auto">
