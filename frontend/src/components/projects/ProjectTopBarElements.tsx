@@ -51,7 +51,7 @@ export function ProjectTopBarElements() {
           <ContextMenu options={contextMenuItems}>
             <Link
               to={`/chats/${uuidv4()}`}
-              className="h-11 text-grey-300 font-bold  text-lg text-gray-400 hover:animate-pulse cursor-pointer flex gap-2 items-center mr-[20px] uppercase"
+              className="h-11 text-grey-300 font-bold  text-lg text-gray-400 hover:animate-pulse cursor-pointer flex gap-2 items-center mr-[32px] uppercase"
             >
               {projectName}
             </Link>
