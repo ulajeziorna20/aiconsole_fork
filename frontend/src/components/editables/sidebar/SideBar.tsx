@@ -39,10 +39,10 @@ const SideBar = ({ initialTab }: { initialTab: string }) => {
 
   return (
     <div
-      className={`min-w-[336px] w-[336px] h-full  bg-gray-900 pl-[30px] py-[20px] drop-shadow-md flex flex-col border-r  border-gray-600 `}
+      className={`min-w-[336px] w-[336px] h-full  bg-gray-900 pl-[20px] py-[20px] drop-shadow-md flex flex-col border-r  border-gray-600 `}
     >
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
-        <Tabs.List className="mb-[15px] mr-[30px]">
+        <Tabs.List className="mb-[15px] mr-[20px]">
           {TABS.map(({ label, key }) => (
             <Tab key={key} value={key} label={label} activeTab={activeTab} />
           ))}

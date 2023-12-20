@@ -160,7 +160,7 @@ const SideBarItem = ({
 
   return (
     <ContextMenu options={menuItems} ref={triggerRef} onOpenChange={handleOpenContextChange}>
-      <div className="max-w-[275px] mb-[5px]">
+      <div className="max-w-[295px] mb-[5px]">
         <div
           className={cn(
             forced && editableObjectType === 'agent' && 'text-agent',
