@@ -274,9 +274,17 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                 )}
                 <div className="flex items-center justify-between w-full gap-[10px]">
                   {isProjectAsset ? (
-                    <Button onClick={() => handleDeleteWithInteraction(asset.id)} variant="tertiary">
-                      <Icon icon={Trash} /> Delete {assetType}
-                    </Button>
+                    <AlertDialog
+                      title={`Are you sure you want to delete this ${editableObjectType}?`}
+                      onConfirm={() => handleDeleteWithInteraction(asset.id)}
+                      openModalButton={
+                        <Button variant="tertiary">
+                          <Icon icon={Trash} /> Delete {assetType}
+                        </Button>
+                      }
+                    >
+                      This process is irreversible.
+                    </AlertDialog>
                   ) : null}
                   <Button
                     disabled={disableSubmit}
@@ -290,11 +298,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
               </div>
             )}
             <AlertDialog
-              title="Do you want to discard your changes and continue?"
+              title="Are you sure you want to close this window?"
               isOpen={blockerState === 'blocked'}
               onClose={reset}
               onConfirm={confirmPageEscape}
-            />
+            >
+              {`This ${assetType} is unsaved.\nYou may lose your changes.`}
+            </AlertDialog>
           </div>
         </div>
       </div>
