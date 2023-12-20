@@ -152,7 +152,7 @@ export function CodeInput({
 
   const codeInputCore = (fullScreen: boolean) => (
     <div className="h-full relative">
-      {label && fullScreen && (
+      {label && (fullScreen || !withFullscreen) && (
         <div className="font-semibold text-white mb-[10px] flex ">
           <label htmlFor={label} className="py-[12px]">
             {label}
