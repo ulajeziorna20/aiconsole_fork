@@ -37,7 +37,7 @@ export function EditorHeader({ editable, onRename, children, isChanged, editable
   }
 
   return (
-    <div onClick={() => setIsEditing(true)} className="flex border-b border-gray-600 w-full">
+    <div className="flex border-b border-gray-600 w-full">
       {editableObjectType !== 'chat' && lastUsedChat ? (
         <Button
           variant="tertiary"
@@ -47,30 +47,32 @@ export function EditorHeader({ editable, onRename, children, isChanged, editable
           <Icon icon={ArrowLeftToLine} /> Back
         </Button>
       ) : null}
-      <div className="px-[20px] py-[13px] w-[100%] flex flex-row gap-[10px] cursor-pointer  bg-gray-90 shadow-md items-center overflow-clip relative">
-        <AssetIcon
-          className={cn(
-            'flex-none',
-            editableType === 'chat' && 'text-chat',
-            editableType === 'agent' && 'text-agent',
-            editableType === 'material' && 'text-material',
-          )}
-        />
-        <div
-          className={cn(
-            'absolute bottom-[-20px] left-[15px] opacity-[0.3] blur-[10px]  h-[34px] w-[34px] group-hover:block',
-            editableObjectType === 'chat' && 'fill-chat bg-chat',
-            editableObjectType === 'agent' && 'fill-agent bg-agent',
-            editableObjectType === 'material' && 'fill-material bg-material',
-          )}
-        />
-        <InlineEditableObjectName
-          editableObject={editable}
-          onRename={onRename}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
-          className={'flex-grow truncate ' + (isChanged ? ' italic font-bold ' : '')}
-        />
+      <div className="px-[20px] py-[13px] w-full flex flex-row gap-[10px] cursor-pointer  bg-gray-90 shadow-md items-center overflow-clip relative">
+        <div onClick={() => setIsEditing(true)} className="flex flex-row gap-[10px] items-center w-full">
+          <AssetIcon
+            className={cn(
+              'flex-none',
+              editableType === 'chat' && 'text-chat',
+              editableType === 'agent' && 'text-agent',
+              editableType === 'material' && 'text-material',
+            )}
+          />
+          <div
+            className={cn(
+              'absolute bottom-[-20px] left-[15px] opacity-[0.3] blur-[10px]  h-[34px] w-[34px] group-hover:block',
+              editableObjectType === 'chat' && 'fill-chat bg-chat',
+              editableObjectType === 'agent' && 'fill-agent bg-agent',
+              editableObjectType === 'material' && 'fill-material bg-material',
+            )}
+          />
+          <InlineEditableObjectName
+            editableObject={editable}
+            onRename={onRename}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            className={'flex-grow truncate ' + (isChanged ? ' italic font-bold ' : '')}
+          />
+        </div>
         <div className="self-end text-gray-400 text-[15px] min-w-fit">{children}</div>
       </div>
     </div>

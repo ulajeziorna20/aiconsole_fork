@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/common/AlertDialog';
 import { Button } from '@/components/common/Button';
 import { Icon } from '@/components/common/icons/Icon';
 import { Asset, AssetType } from '@/types/editables/assetTypes';
@@ -14,9 +15,18 @@ interface AssetInfoBarProps {
 }
 
 export const RestoreButton = ({ onRevert }: { onRevert: () => void }) => (
-  <Button variant="tertiary" onClick={onRevert} small classNames="p-0">
-    <Icon icon={IterationCcw} /> Restore original
-  </Button>
+  <AlertDialog
+    title="Are you sure you want to restore the original?"
+    onConfirm={onRevert}
+    confirmationButtonText="Restore original"
+    openModalButton={
+      <Button variant="tertiary" small classNames="p-0">
+        <Icon icon={IterationCcw} /> Restore original
+      </Button>
+    }
+  >
+    You may lose your changes.
+  </AlertDialog>
 );
 
 export const AssetInfoBar = ({ asset, hasCore, assetType, lastSavedAsset, onRevert }: AssetInfoBarProps) => {
