@@ -117,12 +117,12 @@ export function ProjectCard({ name, path, chatHistory }: ProjectCardProps) {
   // TODO: add duplicate logic and hide logic
   const contextMenuItems: ContextMenuItems = useMemo(
     () => [
-      {
-        type: 'item',
-        icon: Edit,
-        title: 'Rename',
-        action: () => setIsEditing(true),
-      },
+      // {
+      //   type: 'item',
+      //   icon: Edit,
+      //   title: 'Rename',
+      //   action: () => setIsEditing(true),
+      // },
       // {
       //   type: 'item',
       //   icon: Copy,
@@ -136,7 +136,7 @@ export function ProjectCard({ name, path, chatHistory }: ProjectCardProps) {
       //   title: 'Hide recent',
       //   action: () => {},
       // },
-      { type: 'separator', key: 'delete-separator' },
+      // { type: 'separator', key: 'delete-separator' },
       {
         type: 'item',
         icon: Trash,
