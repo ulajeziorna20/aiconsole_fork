@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { FormGroup } from '@/components/common/FormGroup';
 import { CodeInput } from './CodeInput';
-import { TextInput } from './TextInput';
-import { Agent } from '@/types/editables/assetTypes';
+import { ErrorObject, TextInput } from './TextInput';
+import { Agent, Asset } from '@/types/editables/assetTypes';
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import { Select } from '@/components/common/Select';
 import { useState } from 'react';
@@ -16,6 +16,10 @@ const executionModes = [
     label: 'Normal',
   },
   {
+    value: 'aiconsole.core.execution_modes.interpreter:execution_mode_interpreter',
+    label: 'Interpreter',
+  },
+  {
     value: 'custom',
     label: 'Custom',
   },
@@ -23,16 +27,31 @@ const executionModes = [
 
 interface AgentFormProps {
   agent: Agent;
+  errors?: ErrorObject;
+  setErrors?: React.Dispatch<React.SetStateAction<ErrorObject>>;
 }
 
 // TODO: all commented lines are ready UI - integrate it with backend when ready
-export const AgentForm = ({ agent }: AgentFormProps) => {
+export const AgentForm = ({ agent, errors, setErrors }: AgentFormProps) => {
   const [executionMode, setExecutionMode] = useState('');
+  const [customExecutionMode, setCustomExecutionMode] = useState('');
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
-  const handleChange = (value: string) => setSelectedAsset({ ...agent, usage: value });
+  const handleUsageChange = (value: string) => setSelectedAsset({ ...agent, usage: value });
+  const setExecutionModeState = (value: string) => setSelectedAsset({ ...agent, execution_mode: value } as Asset);
+  const isCustomMode = executionMode !== 'custom';
 
   const handleSetExecutionMode = (value: string) => {
     setExecutionMode(value);
+    if (!isCustomMode) {
+      setCustomExecutionMode('');
+      setErrors?.((prev) => ({ ...prev, executionMode: '' }));
+      setExecutionModeState(value);
+    }
+  };
+
+  const handleCustomExecutionModeChange = (value: string) => {
+    setCustomExecutionMode(value);
+    setExecutionModeState(value);
   };
 
   const setAsset = (value: string) =>
@@ -40,8 +59,6 @@ export const AgentForm = ({ agent }: AgentFormProps) => {
       ...agent,
       system: value,
     } as Agent);
-
-  const isCustomMode = executionMode !== 'custom';
 
   return (
     <>
@@ -55,7 +72,7 @@ export const AgentForm = ({ agent }: AgentFormProps) => {
             placeholder="Write text here"
             value={agent.usage}
             className="w-full"
-            onChange={handleChange}
+            onChange={handleUsageChange}
             helperText="Usage is used to help identify when this agent should be used. "
             resize
           />
@@ -63,26 +80,29 @@ export const AgentForm = ({ agent }: AgentFormProps) => {
       </div>
       <FormGroup className="w-full h-full flex overflow-clip">
         <div className="flex-1">
-          {/* <TextInput
+          <TextInput
             label="Execution mode"
             name="executionMode"
+            required
             placeholder="Write text here"
-            value={executionMode}
-            onChange={handleChange}
+            setErrors={setErrors}
+            errors={errors}
+            value={customExecutionMode}
+            onChange={handleCustomExecutionModeChange}
             className="mb-[20px]"
             helperText="Choose the right execution mode for your agent."
             hidden={isCustomMode}
             labelChildren={
               <Select options={executionModes} placeholder="Choose execution mode" onChange={handleSetExecutionMode} />
             }
-          /> */}
+          />
           <CodeInput
             label="System prompt"
             labelContent={<HelperLabel helperText="Add your system prompt if needed." className="py-[13px]" />}
             value={agent.system}
             withFullscreen
             codeLanguage="markdown"
-            // maxHeight={isCustomMode ? 'calc(100% - 120px)' : 'calc(100% - 200px)'}
+            maxHeight={isCustomMode ? 'calc(100% - 120px)' : 'calc(100% - 200px)'}
             onChange={setAsset}
           />
         </div>

@@ -26,6 +26,15 @@ export type ErrorObject = {
   [key: string]: string | null;
 };
 
+export const checkErrors = (errors: ErrorObject): boolean => {
+  for (const key in errors) {
+    if (errors[key as keyof ErrorObject]) {
+      return true;
+    }
+  }
+  return false;
+};
+
 interface TextInputProps {
   label?: string;
   value: string;
@@ -98,6 +107,7 @@ export function TextInput({
     className: cn(
       className,
       'max-h-[120px] w-full overflow-y-auto border border-gray-500 placeholder:text-gray-400 bg-gray-800 text-[15px] text-white flex-grow resize-none rounded-[8px]  px-[20px] py-[12px] hover:bg-gray-600 hover:placeholder:text-gray-300 focus:bg-gray-600 focus:border-gray-400 focus:outline-none transition duration-100',
+      { 'border-danger': error },
     ),
     value,
     id: label,
@@ -137,7 +147,7 @@ export function TextInput({
       ) : null}
 
       {!withTooltip && !hidden ? core : null}
-      {error && <div className="text-red-700 text-sm absolute right-0">{error}</div>}
+      {error && !hidden && <div className="text-danger text-sm absolute right-0 -bottom-[8px]">{error}</div>}
     </div>
   );
 }
