@@ -37,6 +37,7 @@ import { MaterialForm } from './MaterialForm';
 import { useAssetEditor } from './useAssetEditor';
 import { AgentForm } from './AgentForm';
 import { cn } from '@/utils/common/cn';
+import { ErrorObject, checkErrors } from './TextInput';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -56,7 +57,9 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
   const [newPath, setNewPath] = useState<string>('');
   const [hasCore, setHasCore] = useState(false);
-
+  const [errors, setErrors] = useState<ErrorObject>({
+    executionMode: '',
+  });
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
@@ -217,7 +220,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   };
 
   const isSubmitEnabled = enableSubmit();
-  const disableSubmit = !isSubmitEnabled && !isSavedButtonLabel;
+  const disableSubmit = (!isSubmitEnabled && !isSavedButtonLabel) || checkErrors(errors);
 
   const confirmPageEscape = () => {
     getInitialAsset();
@@ -270,7 +273,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                 {assetType === 'material' ? (
                   <MaterialForm material={asset as Material} />
                 ) : (
-                  <AgentForm agent={asset as Agent} />
+                  <AgentForm agent={asset as Agent} setErrors={setErrors} errors={errors} />
                 )}
                 <div className="flex items-center justify-between w-full gap-[10px]">
                   {isProjectAsset ? (
