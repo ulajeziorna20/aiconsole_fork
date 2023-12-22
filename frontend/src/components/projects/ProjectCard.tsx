@@ -151,7 +151,7 @@ export function ProjectCard({ name, path, chatHistory }: ProjectCardProps) {
     <ContextMenu options={contextMenuItems} ref={triggerRef} onOpenChange={handleOpenContextChange}>
       <div
         className={cn(
-          'group border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] max-w-[435px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient min-h-[240px]',
+          'group border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient min-h-[240px]',
           {
             'bg-project-item-gradient': isShowingContext,
           },
