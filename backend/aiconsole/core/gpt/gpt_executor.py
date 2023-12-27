@@ -22,7 +22,7 @@ from aiconsole.core.gpt.request import GPTRequest
 from aiconsole.api.websockets.outgoing_messages import DebugJSONWSMessage
 from .exceptions import NoOpenAPIKeyException
 from .types import CLEAR_STR, GPTChoice, GPTResponse, GPTResponseMessage
-from openai.error import AuthenticationError
+from openai import AuthenticationError
 from litellm.caching import Cache
 
 _log = logging.getLogger(__name__)
@@ -75,7 +75,7 @@ class GPTExecutor:
 
                 self.partial_response = GPTPartialResponse()
 
-                async for chunk in response:  # type: ignore - for some reason response is not recognized as an async generator
+                async for chunk in response:
                     self.partial_response.apply_chunk(chunk)
                     yield chunk
                     await asyncio.sleep(0)

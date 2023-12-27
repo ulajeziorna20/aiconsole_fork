@@ -16,9 +16,9 @@
 
 from aiconsole.core.assets.asset import AssetStatus
 from aiconsole.core.project import project
+from aiconsole.core.gpt.function_calls import OpenAISchema
 
 
-from openai_function_call import OpenAISchema
 from pydantic import Field
 
 

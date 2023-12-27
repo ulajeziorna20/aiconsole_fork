@@ -31,7 +31,7 @@ from aiconsole.core.gpt.gpt_executor import GPTExecutor
 from aiconsole.core.gpt.request import GPTRequest, ToolDefinition, ToolFunctionDefinition
 from aiconsole.core.gpt.types import CLEAR_STR
 from aiconsole.utils.convert_messages import convert_messages
-from openai_function_call import OpenAISchema
+from aiconsole.core.gpt.function_calls import OpenAISchema
 from pydantic import BaseModel, Field
 
 _log = logging.getLogger(__name__)
