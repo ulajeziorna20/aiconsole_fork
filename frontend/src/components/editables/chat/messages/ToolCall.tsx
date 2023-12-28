@@ -172,7 +172,9 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
           </div>
 
           <div>
-            {tool_call.output && <ToolOutput syntaxHighlighterCustomStyles={customVs2015} tool_call={tool_call} />}
+            {tool_call.output != undefined && (
+              <ToolOutput syntaxHighlighterCustomStyles={customVs2015} tool_call={tool_call} />
+            )}
           </div>
         </div>
       )}
