@@ -52,7 +52,6 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
     def __init__(self):
         self.start_cmd = ""
         self.process = None
-        self.debug_mode = False
         self.output_queue: "queue.Queue[str]" = queue.Queue()
         self.done = threading.Event()
 
@@ -108,8 +107,7 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
             return
 
         while retry_count <= max_retries:
-            if self.debug_mode:
-                print(f"Running code:\n{code}\n---")
+            _log.info(f"Running code:\n{code}\n---")
 
             self.done.clear()
 
