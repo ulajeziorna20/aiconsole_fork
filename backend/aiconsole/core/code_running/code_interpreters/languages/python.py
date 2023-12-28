@@ -97,13 +97,10 @@ def preprocess_python(code: str, materials: list[Material]):
 
     newline = "\n"
     code = f"""
-{apis}
-
-
 import traceback
 from aiconsole.dev.credentials import MissingCredentialException
-
 try:
+{newline.join(("    " + line) for line in apis.split(newline) if line.strip())}
 {newline.join(("    " + line) for line in code.split(newline) if line.strip())}
 except MissingCredentialException as e:
     print(e)
