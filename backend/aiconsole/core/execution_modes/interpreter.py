@@ -202,7 +202,7 @@ async def execution_mode_interpreter(
                                 _log.info(f"function_call: {function_call}")
                                 _log.info(f"function_call.arguments: {function_call.arguments}")
 
-                                code_delta = f"{function_call.name}("  # TODO: This won't work
+                                code_delta = f"{function_call.name}(**"
                                 await send_code_delta(code_delta)
                                 tool_call_data.end_with_code = ")"
                             else:
