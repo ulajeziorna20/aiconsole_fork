@@ -96,12 +96,14 @@ def preprocess_python(code: str, materials: list[Material]):
     apis = ast.unparse(parsed_code)
 
     newline = "\n"
+    api_lines = [line for line in apis.split(newline) if line.strip()]
+    code_lines = [line for line in code.split(newline) if line.strip()]
+
     code = f"""
 import traceback
 from aiconsole.dev.credentials import MissingCredentialException
 try:
-{newline.join(("    " + line) for line in apis.split(newline) if line.strip())}
-{newline.join(("    " + line) for line in code.split(newline) if line.strip())}
+{newline.join(("    " + line) for line in [*api_lines, *code_lines])}
 except MissingCredentialException as e:
     print(e)
 except Exception:
