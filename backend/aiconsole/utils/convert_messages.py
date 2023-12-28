@@ -16,7 +16,6 @@
 
 import json
 from aiconsole.core.chat.types import AICMessage, AICMessageGroup, Chat
-from aiconsole.consts import FUNCTION_CALL_OUTPUT_LIMIT
 from aiconsole.core.gpt.types import (
     GPTFunctionCall,
     GPTRequestMessage,
@@ -96,15 +95,6 @@ As a director I have assigned you ({group.agent_id}) and given you access to the
         else:
             if content == "":
                 content = "No output"
-
-            # Enforce limit on output length, and put info that it was truncated only if limit was reached, truncate so the last part remains (not the first)
-            if len(content) > FUNCTION_CALL_OUTPUT_LIMIT:
-                content = f"""
-Output truncated to last {FUNCTION_CALL_OUTPUT_LIMIT} characters:
-
-...
-{content[-FUNCTION_CALL_OUTPUT_LIMIT:]}
-""".strip()
 
             result.append(GPTRequestToolMessage(tool_call_id=tool_call_id, content=content))
 

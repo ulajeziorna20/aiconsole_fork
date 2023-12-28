@@ -23,6 +23,8 @@ import { ChatStore, useChatStore } from './useChatStore';
 
 import { v4 as uuidv4 } from 'uuid';
 
+const TOOL_CALL_OUTPUT_LIMIT = 20000;
+
 export type RunninngProcess = {
   requestId: string;
   type: 'execute' | 'run' | 'analyse';
@@ -138,6 +140,12 @@ export const createActionSlice: StateCreator<ChatStore, [], [], ActionSlice> = (
       (process) => {
         useChatStore.getState().editToolCall((toolCall) => {
           toolCall.is_code_executing = false;
+          // Enforce limit on output length, and put info that it was truncated only if limit was reached, truncate so the last part remains (not the first)
+          if (toolCall.output && toolCall.output?.length > TOOL_CALL_OUTPUT_LIMIT) {
+            toolCall.output = `Output truncated to last ${TOOL_CALL_OUTPUT_LIMIT} characters:\n...\n${toolCall.output?.substring(
+              toolCall.output.length - TOOL_CALL_OUTPUT_LIMIT,
+            )}`;
+          }
         }, process.entityId);
 
         useChatStore.getState().saveCurrentChatHistory();
