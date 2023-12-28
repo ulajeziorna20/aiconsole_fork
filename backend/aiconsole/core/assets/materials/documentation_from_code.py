@@ -52,6 +52,10 @@ def documentation_from_code(material: "Material", source: str):
             if name.startswith("_"):
                 continue
 
+            # if is imported from somewhere else, skip
+            if not hasattr(obj, "__module__") or obj.__module__ != "temp_module":
+                continue
+
             if inspect.isfunction(obj):
                 # Extract function signature
                 async_prefix = "async " if inspect.iscoroutinefunction(obj) else ""

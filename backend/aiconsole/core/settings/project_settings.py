@@ -163,6 +163,9 @@ class Settings:
     def get_code_autorun(self) -> bool:
         return self._settings.code_autorun
 
+    def get_openai_api_key(self) -> str | None:
+        return self._settings.openai_api_key
+
     def set_code_autorun(self, code_autorun: bool, to_global: bool = False) -> None:
         self._settings.code_autorun = code_autorun
         self.save(PartialSettingsData(code_autorun=self._settings.code_autorun), to_global=to_global)

@@ -89,10 +89,8 @@ export const useAssetStore = create<AssetStore>((set) => ({
           usage_examples: [],
           defined_in: 'project',
           status: 'enabled',
-          content_api: '',
+          content: '',
           content_type: 'static_text',
-          content_dynamic_text: '',
-          content_static_text: '',
           default_status: 'enabled',
           override: false,
         };

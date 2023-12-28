@@ -30,6 +30,82 @@ from fastapi.responses import JSONResponse
 router = APIRouter()
 
 
+def get_default_content_for_type(type: MaterialContentType):
+    if type == MaterialContentType.STATIC_TEXT:
+        return """
+
+content, content content
+
+## Sub header
+
+Bullets in sub header:
+* Bullet 1
+* Bullet 2
+* Bullet 3
+
+""".strip()
+    elif type == MaterialContentType.DYNAMIC_TEXT:
+        return """
+
+import random
+    
+async def content(context):
+    samples = ['sample 1' , 'sample 2', 'sample 3', 'sample 4']
+    return f'''
+# Examples of great content
+{random.sample(samples, 2)}
+
+'''.strip()
+
+""".strip()
+    elif type == MaterialContentType.API:
+        return """
+
+'''
+Add here general API description
+'''
+
+def create():
+    '''
+    Add comment when to use this function, and add example of usage:
+    ```python
+        create()
+    ```
+    '''
+    print("Created")
+
+
+def print_list():
+    '''
+    Use this function to print 'List'.
+    Sample of use:
+    ```python
+        print_list()
+    ```
+
+    '''
+    print("List")
+
+
+
+def fibonacci(n):
+    '''
+    Use it to calculate and return the nth term of the Fibonacci sequence.
+    Sample of use:
+    ```python
+      fibonacci(10)
+    ```
+    '''
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    return fibonacci(n - 1) + fibonacci(n - 2)
+""".strip()
+    else:
+        raise ValueError("Invalid material content type")
+
+
 @router.get("/{material_id}")
 async def material_get(request: Request, material_id: str):
     type = cast(MaterialContentType, request.query_params.get("type", ""))
@@ -47,6 +123,7 @@ async def material_get(request: Request, material_id: str):
             status=AssetStatus.ENABLED,
             defined_in=AssetLocation.PROJECT_DIR,
             override=False,
+            content=get_default_content_for_type(type),
         ),
     )
 

@@ -72,12 +72,8 @@ def preprocess_python(code: str, materials: list[Material]):
 
     # If a line starts with "!" then it's a shell command, we need to wrap it appropriately
     code = "\n".join(
-        [
-            f"import os; os.system({line[1:]!r})" if line.startswith("!") else line
-            for line in code.split("\n")
-        ]
+        [f"import os; os.system({line[1:]!r})" if line.startswith("!") else line for line in code.split("\n")]
     )
-
 
     # Check for syntax errors in user's code
     try:
@@ -98,7 +94,7 @@ def preprocess_python(code: str, materials: list[Material]):
         return f"print(f'''{msg_for_user}''')\nprint('## end_of_execution ##')"
 
     api_materials = [material for material in materials if material.content_type == "api"]
-    apis = [material.content_api for material in api_materials]
+    apis = [material.inlined_content for material in api_materials]
 
     parsed_code = ast.parse("\n\n\n".join(apis))
     parsed_code.body = [b for b in parsed_code.body if not isinstance(b, ast.Expr) or not isinstance(b.value, ast.Str)]
