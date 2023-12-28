@@ -35,13 +35,11 @@
 from typing import Literal, Type
 from aiconsole.core.code_running.code_interpreters.base_code_interpreter import BaseCodeInterpreter
 from .languages.python import Python
-from .languages.shell import Shell
 from .languages.applescript import AppleScript
 
-LanguageStr = Literal["python"] | Literal["shell"] | Literal["applescript"]
+LanguageStr = Literal["python"] | Literal["applescript"]
 
 language_map: dict[LanguageStr, Type[BaseCodeInterpreter]] = {
     "python": Python,
-    "shell": Shell,
     "applescript": AppleScript,
 }

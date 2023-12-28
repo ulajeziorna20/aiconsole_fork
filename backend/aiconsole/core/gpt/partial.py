@@ -14,58 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+from aiconsole.core.gpt.parse_partial_json import parse_partial_json
 
-from litellm import ModelResponse
-from litellm.utils import StreamingChoices, Delta
 from aiconsole.core.gpt.types import GPTChoice, GPTFunctionCall, GPTResponse, GPTResponseMessage, GPTRole, GPTToolCall
+from litellm import ModelResponse
+from litellm.utils import Delta, StreamingChoices
+from openai.types.chat.chat_completion_chunk import ChoiceDeltaToolCall
 from pydantic import BaseModel
-from openai.types.chat.chat_completion_chunk import (
-    ChatCompletionChunk,
-    ChoiceDelta,
-    ChoiceDeltaToolCall,
-)
-
-
-
-def _parse_partial_json(s: str) -> dict | str:
-    try:
-        return json.loads(s)
-    except json.JSONDecodeError:
-        pass
-
-    closing_chars_stack = []
-    escaped = False
-    completed_string = []
-
-    for char in s:
-        if closing_chars_stack and closing_chars_stack[-1] == '"':
-            if char == '"' and not escaped:
-                closing_chars_stack.pop()
-            elif char == "\\":
-                escaped = not escaped
-            elif char == "\n" and not escaped:
-                char = "\\n"
-            else:
-                escaped = False
-        else:
-            if char == '"':
-                closing_chars_stack.append('"')
-            elif char == "{":
-                closing_chars_stack.append("}")
-            elif char == "[":
-                closing_chars_stack.append("]")
-            elif char in ["}", "]"] and closing_chars_stack:
-                closing_chars_stack.pop()
-
-        completed_string.append(char)
-
-    completed_string.extend(reversed(closing_chars_stack))
-
-    try:
-        return json.loads("".join(completed_string))
-    except json.JSONDecodeError:
-        return s
 
 
 class GPTPartialFunctionCall(BaseModel):
@@ -73,9 +28,13 @@ class GPTPartialFunctionCall(BaseModel):
     arguments_builder: list[str] = []
 
     @property
-    def arguments(self) -> dict | str:
+    def arguments(self) -> str:
         self.arguments_builder = ["".join(self.arguments_builder)]
-        return _parse_partial_json(self.arguments_builder[0])
+        return self.arguments_builder[0]
+
+    @property
+    def arguments_dict(self) -> dict | None:
+        return parse_partial_json(self.arguments)
 
 
 class GPTPartialToolsCall(BaseModel):
@@ -131,7 +90,8 @@ class GPTPartialResponse(BaseModel):
                                 id=tool_call.id,
                                 type=tool_call.type,
                                 function=GPTFunctionCall(
-                                    name=tool_call.function.name, arguments=tool_call.function.arguments
+                                    name=tool_call.function.name,
+                                    arguments=tool_call.function.arguments,
                                 ),
                             )
                             for tool_call in choice.message.tool_calls

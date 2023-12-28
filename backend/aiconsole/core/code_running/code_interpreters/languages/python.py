@@ -70,6 +70,15 @@ def preprocess_python(code: str, materials: list[Material]):
     Add end of execution marker
     """
 
+    # If a line starts with "!" then it's a shell command, we need to wrap it appropriately
+    code = "\n".join(
+        [
+            f"import os; os.system({line[1:]!r})" if line.startswith("!") else line
+            for line in code.split("\n")
+        ]
+    )
+
+
     # Check for syntax errors in user's code
     try:
         ast.parse(code)

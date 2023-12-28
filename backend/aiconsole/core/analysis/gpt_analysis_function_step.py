@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 from typing import cast
 
@@ -141,15 +142,16 @@ async def gpt_analysis_function_step(
                 tool_calls = gpt_executor.partial_response.choices[0].message.tool_calls
                 for tool_call in tool_calls:
                     function_call = tool_call.function
-                    arguments = function_call.arguments
-                    if not isinstance(arguments, str):
+                    arguments_dict = function_call.arguments_dict
+
+                    if arguments_dict:
                         await UpdateAnalysisWSMessage(
                             stage=SequenceStage.MIDDLE,
                             request_id=request_id,
-                            agent_id=arguments.get("agent_id", None),
-                            relevant_material_ids=arguments.get("relevant_material_ids", None),
-                            next_step=arguments.get("next_step", None),
-                            thinking_process=arguments.get("thinking_process", None),
+                            agent_id=arguments_dict.get("agent_id", None),
+                            relevant_material_ids=arguments_dict.get("relevant_material_ids", None),
+                            next_step=arguments_dict.get("next_step", None),
+                            thinking_process=arguments_dict.get("thinking_process", None),
                         ).send_to_chat(chat.id)
                 if not tool_calls:
                     await UpdateAnalysisWSMessage(
@@ -177,20 +179,20 @@ async def gpt_analysis_function_step(
         if len(result.tool_calls) > 1:
             raise ValueError(f"Expected one tool call, got {len(result.tool_calls)}")
 
-        arguments = result.tool_calls[0].function.arguments
+        arguments_dict = result.tool_calls[0].function.arguments_dict
 
-        if isinstance(arguments, str):
-            raise ValueError(f"Could not parse arguments from the text: {arguments}")
+        if arguments_dict is None:
+            raise ValueError(f"Could not parse arguments from the text: {result.tool_calls[0].function.arguments}")
 
-        arguments = plan_class(**arguments)
+        plan = plan_class(**arguments_dict)
 
-        picked_agent = pick_agent(arguments, chat, possible_agent_choices)
+        picked_agent = pick_agent(plan, chat, possible_agent_choices)
 
-        relevant_materials = _get_relevant_materials(arguments.relevant_material_ids)
+        relevant_materials = _get_relevant_materials(plan.relevant_material_ids)
 
         await UpdateAnalysisWSMessage(
             request_id=request_id,
-            next_step=arguments.next_step,
+            next_step=plan.next_step,
             agent_id=picked_agent.id,
             relevant_material_ids=[material.id for material in relevant_materials],
             stage=SequenceStage.MIDDLE,

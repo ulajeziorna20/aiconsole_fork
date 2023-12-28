@@ -59,11 +59,6 @@ async def run_code(request: Request, data: RunCodeData, chat_id: str):
         mats = [project.get_project_materials().get_asset(mid) for mid in data.materials_ids]
         mats = [cast(Material, mat) for mat in mats if mat is not None]
 
-        # If the code starts with a !, that means a shell command
-        if data.language == "python" and data.code.startswith("!"):
-            data.language = "shell"
-            data.code = data.code[1:]
-
         try:
             async for token in get_code_interpreter(data.language).run(data.code, mats):
                 await UpdateToolCallOutputWSMessage(

@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 from uuid import uuid4
 
@@ -47,7 +48,8 @@ class CodeTask(OpenAISchema):
 
 class python(CodeTask):
     """
-    When you send a message containing Python code to python, it will be executed in a stateful Jupyter notebook environment
+    Execute python code in a stateful Jupyter notebook environment.
+    You can execute shell commands by prefixing code lines with "!".
     """
 
     code: str = Field(
@@ -55,14 +57,6 @@ class python(CodeTask):
         description="python code to execute, it will be executed in a stateful Jupyter notebook environment",
         json_schema_extra={"type": "string"},
     )
-
-
-class shell(CodeTask):
-    """
-    This function executes the given code on the user's system using the local environment and returns the output.
-    """
-
-    code: str = Field(..., json_schema_extra={"type": "string"})
 
 
 class applescript(CodeTask):
@@ -130,7 +124,6 @@ async def execution_mode_interpreter(
                 messages=[message for message in convert_messages(context.chat)],
                 tools=[
                     ToolDefinition(type="function", function=ToolFunctionDefinition(**python.openai_schema)),
-                    ToolDefinition(type="function", function=ToolFunctionDefinition(**shell.openai_schema)),
                     ToolDefinition(type="function", function=ToolFunctionDefinition(**applescript.openai_schema)),
                 ],
                 min_tokens=250,
@@ -202,7 +195,7 @@ async def execution_mode_interpreter(
                             ).send_to_chat(context.chat.id)
 
                     if function_call.arguments:
-                        if function_call.name not in [python.__name__, shell.__name__, applescript.__name__]:
+                        if function_call.name not in [python.__name__, applescript.__name__]:
                             if tool_call_data.language is None:
                                 await send_language_if_needed("python")
 
@@ -213,10 +206,9 @@ async def execution_mode_interpreter(
                                 await send_code_delta(code_delta)
                                 tool_call_data.end_with_code = ")"
                             else:
-                                if isinstance(function_call.arguments, str):
-                                    code_delta = function_call.arguments[len(tool_call_data.code) :]
-                                    tool_call_data.code = function_call.arguments
-                                    await send_code_delta(code_delta)
+                                code_delta = function_call.arguments[len(tool_call_data.code) :]
+                                tool_call_data.code = function_call.arguments
+                                await send_code_delta(code_delta)
                         else:
                             arguments = function_call.arguments
                             languages = language_map.keys()
@@ -226,16 +218,9 @@ async def execution_mode_interpreter(
                                 await send_language_if_needed(function_call.name)
 
                             # This can now be both a string and a json object
-                            if isinstance(arguments, str):
-                                # We need to handle incorrect OpenAI responses, sometmes arguments is a string containing the code
-                                if arguments and not arguments.startswith("{"):
-                                    await send_language_if_needed("python")
+                            try:
+                                arguments = json.loads(arguments)
 
-                                    code_delta = arguments[len(tool_call_data.code) :]
-                                    tool_call_data.code = arguments
-
-                                    await send_code_delta(code_delta)
-                            else:
                                 code_delta = ""
                                 headline_delta = ""
 
@@ -251,6 +236,16 @@ async def execution_mode_interpreter(
 
                                 if code_delta or headline_delta:
                                     await send_code_delta(code_delta, headline_delta)
+                            except json.JSONDecodeError:
+                                # We need to handle incorrect OpenAI responses, sometmes arguments is a string containing the code
+                                if arguments and not arguments.startswith("{"):
+                                    await send_language_if_needed("python")
+
+                                    code_delta = arguments[len(tool_call_data.code) :]
+                                    tool_call_data.code = arguments
+
+                                    await send_code_delta(code_delta)
+
     finally:
         for tool_call_data in tool_calls_data.values():
             if tool_call_data.finished is False:
