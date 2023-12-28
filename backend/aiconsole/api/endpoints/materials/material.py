@@ -41,6 +41,7 @@ async def material_get(request: Request, material_id: str):
         lambda: MaterialWithStatus(
             id="new_" + get_material_content_name(type).lower(),
             name="New " + get_material_content_name(type),
+            content_type=type,
             usage="",
             usage_examples=[],
             status=AssetStatus.ENABLED,
