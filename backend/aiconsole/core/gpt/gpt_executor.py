@@ -30,6 +30,7 @@ _log = logging.getLogger(__name__)
 
 litellm.cache = Cache()
 litellm.cache.cache
+litellm.set_verbose = False
 
 
 class GPTExecutor:

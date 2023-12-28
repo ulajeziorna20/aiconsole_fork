@@ -13,16 +13,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
 import traceback
-
-from aiconsole.core.assets.asset import Asset, AssetLocation, AssetType
-from aiconsole.core.assets.asset import AssetStatus
-from aiconsole.core.assets.materials.documentation_from_code import documentation_from_code
-from aiconsole.core.assets.materials.rendered_material import RenderedMaterial
+from enum import Enum
 from typing import TYPE_CHECKING
 
-from aiconsole.core.project.venv import (
+from aiconsole.core.assets.asset import Asset, AssetLocation, AssetStatus, AssetType
+from aiconsole.core.assets.materials.documentation_from_code import documentation_from_code
+from aiconsole.core.assets.materials.rendered_material import RenderedMaterial
+from aiconsole.core.code_running.virtual_env.venv import (
     get_current_project_venv_available_packages,
     get_current_project_venv_python_path,
 )

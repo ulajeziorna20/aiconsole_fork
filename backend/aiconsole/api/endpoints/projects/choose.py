@@ -19,7 +19,7 @@ from pathlib import Path
 
 from aiconsole.core.project.paths import get_project_directory
 from aiconsole.core.project.project import change_project_directory, is_project_initialized
-from aiconsole.core.project.venv import create_dedicated_venv
+from aiconsole.core.code_running.virtual_env.create_dedicated_venv import create_dedicated_venv
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
 
