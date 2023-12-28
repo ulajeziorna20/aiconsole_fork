@@ -23,7 +23,7 @@ import { ChatStore, useChatStore } from './useChatStore';
 
 import { v4 as uuidv4 } from 'uuid';
 
-const TOOL_CALL_OUTPUT_LIMIT = 20000;
+const TOOL_CALL_OUTPUT_LIMIT = 40000;
 
 export type RunninngProcess = {
   requestId: string;
