@@ -52,7 +52,7 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> =
       const toolCallLocation = getToolCall(chat, toolCallId);
 
       if (toolCallLocation) {
-        return toolCallLocation.toolCall.output === undefined;
+        return toolCallLocation.toolCall.output == undefined; //TODO: Why this can be null sometimes?
       } else {
         return false;
       }
