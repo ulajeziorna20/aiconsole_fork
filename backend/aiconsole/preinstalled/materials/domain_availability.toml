@@ -4,7 +4,7 @@ usage = "How to check domain availability???"
 usage_examples = []
 default_status = "enabled"
 content_type = "api"
-content_api = """
+content = """
 import subprocess
 
 def is_domain_available(domain) -> bool:

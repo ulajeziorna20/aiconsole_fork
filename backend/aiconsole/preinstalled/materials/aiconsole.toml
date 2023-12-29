@@ -4,7 +4,7 @@ usage = "Notes on what AIConsole is and what it can do."
 usage_examples = []
 default_status = "enabled"
 content_type = "static_text"
-content_static_text = """
+content = """
 ## Core messanging
 
 Claim: Open Source Desktop Alternative to OpenAI GPTs

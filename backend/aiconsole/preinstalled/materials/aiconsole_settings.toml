@@ -1,7 +1,7 @@
 name = "AIConsole Settings"
 usage = "Use it to change settings in aiconsole"
 content_type = "api"
-content_api = """
+content = """
 '''
 Use this material to change AIConsole settings.
 

@@ -1,7 +1,7 @@
 name = "Convert Code to Another Language"
 usage = "When you need to convert code to another language"
 content_type = "api"
-content_api = """
+content = """
 ""\"
 Use this function to convert code to another language, do not use any other method of doing this.
 
