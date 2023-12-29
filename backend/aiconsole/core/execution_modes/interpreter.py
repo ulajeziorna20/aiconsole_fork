@@ -31,7 +31,7 @@ from aiconsole.core.gpt.create_full_prompt_with_materials import create_full_pro
 from aiconsole.core.gpt.gpt_executor import GPTExecutor
 from aiconsole.core.gpt.request import GPTRequest, ToolDefinition, ToolFunctionDefinition
 from aiconsole.core.gpt.types import CLEAR_STR
-from aiconsole.utils.convert_messages import convert_messages
+from aiconsole.core.chat.convert_messages import convert_messages
 from aiconsole.core.gpt.function_calls import OpenAISchema
 from pydantic import BaseModel, Field
 

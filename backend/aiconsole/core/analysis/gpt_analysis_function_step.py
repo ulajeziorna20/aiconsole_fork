@@ -31,7 +31,7 @@ from aiconsole.core.gpt.gpt_executor import GPTExecutor
 from aiconsole.core.gpt.request import GPTRequest, ToolDefinition, ToolFunctionDefinition
 from aiconsole.core.gpt.types import EnforcedFunctionCall, EnforcedFunctionCallFuncSpec, GPTRequestTextMessage
 from aiconsole.core.project import project
-from aiconsole.utils.convert_messages import convert_messages
+from aiconsole.core.chat.convert_messages import convert_messages
 
 _log = logging.getLogger(__name__)
 

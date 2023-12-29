@@ -21,7 +21,7 @@ from aiconsole.core.chat.chat_outgoing_messages import ResetMessageWSMessage, Se
 from aiconsole.core.assets.agents.agent import ExecutionModeContext
 from aiconsole.core.execution_modes.get_agent_system_message import get_agent_system_message
 from aiconsole.core.gpt.gpt_executor import GPTExecutor
-from aiconsole.utils.convert_messages import convert_messages
+from aiconsole.core.chat.convert_messages import convert_messages
 from aiconsole.core.gpt.create_full_prompt_with_materials import create_full_prompt_with_materials
 from aiconsole.core.gpt.types import CLEAR_STR
 from aiconsole.core.gpt.request import GPTRequest

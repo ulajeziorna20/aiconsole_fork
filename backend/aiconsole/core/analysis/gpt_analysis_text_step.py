@@ -21,7 +21,7 @@ from aiconsole.core.gpt.consts import GPTMode
 from aiconsole.core.gpt.gpt_executor import GPTExecutor
 from aiconsole.core.gpt.request import GPTRequest
 from aiconsole.core.gpt.types import GPTRequestTextMessage
-from aiconsole.utils.convert_messages import convert_messages
+from aiconsole.core.chat.convert_messages import convert_messages
 
 
 async def gpt_analysis_text_step(
