@@ -66,9 +66,3 @@ def download_python():
 
     _log.info("Python installation completed successfully.")
     return True
-
-
-if __name__ == "__main__":
-    if not download_python():
-        _log.error("Python download and extraction failed.")
-        exit(1)
