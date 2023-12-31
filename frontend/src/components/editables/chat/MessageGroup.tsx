@@ -29,6 +29,16 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
       <div className="container flex mx-auto gap-[92px] max-w-[1104px]">
         <UserInfo agentId={group.agent_id} materialsIds={group.materials_ids} task={group.task} />
         <div className="flex-grow flex flex-col gap-5  overflow-auto ">
+          {group.messages.length == 0 && (
+            <div>
+              {group.analysis}{' '}
+              {group.task && (
+                <span className="text-white">
+                  <br /> Next step: <span className="text-purple-400 leading-[24px]">{group.task}</span>
+                </span>
+              )}
+            </div>
+          )}
           {group.messages.map((message) => (
             <MessageComponent key={message.id} message={message} group={group} />
           ))}

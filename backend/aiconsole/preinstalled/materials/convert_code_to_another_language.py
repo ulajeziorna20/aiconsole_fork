@@ -12,6 +12,7 @@ convert_language(FILE_PATH, DESIRED_LANGUAGE)
 
 import logging
 import os
+from typing import cast
 import litellm
 
 _log = logging.getLogger(__name__)
@@ -20,15 +21,18 @@ _log = logging.getLogger(__name__)
 def convert_language(file_name, desired_language):
     file_contents = open(file_name).read()
 
-    completion = litellm.completion(
-        model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": f"You are a master programmer, translate the following code into {desired_language}. Translate what you can, don't complain. This is just a starter so a human programmer can finish the job.",
-            },
-            {"role": "user", "content": file_contents},
-        ],
+    completion: litellm.ModelResponse = cast(
+        litellm.ModelResponse,
+        litellm.completion(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"You are a master programmer, translate the following code into {desired_language}. Translate what you can, don't complain. This is just a starter so a human programmer can finish the job.",
+                },
+                {"role": "user", "content": file_contents},
+            ],
+        ),
     )
 
     # Create .py file with the same name
