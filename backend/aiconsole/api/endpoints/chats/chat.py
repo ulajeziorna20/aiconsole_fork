@@ -45,7 +45,7 @@ async def delete_history(chat_id: str):
 async def get_history(chat_id: str):
     chat = await load_chat_history(chat_id)
 
-    return JSONResponse(chat.model_dump())
+    return JSONResponse(chat.model_dump(mode="json"))
 
 
 @router.patch("/{chat_id}")

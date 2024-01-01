@@ -21,13 +21,21 @@ from typing import cast
 from uuid import uuid4
 
 from aiconsole.consts import DIRECTOR_MIN_TOKENS, DIRECTOR_PREFERRED_TOKENS
-from aiconsole.core.analysis.agents_to_choose_from import agents_to_choose_from
-from aiconsole.core.analysis.create_plan_class import create_plan_class
 from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.asset import AssetLocation, AssetStatus
 from aiconsole.core.assets.materials.material import Material
+from aiconsole.core.chat.chat_mutations import (
+    CreateMessageGroupMutation,
+    SetIsAnalysisInProgressMutation,
+    SetAgentIdMessageGroupMutation,
+    SetAnalysisMessageGroupMutation,
+    SetMaterialsIdsMessageGroupMutation,
+    SetTaskMessageGroupMutation,
+)
 from aiconsole.core.chat.chat_mutator import ChatMutator
 from aiconsole.core.chat.convert_messages import convert_messages
+from aiconsole.core.chat.execution_modes.analysis.agents_to_choose_from import agents_to_choose_from
+from aiconsole.core.chat.execution_modes.analysis.create_plan_class import create_plan_class
 from aiconsole.core.chat.types import Chat
 from aiconsole.core.gpt.consts import GPTMode
 from aiconsole.core.gpt.gpt_executor import GPTExecutor
@@ -107,13 +115,18 @@ async def gpt_analysis_function_step(
     gpt_executor = GPTExecutor()
 
     # Create a new message group for analysis
-    message_group = chat_mutator.op_create_message_group(
-        message_group_id=str(uuid4()),
-        agent_id="director",
-        role="system",
-        materials_ids=[],
-        analysis="",
-        task="",
+    message_group_id = str(uuid4())
+    await chat_mutator.mutate(
+        CreateMessageGroupMutation(
+            message_group_id=message_group_id,
+            agent_id="director",
+            username="",
+            email="",
+            role="system",
+            materials_ids=[],
+            analysis="",
+            task="",
+        )
     )
 
     # Pick from forced or enabled agents if no agent is forced
@@ -155,13 +168,17 @@ async def gpt_analysis_function_step(
             type="function", function=EnforcedFunctionCallFuncSpec(name=plan_class.__name__)
         )
 
-    chat_mutator.op_set_is_analysis_in_progress(
-        is_analysis_in_progress=True,
+    await chat_mutator.mutate(
+        SetIsAnalysisInProgressMutation(
+            is_analysis_in_progress=True,
+        )
     )
 
-    chat_mutator.op_set_message_group_analysis(
-        message_group_id=message_group.id,
-        analysis="",
+    await chat_mutator.mutate(
+        SetAnalysisMessageGroupMutation(
+            message_group_id=message_group_id,
+            analysis="",
+        )
     )
 
     try:
@@ -174,35 +191,45 @@ async def gpt_analysis_function_step(
 
                     if arguments_dict:
                         if "agent_id" in arguments_dict:
-                            chat_mutator.op_set_message_group_agent_id(
-                                message_group_id=message_group.id,
-                                agent_id=arguments_dict["agent_id"],
+                            await chat_mutator.mutate(
+                                SetAgentIdMessageGroupMutation(
+                                    message_group_id=message_group_id,
+                                    agent_id=arguments_dict["agent_id"],
+                                )
                             )
 
                         if "relevant_material_ids" in arguments_dict:
-                            chat_mutator.op_set_message_group_materials_ids(
-                                message_group_id=message_group.id,
-                                materials_ids=arguments_dict["relevant_material_ids"],
+                            await chat_mutator.mutate(
+                                SetMaterialsIdsMessageGroupMutation(
+                                    message_group_id=message_group_id,
+                                    materials_ids=arguments_dict["relevant_material_ids"],
+                                )
                             )
 
                         if "next_step" in arguments_dict:
-                            chat_mutator.op_set_message_group_task(
-                                message_group_id=message_group.id,
-                                task=arguments_dict["next_step"],
+                            await chat_mutator.mutate(
+                                SetTaskMessageGroupMutation(
+                                    message_group_id=message_group_id,
+                                    task=arguments_dict["next_step"],
+                                )
                             )
 
                         if "thinking_process" in arguments_dict:
-                            chat_mutator.op_set_message_group_analysis(
-                                message_group_id=message_group.id,
-                                analysis=arguments_dict["thinking_process"],
+                            await chat_mutator.mutate(
+                                SetAnalysisMessageGroupMutation(
+                                    message_group_id=message_group_id,
+                                    analysis=arguments_dict["thinking_process"],
+                                )
                             )
                 if not tool_calls:
                     analysis = gpt_executor.partial_response.choices[0].message.content
 
                     if analysis:
-                        chat_mutator.op_set_message_group_analysis(
-                            message_group_id=message_group.id,
-                            analysis=analysis,
+                        await chat_mutator.mutate(
+                            SetAnalysisMessageGroupMutation(
+                                message_group_id=message_group_id,
+                                analysis=analysis,
+                            )
                         )
             else:
                 _log.warning("No choices in partial response")
@@ -211,9 +238,11 @@ async def gpt_analysis_function_step(
         result = gpt_executor.response.choices[0].message
 
         if len(result.tool_calls) == 0:
-            chat_mutator.op_set_message_group_analysis(
-                message_group_id=message_group.id,
-                analysis=result.content or "",
+            await chat_mutator.mutate(
+                SetAnalysisMessageGroupMutation(
+                    message_group_id=message_group_id,
+                    analysis=result.content or "",
+                )
             )
         if len(result.tool_calls) > 1:
             raise ValueError(f"Expected one tool call, got {len(result.tool_calls)}")
@@ -226,25 +255,33 @@ async def gpt_analysis_function_step(
         plan = plan_class(**arguments_dict)
 
         picked_agent = pick_agent(plan, chat_mutator.chat, possible_agent_choices)
-        chat_mutator.op_set_message_group_agent_id(
-            message_group_id=message_group.id,
-            agent_id=picked_agent.id,
+        await chat_mutator.mutate(
+            SetAgentIdMessageGroupMutation(
+                message_group_id=message_group_id,
+                agent_id=picked_agent.id,
+            )
         )
 
         relevant_materials = _get_relevant_materials(plan.relevant_material_ids)
-        chat_mutator.op_set_message_group_materials_ids(
-            message_group_id=message_group.id,
-            materials_ids=[material.id for material in relevant_materials],
+        await chat_mutator.mutate(
+            SetMaterialsIdsMessageGroupMutation(
+                message_group_id=message_group_id,
+                materials_ids=[material.id for material in relevant_materials],
+            )
         )
 
-        chat_mutator.op_set_message_group_task(
-            message_group_id=message_group.id,
-            task=plan.next_step,
+        await chat_mutator.mutate(
+            SetTaskMessageGroupMutation(
+                message_group_id=message_group_id,
+                task=plan.next_step,
+            )
         )
 
-        chat_mutator.op_set_message_group_analysis(
-            message_group_id=message_group.id,
-            analysis=plan.thinking_process,
+        await chat_mutator.mutate(
+            SetAnalysisMessageGroupMutation(
+                message_group_id=message_group_id,
+                analysis=plan.thinking_process,
+            )
         )
 
         return AnalysisResult(
@@ -253,6 +290,8 @@ async def gpt_analysis_function_step(
             next_step=plan.next_step,
         )
     finally:
-        chat_mutator.op_set_is_analysis_in_progress(
-            is_analysis_in_progress=False,
+        await chat_mutator.mutate(
+            SetIsAnalysisInProgressMutation(
+                is_analysis_in_progress=False,
+            )
         )

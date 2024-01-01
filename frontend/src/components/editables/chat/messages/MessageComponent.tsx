@@ -20,24 +20,28 @@ interface MessageProps {
 }
 
 export function MessageComponent({ message, group }: MessageProps) {
-  const deleteMessage = useChatStore((state) => state.deleteMessage);
-  const editMessage = useChatStore((state) => state.editMessage);
+  const userMutateChat = useChatStore((state) => state.userMutateChat);
   const saveCommandAndMessagesToHistory = useChatStore((state) => state.saveCommandAndMessagesToHistory);
   const getBaseURL = useAPIStore((state) => state.getBaseURL);
 
   const handleRemoveClick = useCallback(() => {
-    deleteMessage(message.id);
-  }, [message.id, deleteMessage]);
+    userMutateChat({
+      type: 'DeleteMessageMutation',
+      message_id: message.id,
+    });
+  }, [message.id, userMutateChat]);
 
   const handleSaveClick = useCallback(
     (content: string) => {
-      editMessage((message: AICMessage) => {
-        message.content = content;
-      }, message.id);
+      userMutateChat({
+        type: 'SetContentMessageMutation',
+        message_id: message.id,
+        content,
+      });
 
       saveCommandAndMessagesToHistory(content, group.role === 'user');
     },
-    [message.id, editMessage, saveCommandAndMessagesToHistory, group.role],
+    [message.id, saveCommandAndMessagesToHistory, group.role, userMutateChat],
   );
 
   const submitCommand = useChatStore((state) => state.submitCommand);

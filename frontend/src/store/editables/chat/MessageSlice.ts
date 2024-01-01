@@ -16,30 +16,21 @@
 
 import { StateCreator } from 'zustand';
 
-import { AICToolCall, AICMessage, AICMessageGroup } from '@/types/editables/chatTypes';
+import { AICToolCall, AICMessage } from '@/types/editables/chatTypes';
 import { ChatStore } from './useChatStore';
-import {
-  deepCopyChat,
-  getGroup,
-  getLastGroup,
-  getLastMessage,
-  getMessage,
-  getToolCall,
-} from '@/utils/editables/chatUtils';
+import { deepCopyChat, getMessage, getToolCall } from '@/utils/editables/chatUtils';
+import { ChatMutation } from '@/api/ws/chat/chatMutations';
+import { applyMutation } from '@/api/ws/chat/applyMutation';
+import { useWebSocketStore } from '@/api/ws/useWebSocketStore';
+
+import { v4 as uuidv4 } from 'uuid';
 
 export type MessageSlice = {
   loadingMessages: boolean;
   isViableForRunningCode: (toolCallId: string) => boolean;
-  setIsAnalysisInProgress(isAnalysisInProgress: boolean): void;
-  editGroup: (change: (group: AICMessageGroup) => void, groupId: string) => void;
-  editMessage: (change: (message: AICMessage) => void, messageId: string) => void;
-  editToolCall: (change: (output: AICToolCall) => void, outputId: string) => void;
-  appendToolCall: (toolCall: AICToolCall, messageId?: string) => void;
-  appendMessage: (message: AICMessage, groupId?: string) => void;
-  appendGroup: (group: AICMessageGroup) => void;
-  deleteToolCall: (toolCallId: string) => void;
-  deleteGroup: (groupId: string) => void;
-  deleteMessage: (messageId: string) => void;
+  userMutateChat: (mutation: ChatMutation | ChatMutation[]) => Promise<void>;
+  lockChat: () => Promise<void>;
+  unlockChat: () => Promise<void>;
 };
 
 export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> = (set, get) => ({
@@ -64,40 +55,65 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> =
     }
   },
   loadingMessages: false,
-  setIsAnalysisInProgress: (isAnalysisInProgress: boolean) => {
-    set((state) => {
-      console.log(state.chat);
-      const chat = deepCopyChat(state.chat);
+  lockChat: async () => {
+    const chat = get().chat;
 
-      if (!chat) {
-        throw new Error('Chat is not initialized');
-      }
+    if (!chat) {
+      throw new Error('Chat is not initialized');
+    }
 
-      chat.is_analysis_in_progress = isAnalysisInProgress;
-
-      return {
-        chat,
-      };
+    //TODO: Wait for confirmation from server
+    useWebSocketStore.getState().sendMessage({
+      type: 'AcquireLockClientMessage',
+      request_id: uuidv4(),
+      chat_id: chat.id,
     });
   },
-  editGroup: (change: (group: AICMessageGroup) => void, groupId: string) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-      const groupLocation = getGroup(chat, groupId);
+  unlockChat: async () => {
+    const chat = get().chat;
 
-      if (!groupLocation) {
-        console.log(`Group ${groupId} found in`, chat);
-        throw new Error(`Group ${groupId} found in ${chat}`);
-      }
+    if (!chat) {
+      throw new Error('Chat is not initialized');
+    }
 
-      if (change) change(groupLocation.group);
-
-      return {
-        chat,
-      };
+    useWebSocketStore.getState().sendMessage({
+      type: 'ReleaseLockClientMessage',
+      request_id: uuidv4(),
+      chat_id: chat.id,
     });
   },
-  editMessage: (change: (message: AICMessage) => void, messageId: string) => {
+  userMutateChat: async (mutation: ChatMutation | ChatMutation[]) => {
+    const mutations = Array.isArray(mutation) ? mutation : [mutation];
+    await get().lockChat();
+    try {
+      set((state) => {
+        const chat = deepCopyChat(state.chat);
+
+        if (!chat) {
+          throw new Error('Chat is not initialized');
+        }
+
+        for (const mutation of mutations) {
+          applyMutation(chat, mutation);
+
+          // send to server
+          useWebSocketStore.getState().sendMessage({
+            type: 'InitChatMutationClientMessage',
+            request_id: uuidv4(),
+            chat_id: chat.id,
+            mutation,
+          });
+        }
+
+        return {
+          chat,
+        };
+      });
+    } finally {
+      await get().unlockChat();
+    }
+  },
+  clientEditMessage: (change: (message: AICMessage) => void, messageId: string) => {
     set((state) => {
       const chat = deepCopyChat(state.chat);
       const messageLocation = getMessage(chat, messageId);
@@ -120,7 +136,7 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> =
       throw new Error('Chat is not initialized');
     }
   },
-  editToolCall: (change: (toolCall: AICToolCall) => void, toolCallId: string) => {
+  clientEditToolCall: (change: (toolCall: AICToolCall) => void, toolCallId: string) => {
     set((state) => {
       const chat = deepCopyChat(state.chat);
       const outputLocation = getToolCall(chat, toolCallId);
@@ -137,129 +153,5 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> =
         chat,
       };
     });
-  },
-  appendToolCall: (toolCall: AICToolCall, messageId?: string) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-      const messageLocation = messageId === undefined ? getLastMessage(chat) : getMessage(chat, messageId);
-
-      if (!messageLocation) {
-        throw new Error(`Message with id ${messageId} is not a code message`);
-      }
-
-      messageLocation.message.tool_calls.push({
-        ...toolCall,
-      });
-
-      return {
-        chat,
-      };
-    });
-  },
-  appendGroup: (group: AICMessageGroup) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-
-      if (!chat) {
-        throw new Error('Chat is not initialized');
-      }
-
-      chat.message_groups.push({
-        ...group,
-      });
-
-      return {
-        chat,
-      };
-    });
-  },
-  deleteGroup: (groupId: string) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-
-      if (!chat) {
-        throw new Error('Chat is not initialized');
-      }
-
-      const groupLocation = getGroup(chat, groupId);
-
-      if (!groupLocation) {
-        throw new Error(`Group ${groupId} found in ${chat}`);
-      }
-
-      chat.message_groups.splice(chat.message_groups.indexOf(groupLocation.group), 1);
-
-      return {
-        chat,
-      };
-    });
-    get().saveCurrentChatHistory();
-  },
-  appendMessage: (message: AICMessage, groupId?: string) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-
-      const groupLocation = groupId === undefined ? getLastGroup(chat) : getGroup(chat, groupId);
-
-      if (!groupLocation) {
-        throw new Error(`Group ${groupId} found in ${chat}`);
-      }
-
-      groupLocation.group.messages.push({
-        ...message,
-      });
-
-      return {
-        chat,
-      };
-    });
-  },
-  deleteMessage: (messageId: string) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-
-      if (!chat) {
-        throw new Error('Chat is not initialized');
-      }
-
-      const messageLocation = getMessage(chat, messageId);
-
-      if (!messageLocation) {
-        throw new Error('Message not found');
-      }
-
-      messageLocation.group.messages.splice(messageLocation.messageIndex, 1);
-
-      if (messageLocation.group.messages.length === 0) {
-        chat.message_groups.splice(chat.message_groups.indexOf(messageLocation.group), 1);
-      }
-
-      return {
-        chat,
-      };
-    });
-    get().saveCurrentChatHistory();
-  },
-  deleteToolCall: (toolCallId: string) => {
-    set((state) => {
-      const chat = deepCopyChat(state.chat);
-
-      const toolCallLocation = getToolCall(chat, toolCallId);
-
-      if (!toolCallLocation) {
-        throw new Error(`Tool call with id ${toolCallId} not found`);
-      }
-
-      toolCallLocation.message.tool_calls.splice(toolCallLocation.toolCallIndex, 1);
-
-      if (toolCallLocation.message.tool_calls.length === 0 && toolCallLocation.message.content === '') {
-        toolCallLocation.group.messages.splice(toolCallLocation.messageIndex, 1);
-      }
-
-      return {
-        chat,
-      };
-    });
-    get().saveCurrentChatHistory();
   },
 });

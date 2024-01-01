@@ -14,16 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import BaseModel
+import random
+
+from aiconsole.core.chat.execution_modes.analysis.agents_to_choose_from import agents_to_choose_from
 
 
-class BaseIncomingWSMessage(BaseModel):
-    def get_type(self):
-        return self.__class__.__name__
+def create_agents_str() -> str:
+    """
+    Randomization of agents is done because LLMs have a tendency to overfit to the first few examples.
+    """
 
-    def send(self, websocket):
-        websocket.send_json({"type": self.get_type(), **self.model_dump()})
+    # Forced agents if available or enabled agents otherwise
+    possible_agent_choices = agents_to_choose_from()
 
+    new_line = "\n"
 
-class SetChatIdWSMessage(BaseIncomingWSMessage):
-    chat_id: str
+    random_agents = new_line.join(
+        [f"* {c.id} - {c.usage}" for c in random.sample(possible_agent_choices, len(possible_agent_choices))]
+    )
+
+    return random_agents

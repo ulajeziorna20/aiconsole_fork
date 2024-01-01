@@ -16,8 +16,6 @@ export function AgentAvatar({ agentId, title, type, className }: AgentAvatarProp
   return (
     <img
       title={title}
-      src={`${getBaseURL()}/profile/${agentId}.jpg`}
-      className={cn(className, 'rounded-full border border-slate-800', {
       src={`${getBaseURL()}/api/agents/${agentId}/image`}
       className={cn(className, 'rounded-full mb-[10px] mt-[5px] border border-slate-800', {
         'w-20 h-20 ': type === 'large',

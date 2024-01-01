@@ -22,7 +22,7 @@ import litellm
 import tomlkit
 import tomlkit.container
 import tomlkit.exceptions
-from aiconsole.api.websockets.outgoing_messages import SettingsWSMessage
+from aiconsole.api.websockets.server_messages import SettingsServerMessage
 from aiconsole.core.assets.asset import AssetStatus, AssetType
 from aiconsole.core.project import project
 from aiconsole.core.project.paths import get_project_directory
@@ -115,7 +115,7 @@ class Settings:
 
     async def reload(self, initial: bool = False):
         self._settings = await self.__load()
-        await SettingsWSMessage(
+        await SettingsServerMessage(
             initial=initial
             or not (
                 not self._suppress_notification_until or self._suppress_notification_until < datetime.datetime.now()

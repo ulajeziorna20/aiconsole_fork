@@ -19,69 +19,101 @@ from datetime import datetime
 import traceback
 from uuid import uuid4
 
-from aiconsole.api.websockets.outgoing_messages import ErrorWSMessage
-from aiconsole.core.assets.agents.agent import ExecutionModeContext
+from aiconsole.api.websockets.server_messages import ErrorServerMessage
+from aiconsole.core.chat.chat_mutations import (
+    AppendToContentMessageMutation,
+    AppendToOutputToolCallMutation,
+    CreateMessageMutation,
+    CreateToolCallMutation,
+)
+from aiconsole.core.chat.execution_modes.execution_mode import AcceptCodeContext, ProcessChatContext
+from aiconsole.core.chat.execution_modes.execution_mode import ExecutionMode
 from aiconsole.core.code_running.run_code import get_code_interpreter
 
 
-async def execution_mode_example_countdown(
-    context: ExecutionModeContext,
+async def execution_mode_process(
+    context: ProcessChatContext,
 ):
     message_id = str(uuid4())
 
     # Assumes that a group already exists
-    context.chat_mutator.op_create_message(
-        message_group_id=context.chat_mutator.chat.message_groups[-1].id,
-        message_id=message_id,
-        timestamp=datetime.now().isoformat(),
-        content=f"This is a demo of execution mode. I will count down from 10 to 1 and then hello world code.\n\n",
+    await context.chat_mutator.mutate(
+        CreateMessageMutation(
+            message_group_id=context.chat_mutator.chat.message_groups[-1].id,
+            message_id=message_id,
+            timestamp=datetime.now().isoformat(),
+            content=f"This is a demo of execution mode. I will count down from 10 to 1 and then hello world code.\n\n",
+        )
     )
 
     for i in range(10, 0, -1):
-        context.chat_mutator.op_append_to_message_content(
-            message_id=message_id,
-            content_delta=f"{i}...",
+        await context.chat_mutator.mutate(
+            AppendToContentMessageMutation(
+                message_id=message_id,
+                content_delta=f"{i}...",
+            )
         )
         await asyncio.sleep(1)
 
     await asyncio.sleep(1)
 
     message_id = str(uuid4())
-    context.chat_mutator.op_create_message(
-        message_group_id=context.chat_mutator.chat.message_groups[-1].id,
-        message_id=message_id,
-        timestamp=datetime.now().isoformat(),
-        content=f"Done",
+    await context.chat_mutator.mutate(
+        CreateMessageMutation(
+            message_group_id=context.chat_mutator.chat.message_groups[-1].id,
+            message_id=message_id,
+            timestamp=datetime.now().isoformat(),
+            content=f"Done",
+        )
     )
 
     tool_call_id = str(uuid4())
 
     code = "print('Hello world!')"
 
-    context.chat_mutator.op_create_tool_call(
-        tool_call_id=tool_call_id,
-        message_id=message_id,
-        code=code,
-        language="python",
-        output="",
+    await context.chat_mutator.mutate(
+        CreateToolCallMutation(
+            tool_call_id=tool_call_id,
+            message_id=message_id,
+            code=code,
+            headline="",
+            language="python",
+            output="",
+        )
     )
 
     try:
         try:
             async for token in get_code_interpreter("python").run(code, []):
-                context.chat_mutator.op_append_to_tool_call_output(
-                    tool_call_id=tool_call_id,
-                    output_delta=token,
+                await context.chat_mutator.mutate(
+                    AppendToOutputToolCallMutation(
+                        tool_call_id=tool_call_id,
+                        output_delta=token,
+                    )
                 )
         except asyncio.CancelledError:
             get_code_interpreter("python").terminate()
             raise
         except Exception:
-            await ErrorWSMessage(error=traceback.format_exc().strip()).send_to_chat(context.chat_mutator.chat.id)
-            context.chat_mutator.op_append_to_tool_call_output(
-                tool_call_id=tool_call_id,
-                output_delta=traceback.format_exc().strip(),
+            await ErrorServerMessage(error=traceback.format_exc().strip()).send_to_chat(context.chat_mutator.chat.id)
+            await context.chat_mutator.mutate(
+                AppendToOutputToolCallMutation(
+                    tool_call_id=tool_call_id,
+                    output_delta=traceback.format_exc().strip(),
+                )
             )
     except Exception as e:
-        await ErrorWSMessage(error=str(e)).send_to_chat(context.chat_mutator.chat.id)
+        await ErrorServerMessage(error=str(e)).send_to_chat(context.chat_mutator.chat.id)
         raise e
+
+
+async def execution_mode_accept_code(
+    context: AcceptCodeContext,
+):
+    pass
+
+
+execution_mode = ExecutionMode(
+    process_chat=execution_mode_process,
+    accept_code=execution_mode_accept_code,
+)

@@ -14,21 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
 from typing import cast
 from uuid import uuid4
 
-from aiconsole.core.assets.agents.agent import ExecutionModeContext
-from aiconsole.core.code_running.code_interpreters.language_map import LanguageStr, language_map
+from aiconsole.core.chat.chat_mutations import (
+    AppendToContentMessageMutation,
+    AppendToCodeToolCallMutation,
+    AppendToHeadlineToolCallMutation,
+    CreateMessageMutation,
+    CreateToolCallMutation,
+    SetContentMessageMutation,
+    SetLanguageToolCallMutation,
+)
+from aiconsole.core.chat.convert_messages import convert_messages
+from aiconsole.core.chat.execution_modes.execution_mode import AcceptCodeContext, ExecutionMode, ProcessChatContext
 from aiconsole.core.chat.execution_modes.get_agent_system_message import get_agent_system_message
+from aiconsole.core.code_running.code_interpreters.language import LanguageStr
+from aiconsole.core.code_running.code_interpreters.language_map import language_map
 from aiconsole.core.gpt.create_full_prompt_with_materials import create_full_prompt_with_materials
+from aiconsole.core.gpt.function_calls import OpenAISchema
 from aiconsole.core.gpt.gpt_executor import GPTExecutor
 from aiconsole.core.gpt.request import GPTRequest, ToolDefinition, ToolFunctionDefinition
 from aiconsole.core.gpt.types import CLEAR_STR
-from aiconsole.core.chat.convert_messages import convert_messages
-from aiconsole.core.gpt.function_calls import OpenAISchema
 from pydantic import Field
 
 _log = logging.getLogger(__name__)
@@ -63,12 +73,12 @@ class applescript(CodeTask):
     code: str = Field(..., json_schema_extra={"type": "string"})
 
 
-async def execution_mode_interpreter(
-    context: ExecutionModeContext,
+async def execution_mode_process(
+    context: ProcessChatContext,
 ):
     global llm
 
-    message_group = context.message_group
+    message_group = context.chat_mutator.chat.message_groups[-1]
 
     system_message = create_full_prompt_with_materials(
         intro=get_agent_system_message(context.agent),
@@ -82,11 +92,13 @@ async def execution_mode_interpreter(
     message_id = str(uuid4())
 
     # Assumes an existing message group that was created for us
-    context.chat_mutator.op_create_message(
-        message_group_id=message_group.id,
-        message_id=message_id,
-        timestamp=datetime.now().isoformat(),
-        content="",
+    await context.chat_mutator.mutate(
+        CreateMessageMutation(
+            message_group_id=message_group.id,
+            message_id=message_id,
+            timestamp=datetime.now().isoformat(),
+            content="",
+        )
     )
 
     try:
@@ -104,7 +116,7 @@ async def execution_mode_interpreter(
             )
         ):
             if chunk == CLEAR_STR:
-                context.chat_mutator.op_set_message_content(message_id=message_id, content="")
+                await context.chat_mutator.mutate(SetContentMessageMutation(message_id=message_id, content=""))
                 continue
 
             if "choices" not in chunk or len(chunk["choices"]) == 0:
@@ -113,9 +125,11 @@ async def execution_mode_interpreter(
             delta = chunk["choices"][0]["delta"]
 
             if "content" in delta and delta["content"]:
-                context.chat_mutator.op_append_to_message_content(
-                    message_id=message_id,
-                    content_delta=delta["content"],
+                await context.chat_mutator.mutate(
+                    AppendToContentMessageMutation(
+                        message_id=message_id,
+                        content_delta=delta["content"],
+                    )
                 )
 
             tool_calls = executor.partial_response.choices[0].message.tool_calls
@@ -124,22 +138,30 @@ async def execution_mode_interpreter(
                 # All tool calls with lower indexes are finished
                 prev_tool = tool_calls[index - 1] if index > 0 else None
                 if prev_tool and prev_tool.id in tools_requiring_closing_parenthesis:
-                    context.chat_mutator.op_append_to_tool_call_code(
-                        tool_call_id=prev_tool.id,
-                        code_delta=")",
+                    await context.chat_mutator.mutate(
+                        AppendToCodeToolCallMutation(
+                            tool_call_id=prev_tool.id,
+                            code_delta=")",
+                        )
                     )
 
                     tools_requiring_closing_parenthesis.remove(prev_tool.id)
 
-                tool_call_info = context.chat_mutator.chat.get_tool_call(tool_call.id)
+                tool_call_info = context.chat_mutator.chat.get_tool_call_location(tool_call.id)
 
                 if not tool_call_info:
-                    context.chat_mutator.op_create_tool_call(
-                        message_id=message_id,
-                        tool_call_id=tool_call.id,
+                    await context.chat_mutator.mutate(
+                        CreateToolCallMutation(
+                            message_id=message_id,
+                            tool_call_id=tool_call.id,
+                            code="",
+                            headline="",
+                            language=None,
+                            output=None,
+                        )
                     )
 
-                    tool_call_info = context.chat_mutator.chat.get_tool_call(tool_call.id)
+                    tool_call_info = context.chat_mutator.chat.get_tool_call_location(tool_call.id)
 
                     if not tool_call_info:
                         raise Exception(f"Tool call {tool_call.id} should have been created")
@@ -152,48 +174,54 @@ async def execution_mode_interpreter(
                 if tool_call.type == "function":
                     function_call = tool_call.function
 
-                    def send_language_if_needed(lang: LanguageStr):
+                    async def send_language_if_needed(lang: LanguageStr):
                         if tool_call_data.language is None:
-                            context.chat_mutator.op_set_tool_call_language(
-                                tool_call_id=tool_call.id,
-                                language=lang,
+                            await context.chat_mutator.mutate(
+                                SetLanguageToolCallMutation(
+                                    tool_call_id=tool_call.id,
+                                    language=lang,
+                                )
                             )
 
-                    def send_code_delta(code_delta: str = "", headline_delta: str = ""):
+                    async def send_code_delta(code_delta: str = "", headline_delta: str = ""):
                         if code_delta:
-                            context.chat_mutator.op_append_to_tool_call_code(
-                                tool_call_id=tool_call.id,
-                                code_delta=code_delta,
+                            await context.chat_mutator.mutate(
+                                AppendToCodeToolCallMutation(
+                                    tool_call_id=tool_call.id,
+                                    code_delta=code_delta,
+                                )
                             )
 
                         if headline_delta:
-                            context.chat_mutator.op_append_to_tool_call_headline(
-                                tool_call_id=tool_call.id,
-                                headline_delta=headline_delta,
+                            await context.chat_mutator.mutate(
+                                AppendToHeadlineToolCallMutation(
+                                    tool_call_id=tool_call.id,
+                                    headline_delta=headline_delta,
+                                )
                             )
 
                     if function_call.arguments:
                         if function_call.name not in [python.__name__, applescript.__name__]:
                             if tool_call_data.language is None:
-                                send_language_if_needed("python")
+                                await send_language_if_needed("python")
 
                                 _log.info(f"function_call: {function_call}")
                                 _log.info(f"function_call.arguments: {function_call.arguments}")
 
                                 code_delta = f"{function_call.name}(**"
-                                send_code_delta(code_delta)
+                                await send_code_delta(code_delta)
                                 tool_call_data.end_with_code = ")"
                             else:
                                 code_delta = function_call.arguments[len(tool_call_data.code) :]
                                 tool_call_data.code = function_call.arguments
-                                send_code_delta(code_delta)
+                                await send_code_delta(code_delta)
                         else:
                             arguments = function_call.arguments
                             languages = language_map.keys()
 
                             if tool_call_data.language is None and function_call.name in languages:
                                 # Languge is in the name of the function call
-                                send_language_if_needed(cast(LanguageStr, function_call.name))
+                                await send_language_if_needed(cast(LanguageStr, function_call.name))
 
                             # This can now be both a string and a json object
                             try:
@@ -203,7 +231,7 @@ async def execution_mode_interpreter(
                                 headline_delta = ""
 
                                 if arguments and "code" in arguments:
-                                    send_language_if_needed("python")
+                                    await send_language_if_needed("python")
 
                                     code_delta = arguments["code"][len(tool_call_data.code) :]
                                     tool_call_data.code = arguments["code"]
@@ -213,20 +241,34 @@ async def execution_mode_interpreter(
                                     tool_call_data.headline = arguments["headline"]
 
                                 if code_delta or headline_delta:
-                                    send_code_delta(code_delta, headline_delta)
+                                    await send_code_delta(code_delta, headline_delta)
                             except json.JSONDecodeError:
                                 # We need to handle incorrect OpenAI responses, sometmes arguments is a string containing the code
                                 if arguments and not arguments.startswith("{"):
-                                    send_language_if_needed("python")
+                                    await send_language_if_needed("python")
 
                                     code_delta = arguments[len(tool_call_data.code) :]
                                     tool_call_data.code = arguments
 
-                                    send_code_delta(code_delta)
+                                    await send_code_delta(code_delta)
 
     finally:
         for tool_id in tools_requiring_closing_parenthesis:
-            context.chat_mutator.op_append_to_tool_call_code(
-                tool_call_id=tool_id,
-                code_delta=")",
+            await context.chat_mutator.mutate(
+                AppendToCodeToolCallMutation(
+                    tool_call_id=tool_id,
+                    code_delta=")",
+                )
             )
+
+
+async def execution_mode_accept_code(
+    context: AcceptCodeContext,
+):
+    pass
+
+
+execution_mode = ExecutionMode(
+    process_chat=execution_mode_process,
+    accept_code=execution_mode_accept_code,
+)

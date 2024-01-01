@@ -1,6 +1,6 @@
 import argparse
 import asyncio
-from aiconsole.api.websockets.incoming_messages import SetChatIdWSMessage
+from aiconsole.api.websockets.client_messages import OpenChatClientMessage, ProcessChatClientMessage
 from aiconsole.app import app
 from fastapi.testclient import TestClient
 import os
@@ -26,7 +26,7 @@ async def main():
     fastapi_app = app()
 
     with TestClient(fastapi_app) as client:
-        response = client.post("/api/projects/choose", json={"directory": "../../test"})
+        response = client.post("/api/projects/choose", json={"directory": "../test"})
 
         # Print the response content
         print(response)
@@ -42,15 +42,15 @@ async def main():
 
             chat = client.get(f"/api/chats/{chat_info["id"]}").json()
 
-            SetChatIdWSMessage(chat_id=chat_info["id"]).send(websocket)
+            await OpenChatClientMessage(chat_id=chat_info["id"]).send(websocket)
 
-            response = client.post(f"/api/chats/{chat_info["id"]}/analyse", json={"request_id": "test", "chat": chat})
-            print (response.json())
+            request_id = "test"
+            await ProcessChatClientMessage(chat_id=chat_info["id"], request_id=request_id).send(websocket)
 
             while True:
                 data = websocket.receive_json()
                 print(data)
-                if (data["type"] == "RequestProcessingFinishedWSMessage" and data["request_id"] == "test"):
+                if (data["type"] == "LockReleasedServerMessage" and data["request_id"] == "test"):
                     break
                 
 

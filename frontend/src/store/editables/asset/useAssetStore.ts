@@ -49,7 +49,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
           defined_in: 'aiconsole',
           status: 'enabled',
           gpt_mode: 'quality',
-          execution_mode: 'aiconsole.core.chat.execution_modes.normal:execution_mode_normal',
+          execution_mode: 'aiconsole.core.chat.execution_modes.normal:execution_mode',
           default_status: 'enabled',
           override: false,
         };
@@ -69,7 +69,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
           defined_in: 'project',
           status: 'enabled',
           gpt_mode: 'quality',
-          execution_mode: 'aiconsole.core.chat.execution_modes.normal:execution_mode_normal',
+          execution_mode: 'aiconsole.core.chat.execution_modes.normal:execution_mode',
           default_status: 'enabled',
           override: false,
         };

@@ -3,8 +3,8 @@ import { BlinkingCursor } from './BlinkingCursor';
 import { cn } from '@/utils/common/cn';
 
 export const Analysis = () => {
-  const thinkingProcess = useChatStore((store) => store.analysis.thinking_process);
-  const nextStep = useChatStore((store) => store.analysis.next_step);
+  const thinkingProcess = useChatStore(() => '');
+  const nextStep = useChatStore(() => '');
 
   return (
     <div

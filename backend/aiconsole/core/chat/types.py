@@ -16,13 +16,12 @@
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable
-from aiconsole.core.assets.asset import EditableObject
 
-from aiconsole.core.code_running.code_interpreters.language_map import LanguageStr
+from aiconsole.core.assets.asset import EditableObject
+from aiconsole.core.code_running.code_interpreters.language import LanguageStr
 from aiconsole.core.gpt.types import GPTRole
-from aiconsole.core.settings.project_settings import get_aiconsole_settings
-from pydantic import BaseModel, Field, model_validator
+
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class AICToolCall(BaseModel):
@@ -60,6 +59,8 @@ class AICMessageGroup(BaseModel):
 
     @model_validator(mode="after")
     def set_default_username(self):
+        from aiconsole.core.settings.project_settings import get_aiconsole_settings
+
         role = self.role
         if role == "user":
             self.username = self.username or get_aiconsole_settings().get_username()
@@ -67,6 +68,8 @@ class AICMessageGroup(BaseModel):
 
     @model_validator(mode="after")
     def set_default_email(self):
+        from aiconsole.core.settings.project_settings import get_aiconsole_settings
+
         role = self.role
         if role == "user":
             self.email = self.email or get_aiconsole_settings().get_email()
@@ -76,30 +79,30 @@ class AICMessageGroup(BaseModel):
 class ChatHeadline(EditableObject):
     last_modified: datetime
 
-    def model_dump(self, **kwargs):
-        return {
-            **super().model_dump(**kwargs),
-            "last_modified": self.last_modified.isoformat(),
-        }
+    class Config:
+        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 @dataclass
-class AICMessageInfo:
+class AICMessageLocation:
     message_group: AICMessageGroup
     message: AICMessage
 
 
 @dataclass
-class AICToolCallInfo:
+class AICToolCallLocation:
     message_group: AICMessageGroup
     message: AICMessage
     tool_call: AICToolCall
 
 
 class Chat(ChatHeadline):
+    lock_id: str | None = None  # TODO: This has not been implemented, it's just added here.
     title_edited: bool = False
     message_groups: list[AICMessageGroup]
     is_analysis_in_progress: bool = False
+
+    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()})
 
     def get_message_group(self, message_group_id: str) -> AICMessageGroup | None:
         for message_group in self.message_groups:
@@ -107,19 +110,19 @@ class Chat(ChatHeadline):
                 return message_group
         return None
 
-    def get_message(self, message_id: str) -> AICMessageInfo | None:
+    def get_message_location(self, message_id: str) -> AICMessageLocation | None:
         for message_group in self.message_groups:
             for message in message_group.messages:
                 if message.id == message_id:
-                    return AICMessageInfo(message_group=message_group, message=message)
+                    return AICMessageLocation(message_group=message_group, message=message)
         return None
 
-    def get_tool_call(self, tool_call_id: str) -> AICToolCallInfo | None:
+    def get_tool_call_location(self, tool_call_id: str) -> AICToolCallLocation | None:
         for message_group in self.message_groups:
             for message in message_group.messages:
                 for tool_call in message.tool_calls:
                     if tool_call.id == tool_call_id:
-                        return AICToolCallInfo(message_group=message_group, message=message, tool_call=tool_call)
+                        return AICToolCallLocation(message_group=message_group, message=message, tool_call=tool_call)
         return None
 
 

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { useChatStore } from '@/store/editables/chat/useChatStore';
-import { AICToolCall as AICToolCall } from '@/types/editables/chatTypes';
+import { AICToolCall } from '@/types/editables/chatTypes';
 import { useCallback } from 'react';
 import SyntaxHighlighter, { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { duotoneDark as vs2015 } from 'react-syntax-highlighter/dist/cjs/styles/prism';
@@ -27,22 +27,26 @@ interface OutputProps {
 }
 
 export function ToolOutput({ tool_call, syntaxHighlighterCustomStyles }: OutputProps) {
-  const editToolCall = useChatStore((state) => state.editToolCall);
+  const userMutateChat = useChatStore((state) => state.userMutateChat);
 
   const handleAcceptedContent = useCallback(
     (content: string) => {
-      editToolCall((toolCall) => {
-        toolCall.output = content;
-      }, tool_call.id);
+      userMutateChat({
+        type: 'SetOutputToolCallMutation',
+        tool_call_id: tool_call.id,
+        output: content,
+      });
     },
-    [tool_call.id, editToolCall],
+    [tool_call.id, userMutateChat],
   );
 
   const handleRemoveClick = useCallback(() => {
-    editToolCall((toolCall) => {
-      toolCall.output = undefined;
-    }, tool_call.id);
-  }, [tool_call.id, editToolCall]);
+    userMutateChat({
+      type: 'SetOutputToolCallMutation',
+      tool_call_id: tool_call.id,
+      output: undefined,
+    });
+  }, [tool_call.id, userMutateChat]);
 
   return (
     <div className="flex flex-col w-full mt-2">

@@ -16,7 +16,7 @@ async def content(context):
 
 os: {platform.system()}
 cwd: {os.getcwd()}
-user_name: {getpass.getuser()}
+username: {getpass.getuser()}
 time_stamp: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 python_version: {platform.python_version()}
 default_shell: {os.environ.get('SHELL')}
