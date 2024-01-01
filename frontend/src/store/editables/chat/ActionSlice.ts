@@ -38,7 +38,12 @@ export type ActionSlice = {
 
 export const createActionSlice: StateCreator<ChatStore, [], [], ActionSlice> = (set, get) => ({
   isExecutionRunning: () => {
-    return get().chat?.lock_id !== undefined;
+    const chat = get().chat;
+    if (!chat) {
+      return false;
+    }
+
+    return !!chat.lock_id;
   },
 
   runningProcesses: [],

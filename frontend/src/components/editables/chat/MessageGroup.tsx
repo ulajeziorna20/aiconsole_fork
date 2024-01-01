@@ -33,7 +33,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
         ) : (
           <UserInfo username={group.username} email={group.email} />
         )}
-        <div className="flex-grow flex flex-col gap-5 overflow-auto">a
+        <div className="flex-grow flex flex-col gap-5 overflow-auto">
           {group.messages.length == 0 && (
             <div>
               {group.analysis}{' '}

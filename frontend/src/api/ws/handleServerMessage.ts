@@ -87,8 +87,11 @@ export async function handleServerMessage(message: ServerMessage) {
         });
       }
       break;
+    case 'LockAcquiredServerMessage':
+      console.info('LockAcquiredServerMessage is not supported');
+      break;
     case 'LockReleasedServerMessage':
-      throw new Error('LockReleasedServerMessage is not supported');
+      console.info('LockReleasedServerMessage is not supported');
       break;
     case 'NotifyAboutChatMutationServerMessage': {
       const chat = deepCopyChat(useChatStore.getState().chat);
@@ -99,6 +102,11 @@ export async function handleServerMessage(message: ServerMessage) {
       useChatStore.setState({ chat });
       break;
     }
+    case 'ChatOpenedServerMessage':
+      useChatStore.setState({
+        chat: message.chat,
+      });
+      break;
     default:
       console.error('Unknown message type: ', message);
   }

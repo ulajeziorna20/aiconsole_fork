@@ -21,11 +21,15 @@ import { ChatMutationSchema } from './chat/chatMutations';
 
 export const BaseServerMessageSchema = z.object({});
 
+export type BaseServerMessage = z.infer<typeof BaseServerMessageSchema>;
+
 export const NotificationServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('NotificationServerMessage'),
   title: z.string(),
   message: z.string(),
 });
+
+export type NotificationServerMessage = z.infer<typeof NotificationServerMessageSchema>;
 
 export const DebugJSONServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('DebugJSONServerMessage'),
@@ -33,10 +37,14 @@ export const DebugJSONServerMessageSchema = BaseServerMessageSchema.extend({
   object: z.record(z.string(), z.any()), // Assuming `object` is a simple dictionary
 });
 
+export type DebugJSONServerMessage = z.infer<typeof DebugJSONServerMessageSchema>;
+
 export const ErrorServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('ErrorServerMessage'),
   error: z.string(),
 });
+
+export type ErrorServerMessage = z.infer<typeof ErrorServerMessageSchema>;
 
 export const InitialProjectStatusServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('InitialProjectStatusServerMessage'),
@@ -44,19 +52,27 @@ export const InitialProjectStatusServerMessageSchema = BaseServerMessageSchema.e
   project_path: z.string().optional(),
 });
 
+export type InitialProjectStatusServerMessage = z.infer<typeof InitialProjectStatusServerMessageSchema>;
+
 export const ProjectOpenedServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('ProjectOpenedServerMessage'),
   name: z.string(),
   path: z.string(),
 });
 
+export type ProjectOpenedServerMessage = z.infer<typeof ProjectOpenedServerMessageSchema>;
+
 export const ProjectClosedServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('ProjectClosedServerMessage'),
 });
 
+export type ProjectClosedServerMessage = z.infer<typeof ProjectClosedServerMessageSchema>;
+
 export const ProjectLoadingServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('ProjectLoadingServerMessage'),
 });
+
+export type ProjectLoadingServerMessage = z.infer<typeof ProjectLoadingServerMessageSchema>;
 
 export const AssetsUpdatedServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('AssetsUpdatedServerMessage'),
@@ -65,10 +81,14 @@ export const AssetsUpdatedServerMessageSchema = BaseServerMessageSchema.extend({
   count: z.number(),
 });
 
+export type AssetsUpdatedServerMessage = z.infer<typeof AssetsUpdatedServerMessageSchema>;
+
 export const SettingsServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('SettingsServerMessage'),
   initial: z.boolean(),
 });
+
+export type SettingsServerMessage = z.infer<typeof SettingsServerMessageSchema>;
 
 export const NotifyAboutChatMutationServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('NotifyAboutChatMutationServerMessage'),
@@ -77,16 +97,22 @@ export const NotifyAboutChatMutationServerMessageSchema = BaseServerMessageSchem
   mutation: ChatMutationSchema, // Assuming ChatMutationSchema is defined
 });
 
+export type NotifyAboutChatMutationServerMessage = z.infer<typeof NotifyAboutChatMutationServerMessageSchema>;
+
 export const ChatOpenedServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('ChatOpenedServerMessage'),
   chat: ChatSchema, // Assuming ChatSchema is defined
 });
+
+export type ChatOpenedServerMessage = z.infer<typeof ChatOpenedServerMessageSchema>;
 
 export const LockAcquiredServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('LockAcquiredServerMessage'),
   request_id: z.string(),
   chat_id: z.string(),
 });
+
+export type LockAcquiredServerMessage = z.infer<typeof LockAcquiredServerMessageSchema>;
 
 export const LockReleasedServerMessageSchema = BaseServerMessageSchema.extend({
   type: z.literal('LockReleasedServerMessage'),
@@ -95,19 +121,6 @@ export const LockReleasedServerMessageSchema = BaseServerMessageSchema.extend({
   aborted: z.boolean(),
 });
 
-export type BaseServerMessage = z.infer<typeof BaseServerMessageSchema>;
-export type NotificationServerMessage = z.infer<typeof NotificationServerMessageSchema>;
-export type DebugJSONServerMessage = z.infer<typeof DebugJSONServerMessageSchema>;
-export type ErrorServerMessage = z.infer<typeof ErrorServerMessageSchema>;
-export type InitialProjectStatusServerMessage = z.infer<typeof InitialProjectStatusServerMessageSchema>;
-export type ProjectOpenedServerMessage = z.infer<typeof ProjectOpenedServerMessageSchema>;
-export type ProjectClosedServerMessage = z.infer<typeof ProjectClosedServerMessageSchema>;
-export type ProjectLoadingServerMessage = z.infer<typeof ProjectLoadingServerMessageSchema>;
-export type AssetsUpdatedServerMessage = z.infer<typeof AssetsUpdatedServerMessageSchema>;
-export type SettingsServerMessage = z.infer<typeof SettingsServerMessageSchema>;
-export type NotifyAboutChatMutationServerMessage = z.infer<typeof NotifyAboutChatMutationServerMessageSchema>;
-export type ChatOpenedServerMessage = z.infer<typeof ChatOpenedServerMessageSchema>;
-export type LockAcquiredServerMessage = z.infer<typeof LockAcquiredServerMessageSchema>;
 export type LockReleasedServerMessage = z.infer<typeof LockReleasedServerMessageSchema>;
 
 export const ServerMessageSchema = z.union([
