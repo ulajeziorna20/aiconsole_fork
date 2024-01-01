@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from typing import Literal
+from aiconsole.core.gpt.parse_partial_json import parse_partial_json
 from pydantic import BaseModel
 from typing_extensions import TypedDict
 
@@ -37,7 +38,11 @@ class EnforcedFunctionCall(TypedDict):
 
 class GPTFunctionCall(BaseModel):
     name: str
-    arguments: dict | str
+    arguments: str
+
+    @property
+    def arguments_dict(self):
+        return parse_partial_json(self.arguments)
 
 
 class GPTToolCall(BaseModel):

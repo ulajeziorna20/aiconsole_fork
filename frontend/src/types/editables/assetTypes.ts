@@ -24,9 +24,7 @@ export type TabsValues = 'chats' | 'materials' | 'agents';
 
 export type Material = Asset & {
   content_type: MaterialContentType;
-  content_static_text: string;
-  content_dynamic_text: string;
-  content_api: string;
+  content: string;
 };
 
 export type RenderedMaterial = {
@@ -40,6 +38,8 @@ export type MaterialDefinitionSource = 'aiconsole' | 'project';
 export type AssetType = 'material' | 'agent';
 
 export type GPTMode = 'quality' | 'speed' | 'cost';
+
+export type GPTRole = 'user' | 'system' | 'assistant' | 'tool';
 
 export type EditableObjectType = 'material' | 'agent' | 'chat';
 

@@ -72,21 +72,21 @@ async def save_asset_to_fs(asset: Asset):
                 MaterialContentType.STATIC_TEXT: lambda: doc.append(
                     "content_static_text",
                     tomlkit.string(
-                        make_sure_starts_and_ends_with_newline(asset.content_static_text),
+                        make_sure_starts_and_ends_with_newline(asset.content),
                         multiline=True,
                     ),
                 ),
                 MaterialContentType.DYNAMIC_TEXT: lambda: doc.append(
                     "content_dynamic_text",
                     tomlkit.string(
-                        make_sure_starts_and_ends_with_newline(asset.content_dynamic_text),
+                        make_sure_starts_and_ends_with_newline(asset.content),
                         multiline=True,
                     ),
                 ),
                 MaterialContentType.API: lambda: doc.append(
                     "content_api",
                     tomlkit.string(
-                        make_sure_starts_and_ends_with_newline(asset.content_api),
+                        make_sure_starts_and_ends_with_newline(asset.content),
                         multiline=True,
                     ),
                 ),

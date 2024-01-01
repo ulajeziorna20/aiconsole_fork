@@ -15,7 +15,10 @@
 # limitations under the License.
 
 from aiconsole.core.gpt.consts import MODEL_DATA
-import openai
+from openai import OpenAI
+import logging
+
+_log = logging.getLogger(__name__)
 
 cached_good_keys = set()
 
@@ -25,18 +28,14 @@ async def check_key(key: str) -> bool:
     if key in cached_good_keys:
         return True
 
-    try:
-        # set key
-        openai.api_key = key
-        models = openai.Model.list(key=key)["data"]  # type: ignore
-        available_models = [model["id"] for model in models]
-        needed_models = MODEL_DATA.keys()
+    client = OpenAI(api_key=key)
+    models = client.models.list().data
+    available_models = [model.id for model in models]
+    needed_models = MODEL_DATA.keys()
 
-        good = set(needed_models).issubset(set(available_models))
+    good = set(needed_models).issubset(set(available_models))
 
-        if good:
-            cached_good_keys.add(key)
+    if good:
+        cached_good_keys.add(key)
 
-        return good
-    except Exception:
-        return False
+    return good
