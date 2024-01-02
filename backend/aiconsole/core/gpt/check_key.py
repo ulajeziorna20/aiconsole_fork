@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from aiconsole.core.gpt.consts import MODEL_DATA
-from openai import OpenAI
-import logging
 
-_log = logging.getLogger(__name__)
+from openai import OpenAI
+
+from aiconsole.core.gpt.consts import MODEL_DATA
 
 cached_good_keys = set()
 
