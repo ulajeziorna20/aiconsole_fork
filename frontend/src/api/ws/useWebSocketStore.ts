@@ -17,7 +17,6 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { ErrorEvent } from 'reconnecting-websocket/events';
 import { create } from 'zustand';
-import { useChatStore } from '../../store/editables/chat/useChatStore';
 import { useAPIStore } from '../../store/useAPIStore';
 import { ClientMessage } from './clientMessages';
 import { handleServerMessage } from './handleServerMessage';
@@ -27,7 +26,8 @@ export type WebSockeStore = {
   ws: ReconnectingWebSocket | null;
   initWebSocket: () => void;
   disconnect: () => void;
-  sendMessage: (message: ClientMessage) => void;
+  waitUntilConnected: () => Promise<void>;
+  sendMessage: (message: ClientMessage) => Promise<void>;
   sendMessageAndWaitForResponse: (
     messageToSend: ClientMessage,
     responseCriteria: (response: ServerMessage) => boolean,
@@ -51,6 +51,8 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
 
     ws.onopen = () => {
       set({ ws });
+
+      console.log('WebSocket connection established');
     };
 
     ws.onmessage = async (e: MessageEvent) => {
@@ -73,8 +75,17 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
     set({ ws: null });
   },
 
-  sendMessage: (message: ClientMessage) => {
+  waitUntilConnected: async () => {
+    while (!get().ws) {
+      console.log('Waiting for WebSocket to be initialized');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  },
+
+  sendMessage: async (message: ClientMessage) => {
     console.log('Sending ClientMessage', message);
+
+    await get().waitUntilConnected();
     get().ws?.send(JSON.stringify(message));
   },
 
@@ -83,10 +94,9 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
     responseCriteria: (response: ServerMessage) => boolean,
     timeout: number = 30000, // default timeout of 10 seconds
   ): Promise<ServerMessage> => {
-    return new Promise<ServerMessage>((resolve, reject) => {
-      // Send the message
-      get().sendMessage(messageToSend);
+    await get().waitUntilConnected();
 
+    return new Promise<ServerMessage>((resolve, reject) => {
       // Handler for incoming messages
       const messageHandler = (e: MessageEvent) => {
         try {
@@ -106,10 +116,15 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
       // Add the message handler to the WebSocket
       get().ws?.addEventListener('message', messageHandler);
 
+      // Send the message
+      get().sendMessage(messageToSend);
+
       // Timeout mechanism
       const timeoutId = setTimeout(() => {
         cleanup();
-        reject(new Error('Response timeout'));
+        reject(
+          new Error(`Timeout of ${timeout}ms exceeded while waiting for response for message ${messageToSend.type}`),
+        );
       }, timeout);
 
       // Cleanup logic

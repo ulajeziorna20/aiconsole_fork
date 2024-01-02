@@ -10,7 +10,7 @@ import { deepCopyChat } from '@/utils/editables/chatUtils';
 export async function handleServerMessage(message: ServerMessage) {
   const showToast = useToastsStore.getState().showToast;
 
-  console.log('WebSocket message: ', message);
+  console.log('Received ServerMessage: ', message);
 
   switch (message.type) {
     case 'ErrorServerMessage':
@@ -87,24 +87,6 @@ export async function handleServerMessage(message: ServerMessage) {
         });
       }
       break;
-    case 'LockAcquiredServerMessage': {
-      const chat = deepCopyChat(useChatStore.getState().chat);
-      if (!chat || message.chat_id !== chat.id) {
-        throw new Error('Chat is not initialized');
-      }
-      chat.lock_id = message.request_id;
-      useChatStore.setState({ chat });
-      break;
-    }
-    case 'LockReleasedServerMessage': {
-      const chat = deepCopyChat(useChatStore.getState().chat);
-      if (!chat || message.chat_id !== chat.id) {
-        throw new Error('Chat is not initialized');
-      }
-      chat.lock_id = '';
-      useChatStore.setState({ chat });
-      break;
-    }
     case 'NotifyAboutChatMutationServerMessage': {
       const chat = deepCopyChat(useChatStore.getState().chat);
       if (!chat) {

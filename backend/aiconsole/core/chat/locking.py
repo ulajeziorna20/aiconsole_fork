@@ -3,12 +3,10 @@ from typing import Dict
 import asyncio
 from aiconsole.api.websockets.connection_manager import AICConnection
 from aiconsole.api.websockets.server_messages import (
-    LockAcquiredServerMessage,
-    LockReleasedServerMessage,
     NotifyAboutChatMutationServerMessage,
 )
 from aiconsole.core.chat.apply_mutation import apply_mutation
-from aiconsole.core.chat.chat_mutations import ChatMutation
+from aiconsole.core.chat.chat_mutations import ChatMutation, LockAcquiredMutation, LockReleasedMutation
 from aiconsole.core.chat.chat_mutator import ChatMutator
 from aiconsole.core.chat.load_chat_history import load_chat_history
 from aiconsole.core.chat.save_chat_history import save_chat_history
@@ -33,7 +31,8 @@ async def wait_for_lock(chat_id: str) -> None:
         raise HTTPException(status_code=408, detail="Lock acquisition timed out")
 
 
-async def acquire_lock(chat_id: str, request_id: str):
+async def acquire_lock(chat_id: str, request_id: str, skip_mutating_clients: bool = False):
+    _log.debug(f"Acquiring lock {chat_id} {request_id}")
     if chat_id not in chats:
         chat_history = await load_chat_history(chat_id)
         chat_history.lock_id = None
@@ -45,7 +44,10 @@ async def acquire_lock(chat_id: str, request_id: str):
     chats[chat_id].lock_id = request_id
     lock_events[chat_id].clear()
 
-    await LockAcquiredServerMessage(request_id=request_id, chat_id=chat_id).send_to_chat(chat_id)
+    if not skip_mutating_clients:
+        await NotifyAboutChatMutationServerMessage(
+            request_id=request_id, chat_id=chat_id, mutation=LockAcquiredMutation(lock_id=request_id)
+        ).send_to_chat(chat_id)
 
     return chats[chat_id]
 
@@ -57,7 +59,9 @@ async def release_lock(chat_id: str, request_id: str) -> None:
         del chats[chat_id]
         lock_events[chat_id].set()
 
-        await LockReleasedServerMessage(request_id=request_id, chat_id=chat_id, aborted=False).send_to_chat(chat_id)
+        await NotifyAboutChatMutationServerMessage(
+            request_id=request_id, chat_id=chat_id, mutation=LockReleasedMutation(lock_id=request_id)
+        ).send_to_chat(chat_id)
 
 
 class DefaultChatMutator(ChatMutator):

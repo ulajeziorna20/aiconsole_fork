@@ -18,11 +18,15 @@ import { StateCreator } from 'zustand';
 
 import { Chat } from '@/types/editables/chatTypes';
 import { ChatStore } from './useChatStore';
+import { useEditablesStore } from '../useEditablesStore';
+import { EditablesAPI } from '@/api/api/EditablesAPI';
 
 export type ChatSlice = {
   chat?: Chat;
   lastUsedChat?: Chat;
   setLastUsedChat: (chat: Chat) => void;
+  setChat: (chat: Chat) => void;
+  renameChat: (newChat: Chat) => Promise<void>;
 };
 
 export const createChatSlice: StateCreator<ChatStore, [], [], ChatSlice> = (set, get) => ({
@@ -32,5 +36,15 @@ export const createChatSlice: StateCreator<ChatStore, [], [], ChatSlice> = (set,
   materials: [],
   setLastUsedChat: (chat: Chat) => {
     set({ lastUsedChat: chat });
+  },
+  setChat: (chat: Chat) => {
+    set({ chat });
+  },
+  renameChat: async (newChat: Chat) => {
+    await EditablesAPI.updateEditableObject('chat', newChat, newChat.id);
+    get().setChat(newChat);
+
+    //If it's chat we need to reload chat history because there is no autoreload on change for chats
+    useEditablesStore.getState().initChatHistory();
   },
 });

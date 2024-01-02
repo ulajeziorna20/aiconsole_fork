@@ -4,10 +4,10 @@ import { ChatMutation } from '@/api/ws/chat/chatMutations';
 export function applyMutation(chat: Chat, mutation: ChatMutation) {
   switch (mutation.type) {
     case 'LockAcquiredMutation':
-      throw new Error('LockAcquiredMutation is not supported');
+      chat.lock_id = mutation.lock_id;
       break;
     case 'LockReleasedMutation':
-      throw new Error('LockReleasedMutation is not supported');
+      chat.lock_id = undefined;
       break;
     case 'CreateMessageGroupMutation':
       chat.message_groups.push({

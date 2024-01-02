@@ -118,7 +118,6 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> =
       const chat = deepCopyChat(state.chat);
       const messageLocation = getMessage(chat, messageId);
       if (!messageLocation) {
-        console.trace();
         console.error(`Message with id ${messageId} not found in`, chat);
         throw new Error('Message not found');
       }
@@ -142,7 +141,6 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageSlice> =
       const outputLocation = getToolCall(chat, toolCallId);
 
       if (!outputLocation) {
-        console.trace();
         console.error(`Tool call with id ${toolCallId} not found in`, chat);
         throw new Error(`Tool call with id ${toolCallId} not found`);
       }

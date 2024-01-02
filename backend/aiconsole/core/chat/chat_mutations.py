@@ -6,11 +6,11 @@ from pydantic import BaseModel
 
 
 class LockAcquiredMutation(BaseModel):
-    pass
+    lock_id: str
 
 
 class LockReleasedMutation(BaseModel):
-    aborted: bool
+    lock_id: str
 
 
 class CreateMessageGroupMutation(BaseModel):

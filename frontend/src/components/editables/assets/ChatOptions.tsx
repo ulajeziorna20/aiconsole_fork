@@ -42,15 +42,15 @@ const ChatOptions = () => {
 
   useEffect(() => {
     // TODO: set options from chat
-    console.log(chat);
+    //console.log(chat);
   }, [chat]);
 
   const debounceChatUpdate = useDebounceCallback(() => {
     // TODO: send data to backend
-    console.log(`Chat ${chat?.id} options updated`);
-    console.log('chosenMaterials', chosenMaterials);
-    console.log('selectedAgentId', selectedAgentId);
-    console.log('allowExtraMaterials', allowExtraMaterials);
+    //console.log(`Chat ${chat?.id} options updated`);
+    //console.log('chosenMaterials', chosenMaterials);
+    //console.log('selectedAgentId', selectedAgentId);
+    //console.log('allowExtraMaterials', allowExtraMaterials);
   }, 500);
 
   useEffect(() => {

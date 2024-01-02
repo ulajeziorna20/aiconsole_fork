@@ -94,17 +94,13 @@ class NotifyAboutChatMutationServerMessage(BaseServerMessage):
     chat_id: str
     mutation: ChatMutation
 
+    def model_dump(self, **kwargs):
+        # include type of mutation in the dump of "mutation"
+        return {
+            **super().model_dump(**kwargs),
+            "mutation": {**self.mutation.model_dump(**kwargs), "type": self.mutation.__class__.__name__},
+        }
+
 
 class ChatOpenedServerMessage(BaseServerMessage):
     chat: Chat
-
-
-class LockAcquiredServerMessage(BaseServerMessage):
-    request_id: str
-    chat_id: str
-
-
-class LockReleasedServerMessage(BaseServerMessage):
-    request_id: str
-    chat_id: str
-    aborted: bool

@@ -104,20 +104,23 @@ async def _handle_acquire_lock_ws_message(connection: AICConnection, message: Ac
 async def _handle_release_lock_ws_message(connection: AICConnection, message: ReleaseLockClientMessage):
     await release_lock(chat_id=message.chat_id, request_id=message.request_id)
 
-    _log.info(f"Removing lock {message.request_id} {connection.acquired_locks}")
-    connection.acquired_locks.remove(
-        AcquiredLock(
-            chat_id=message.chat_id,
-            request_id=message.request_id,
-        )
-    )
+    lock_data = AcquiredLock(chat_id=message.chat_id, request_id=message.request_id)
+
+    if lock_data in connection.acquired_locks:
+        connection.acquired_locks.remove(lock_data)
+    else:
+        _log.error(f"Lock {lock_data} not found in {connection.acquired_locks}")
 
 
 async def _handle_open_chat_ws_message(connection: AICConnection, message: OpenChatClientMessage):
     temporary_request_id = str(uuid4())
 
     try:
-        chat = await acquire_lock(chat_id=message.chat_id, request_id=temporary_request_id)
+        chat = await acquire_lock(
+            chat_id=message.chat_id,
+            request_id=temporary_request_id,
+            skip_mutating_clients=True,  # Skip because they do not yet have the chat
+        )
 
         connection.open_chats_ids.add(message.chat_id)
 
