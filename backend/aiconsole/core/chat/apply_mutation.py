@@ -45,6 +45,8 @@ _log = logging.getLogger(__name__)
 
 def apply_mutation(chat: Chat, mutation: ChatMutation) -> None:
     """
+    KEEEP THIS IN SYNC WITH FRONTEND applyMutation!
+
     Chat to which we received an exclusive write access.
     It provides modification methods which should be used instead of modifying the chat directly.
     """
@@ -83,7 +85,7 @@ def apply_mutation(chat: Chat, mutation: ChatMutation) -> None:
 # Handlers
 
 
-def _handle_CreateMessageGroupMutation(chat, mutation: CreateMessageGroupMutation) -> AICMessageGroup:
+def _handle_CreateMessageGroupMutation(chat: Chat, mutation: CreateMessageGroupMutation) -> AICMessageGroup:
     message_group = AICMessageGroup(
         id=mutation.message_group_id,
         agent_id=mutation.agent_id,
@@ -127,6 +129,11 @@ def _handle_SetMessageGroupAgentIdMutation(chat, mutation: SetAgentIdMessageGrou
     message_group = _get_message_group(chat, mutation.message_group_id)
     message_group.agent_id = mutation.agent_id
 
+    if mutation.agent_id == "user":
+        message_group.role = "user"
+    else:
+        message_group.role = "assistant"
+
 
 def _handle_SetMessageGroupMaterialsIdsMutation(chat, mutation: SetMaterialsIdsMessageGroupMutation) -> None:
     message_group = _get_message_group(chat, mutation.message_group_id)
@@ -158,8 +165,13 @@ def _handle_CreateMessageMutation(chat, mutation: CreateMessageMutation) -> AICM
 
 
 def _handle_DeleteMessageMutation(chat, mutation: DeleteMessageMutation) -> None:
-    message = _get_message_location(chat, mutation.message_id)
-    message.message_group.messages = [m for m in message.message_group.messages if m.id != mutation.message_id]
+    message_location = _get_message_location(chat, mutation.message_id)
+    message_location.message_group.messages = [
+        m for m in message_location.message_group.messages if m.id != mutation.message_id
+    ]
+
+    if not message_location.message_group.messages:
+        chat.message_groups = [group for group in chat.message_groups if group.id != message_location.message_group.id]
 
 
 def _handle_SetContentMessageMutation(chat, mutation: SetContentMessageMutation) -> None:

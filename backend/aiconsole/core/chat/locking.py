@@ -3,6 +3,7 @@ from typing import Dict
 import asyncio
 from aiconsole.api.websockets.connection_manager import AICConnection
 from aiconsole.api.websockets.server_messages import (
+    DebugJSONServerMessage,
     NotifyAboutChatMutationServerMessage,
 )
 from aiconsole.core.chat.apply_mutation import apply_mutation
@@ -39,6 +40,7 @@ async def acquire_lock(chat_id: str, request_id: str, skip_mutating_clients: boo
         chats[chat_id] = chat_history
 
     if chats[chat_id].lock_id:
+        raise Exception("Lock already acquired")
         await wait_for_lock(chat_id)
 
     chats[chat_id].lock_id = request_id
@@ -76,9 +78,8 @@ class DefaultChatMutator(ChatMutator):
 
     async def mutate(self, mutation: ChatMutation) -> None:
         if self.chat_id not in chats or chats[self.chat_id].lock_id != self.request_id:
-            raise HTTPException(
-                status_code=403,
-                detail=f"Lock not acquired for chat {self.chat_id} request_id={self.request_id} lock_id={self.chat.lock_id}",
+            raise Exception(
+                f"Lock not acquired for chat {self.chat_id} request_id={self.request_id} lock_id={self.chat.lock_id}",
             )
 
         apply_mutation(self.chat, mutation)

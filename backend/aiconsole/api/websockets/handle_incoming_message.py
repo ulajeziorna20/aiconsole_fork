@@ -14,11 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import logging
 from uuid import uuid4
 
-from aiconsole.api.websockets.connection_manager import AcquiredLock, AICConnection
 from aiconsole.api.websockets.client_messages import (
     AcceptCodeClientMessage,
     AcquireLockClientMessage,
@@ -28,14 +26,16 @@ from aiconsole.api.websockets.client_messages import (
     ProcessChatClientMessage,
     ReleaseLockClientMessage,
 )
-from aiconsole.api.websockets.server_messages import ChatOpenedServerMessage, ErrorServerMessage
+from aiconsole.api.websockets.connection_manager import AcquiredLock, AICConnection
+from aiconsole.api.websockets.server_messages import (
+    ChatOpenedServerMessage,
+)
 from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.asset import AssetLocation
 from aiconsole.core.chat.execution_modes.execution_mode import AcceptCodeContext, ProcessChatContext
 from aiconsole.core.chat.execution_modes.import_and_validate_execution_mode import import_and_validate_execution_mode
 from aiconsole.core.chat.locking import DefaultChatMutator, acquire_lock, release_lock
 from aiconsole.core.gpt.consts import GPTMode
-from fastapi import HTTPException
 
 _log = logging.getLogger(__name__)
 
@@ -139,6 +139,7 @@ async def _handle_init_chat_mutation_ws_message(
     connection: AICConnection | None, message: InitChatMutationClientMessage
 ):
     mutator = DefaultChatMutator(chat_id=message.chat_id, request_id=message.request_id, connection=connection)
+
     await mutator.mutate(message.mutation)
 
 
@@ -147,7 +148,9 @@ async def _handle_accept_code_ws_message(connection: AICConnection, message: Acc
         chat = await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
 
         chat_mutator = DefaultChatMutator(
-            chat_id=message.chat_id, request_id=message.request_id, connection=connection
+            chat_id=message.chat_id,
+            request_id=message.request_id,
+            connection=None,  # Source connection is None because the originating mutations come from server
         )
 
         agent = director_agent
@@ -164,13 +167,6 @@ async def _handle_accept_code_ws_message(connection: AICConnection, message: Acc
                 chat_mutator=chat_mutator, agent=agent, rendered_materials=[], tool_call=tool_call_location.tool_call
             )
         )
-    except asyncio.CancelledError:
-        _log.info("Cancelled processingx")
-        aborted = True
-    except Exception as e:
-        _log.exception("Analysis failed", exc_info=e)
-        await ErrorServerMessage(error=str(e)).send_to_chat(message.chat_id)
-        raise HTTPException(status_code=400, detail=str(e))
     finally:
         await release_lock(chat_id=message.chat_id, request_id=message.request_id)
 
@@ -180,7 +176,9 @@ async def _handle_process_chat_ws_message(connection: AICConnection, message: Pr
         chat = await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
 
         chat_mutator = DefaultChatMutator(
-            chat_id=message.chat_id, request_id=message.request_id, connection=connection
+            chat_id=message.chat_id,
+            request_id=message.request_id,
+            connection=None,  # Source connection is None because the originating mutations come from server
         )
 
         agent = director_agent
@@ -194,12 +192,5 @@ async def _handle_process_chat_ws_message(connection: AICConnection, message: Pr
                 rendered_materials=[],
             )
         )
-    except asyncio.CancelledError:
-        _log.info("Cancelled processingx")
-        aborted = True
-    except Exception as e:
-        _log.exception("Analysis failed", exc_info=e)
-        await ErrorServerMessage(error=str(e)).send_to_chat(message.chat_id)
-        raise HTTPException(status_code=400, detail=str(e))
     finally:
         await release_lock(chat_id=message.chat_id, request_id=message.request_id)
