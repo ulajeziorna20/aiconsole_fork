@@ -8,11 +8,6 @@ import { Chat } from '@/types/editables/chatTypes';
 
 export const useChat = () => {
   const setChat = useCallback((chat: Chat) => {
-    useWebSocketStore.getState().sendMessage({
-      type: 'OpenChatClientMessage',
-      chat_id: chat.id,
-    });
-
     useChatStore.setState(() => {
       return { chat };
     });

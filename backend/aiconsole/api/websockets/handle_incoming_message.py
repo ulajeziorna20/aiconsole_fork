@@ -98,10 +98,13 @@ async def _handle_acquire_lock_ws_message(connection: AICConnection, message: Ac
         )
     )
 
+    _log.info(f"Acquired lock {message.request_id} {connection.acquired_locks}")
+
 
 async def _handle_release_lock_ws_message(connection: AICConnection, message: ReleaseLockClientMessage):
     await release_lock(chat_id=message.chat_id, request_id=message.request_id)
 
+    _log.info(f"Removing lock {message.request_id} {connection.acquired_locks}")
     connection.acquired_locks.remove(
         AcquiredLock(
             chat_id=message.chat_id,

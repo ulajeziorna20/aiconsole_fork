@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+from aiconsole.api.websockets.server_messages import ErrorServerMessage
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from aiconsole.core.project import project
 
@@ -33,7 +34,13 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         while True:
+            _log.debug("Waiting for message")
             json_data = await websocket.receive_json()
-            await handle_incoming_message(connection, json_data)
+            try:
+                await handle_incoming_message(connection, json_data)
+            except Exception as e:
+                await ErrorServerMessage(error=f"Error handling message: {e}").send_to_connection(connection)
+                _log.exception(e)
+                _log.error(f"Error handling message: {e}")
     except WebSocketDisconnect:
         connection_manager.disconnect(connection)

@@ -26,6 +26,8 @@ import {
 } from '@/types/editables/assetTypes';
 import ky from 'ky';
 import { API_HOOKS, getBaseURL } from '../../store/useAPIStore';
+import { useWebSocketStore } from '../ws/useWebSocketStore';
+import { ChatOpenedServerMessage, ServerMessage } from '../ws/serverMessages';
 
 const previewMaterial: (material: Material) => Promise<RenderedMaterial> = async (material: Material) =>
   ky
@@ -60,6 +62,20 @@ async function fetchEditableObject<T extends EditableObject>({
   location?: MaterialDefinitionSource;
   type?: string;
 }): Promise<T> {
+  if (editableObjectType === 'chat') {
+    const response: ChatOpenedServerMessage = (await useWebSocketStore
+      .getState()
+      .sendMessageAndWaitForResponse({ type: 'OpenChatClientMessage', chat_id: id }, (response: ServerMessage) => {
+        if (response.type === 'ChatOpenedServerMessage') {
+          return response.chat.id === id;
+        } else {
+          return false;
+        }
+      })) as ChatOpenedServerMessage;
+
+    return response.chat as unknown as T;
+  }
+
   return ky
     .get(`${getBaseURL()}/api/${editableObjectType}s/${id}`, {
       searchParams: { location: location || '', type: type || '' },
@@ -114,6 +130,10 @@ async function updateEditableObject(
 ) {
   if (!originalId) {
     originalId = editableObject.id;
+  }
+
+  if (editableObjectType === 'chat') {
+    throw new Error('Chat cannot be updated');
   }
 
   return ky.patch(`${getBaseURL()}/api/${editableObjectType}s/${originalId}`, {

@@ -87,7 +87,6 @@ export const createCommandSlice: StateCreator<ChatStore, [], [], CommandSlice> =
         commandIndex: history.length,
       }));
     }
-    get().saveCurrentChatHistory();
   },
   submitCommand: async (command: string) => {
     await get().stopWork();

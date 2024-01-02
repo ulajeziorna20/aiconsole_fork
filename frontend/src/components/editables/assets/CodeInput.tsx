@@ -20,7 +20,7 @@ import 'highlight.js/styles/vs2015.css';
 
 import { cn } from '@/utils/common/cn';
 import { FocusEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { useClickOutside } from '@/hooks/useClickOutside';
+import { useClickOutside } from '@/utils/common/useClickOutside';
 import { Icon } from '@/components/common/icons/Icon';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import { CodeInputFullScreen } from './CodeInputFullScreen';

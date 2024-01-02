@@ -87,12 +87,24 @@ export async function handleServerMessage(message: ServerMessage) {
         });
       }
       break;
-    case 'LockAcquiredServerMessage':
-      console.info('LockAcquiredServerMessage is not supported');
+    case 'LockAcquiredServerMessage': {
+      const chat = deepCopyChat(useChatStore.getState().chat);
+      if (!chat || message.chat_id !== chat.id) {
+        throw new Error('Chat is not initialized');
+      }
+      chat.lock_id = message.request_id;
+      useChatStore.setState({ chat });
       break;
-    case 'LockReleasedServerMessage':
-      console.info('LockReleasedServerMessage is not supported');
+    }
+    case 'LockReleasedServerMessage': {
+      const chat = deepCopyChat(useChatStore.getState().chat);
+      if (!chat || message.chat_id !== chat.id) {
+        throw new Error('Chat is not initialized');
+      }
+      chat.lock_id = '';
+      useChatStore.setState({ chat });
       break;
+    }
     case 'NotifyAboutChatMutationServerMessage': {
       const chat = deepCopyChat(useChatStore.getState().chat);
       if (!chat) {

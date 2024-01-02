@@ -41,29 +41,6 @@ async def delete_history(chat_id: str):
         )
 
 
-@router.get("/{chat_id}")
-async def get_history(chat_id: str):
-    chat = await load_chat_history(chat_id)
-
-    return JSONResponse(chat.model_dump(mode="json"))
-
-
-@router.patch("/{chat_id}")
-async def save_history(chat_id, chat: Chat):
-    if chat_id != chat.id:
-        return Response(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content="Chat ID mismatch",
-        )
-
-    save_chat_history(chat)
-
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        content="Chat history saved successfully",
-    )
-
-
 @router.get("/{chat_id}/path")
 async def get_history_path(chat_id: str):
     return {"path": str(get_history_directory() / f"{chat_id}.json")}

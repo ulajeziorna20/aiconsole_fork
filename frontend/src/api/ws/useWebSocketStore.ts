@@ -15,19 +15,24 @@
 // limitations under the License.
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { create } from 'zustand';
 import { ErrorEvent } from 'reconnecting-websocket/events';
+import { create } from 'zustand';
 import { useChatStore } from '../../store/editables/chat/useChatStore';
 import { useAPIStore } from '../../store/useAPIStore';
 import { ClientMessage } from './clientMessages';
-import { ServerMessage } from './serverMessages';
 import { handleServerMessage } from './handleServerMessage';
+import { ServerMessage } from './serverMessages';
 
 export type WebSockeStore = {
   ws: ReconnectingWebSocket | null;
   initWebSocket: () => void;
   disconnect: () => void;
   sendMessage: (message: ClientMessage) => void;
+  sendMessageAndWaitForResponse: (
+    messageToSend: ClientMessage,
+    responseCriteria: (response: ServerMessage) => boolean,
+    timeout?: number,
+  ) => Promise<ServerMessage>;
   initStarted: boolean;
 };
 
@@ -46,13 +51,6 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
 
     ws.onopen = () => {
       set({ ws });
-
-      const chatId = useChatStore.getState().chat?.id || '';
-
-      get().sendMessage({
-        type: 'OpenChatClientMessage',
-        chat_id: chatId,
-      });
     };
 
     ws.onmessage = async (e: MessageEvent) => {
@@ -76,6 +74,51 @@ export const useWebSocketStore = create<WebSockeStore>((set, get) => ({
   },
 
   sendMessage: (message: ClientMessage) => {
+    console.log('Sending ClientMessage', message);
     get().ws?.send(JSON.stringify(message));
+  },
+
+  sendMessageAndWaitForResponse: async (
+    messageToSend: ClientMessage,
+    responseCriteria: (response: ServerMessage) => boolean,
+    timeout: number = 30000, // default timeout of 10 seconds
+  ): Promise<ServerMessage> => {
+    return new Promise<ServerMessage>((resolve, reject) => {
+      // Send the message
+      get().sendMessage(messageToSend);
+
+      // Handler for incoming messages
+      const messageHandler = (e: MessageEvent) => {
+        try {
+          const incomingMessage: ServerMessage = JSON.parse(e.data); //TOOD: Zod parsing
+
+          // Check if the incoming message meets the criteria
+          if (responseCriteria(incomingMessage)) {
+            cleanup();
+            resolve(incomingMessage);
+          }
+        } catch (error) {
+          cleanup();
+          reject(error);
+        }
+      };
+
+      // Add the message handler to the WebSocket
+      get().ws?.addEventListener('message', messageHandler);
+
+      // Timeout mechanism
+      const timeoutId = setTimeout(() => {
+        cleanup();
+        reject(new Error('Response timeout'));
+      }, timeout);
+
+      // Cleanup logic
+      const cleanup = () => {
+        clearTimeout(timeoutId);
+        get().ws?.removeEventListener('message', messageHandler);
+      };
+
+      // Optional: add more logic as needed
+    });
   },
 }));

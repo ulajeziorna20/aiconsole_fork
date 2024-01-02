@@ -17,7 +17,7 @@
 import { ChangeEvent, useRef, useState } from 'react';
 
 import { Icon } from '@/components/common/icons/Icon';
-import { useClickOutside } from '@/hooks/useClickOutside';
+import { useClickOutside } from '@/utils/common/useClickOutside';
 import { cn } from '@/utils/common/cn';
 import { getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
 
