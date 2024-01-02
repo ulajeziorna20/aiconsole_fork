@@ -69,7 +69,7 @@ async def is_project(params: ChooseParams):
 
 
 @router.post("/choose")
-async def choose_project(params: ChooseParams, background_tasks: BackgroundTasks):
+async def choose_project_endpoint(params: ChooseParams, background_tasks: BackgroundTasks):
     directory = Path(params.directory)
 
     await choose_project(directory, background_tasks)
