@@ -1,11 +1,9 @@
+import asyncio
 from collections import defaultdict
 from typing import Dict
-import asyncio
+
 from aiconsole.api.websockets.connection_manager import AICConnection
-from aiconsole.api.websockets.server_messages import (
-    DebugJSONServerMessage,
-    NotifyAboutChatMutationServerMessage,
-)
+from aiconsole.api.websockets.server_messages import NotifyAboutChatMutationServerMessage
 from aiconsole.core.chat.apply_mutation import apply_mutation
 from aiconsole.core.chat.chat_mutations import ChatMutation, LockAcquiredMutation, LockReleasedMutation
 from aiconsole.core.chat.chat_mutator import ChatMutator

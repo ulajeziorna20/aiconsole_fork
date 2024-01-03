@@ -89,6 +89,7 @@ async def execution_mode_process(
         context = ProcessChatContext(
             chat_mutator=context.chat_mutator,
             agent=analysis.agent,
+            materials=analysis.relevant_materials,
             rendered_materials=rendered_materials,
         )
 

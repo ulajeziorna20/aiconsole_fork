@@ -189,6 +189,7 @@ async def _handle_process_chat_ws_message(connection: AICConnection, message: Pr
             ProcessChatContext(
                 chat_mutator=chat_mutator,
                 agent=agent,
+                materials=[],
                 rendered_materials=[],
             )
         )

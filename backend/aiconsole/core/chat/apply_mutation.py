@@ -78,7 +78,7 @@ def apply_mutation(chat: Chat, mutation: ChatMutation) -> None:
         SetOutputToolCallMutation.__name__: _handle_SetToolCallOutputMutation,
         AppendToOutputToolCallMutation.__name__: _handle_AppendToToolCallOutputMutation,
         SetIsStreamingToolCallMutation.__name__: _handle_SetToolCallIsStreamingMutation,
-        SetIsExecutingToolCallMutation.__name__: _handle_SetToolCallIsExecutingMutation,
+        SetIsExecutingToolCallMutation.__name__: _handle_SetIsExecutingToolCallMutation,
     }[mutation.__class__.__name__](chat, mutation)
 
 
@@ -239,7 +239,7 @@ def _handle_SetToolCallIsStreamingMutation(chat, mutation: SetIsStreamingToolCal
     _get_tool_call_location(chat, mutation.tool_call_id).tool_call.is_streaming = mutation.is_streaming
 
 
-def _handle_SetToolCallIsExecutingMutation(chat, mutation: SetIsExecutingToolCallMutation) -> None:
+def _handle_SetIsExecutingToolCallMutation(chat, mutation: SetIsExecutingToolCallMutation) -> None:
     _get_tool_call_location(chat, mutation.tool_call_id).tool_call.is_executing = mutation.is_executing
 
 
