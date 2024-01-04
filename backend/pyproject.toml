@@ -51,3 +51,4 @@ python_files = "*_tests.py"
 known_first_party = "aiconsole,aiconsole_toolkit"
 default_section = "THIRDPARTY"
 sections = ["FUTURE","STDLIB","THIRDPARTY","FIRSTPARTY","LOCALFOLDER"]
+profile = "black"

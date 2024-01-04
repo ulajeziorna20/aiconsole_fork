@@ -1,11 +1,8 @@
-from datetime import datetime
-import getpass
-import os
-import platform
-import getpass
-import os
-import platform
 import datetime
+import getpass
+import os
+import platform
+from datetime import datetime
 
 from aiconsole_toolkit.env import get_current_project_venv_available_packages
 

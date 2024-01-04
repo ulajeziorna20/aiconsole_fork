@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import watchdog.events
-
-
 import asyncio
 import threading
+
+import watchdog.events
 
 
 class BatchingWatchDogHandler(watchdog.events.FileSystemEventHandler):

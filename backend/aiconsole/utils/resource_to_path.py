@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from pathlib import Path
+
 from aiconsole.consts import AICONSOLE_PATH
 
 

@@ -1,8 +1,9 @@
 from typing import Literal
 
+from pydantic import BaseModel
+
 from aiconsole.core.code_running.code_interpreters.language import LanguageStr
 from aiconsole.core.gpt.types import GPTRole
-from pydantic import BaseModel
 
 
 class LockAcquiredMutation(BaseModel):

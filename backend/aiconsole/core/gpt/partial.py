@@ -14,13 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from aiconsole.core.gpt.parse_partial_json import parse_partial_json
-
-from aiconsole.core.gpt.types import GPTChoice, GPTFunctionCall, GPTResponse, GPTResponseMessage, GPTRole, GPTToolCall
 from litellm import ModelResponse
 from litellm.utils import Delta, StreamingChoices
 from openai.types.chat.chat_completion_chunk import ChoiceDeltaToolCall
 from pydantic import BaseModel
+
+from aiconsole.core.gpt.parse_partial_json import parse_partial_json
+from aiconsole.core.gpt.types import (
+    GPTChoice,
+    GPTFunctionCall,
+    GPTResponse,
+    GPTResponseMessage,
+    GPTRole,
+    GPTToolCall,
+)
 
 
 class GPTPartialFunctionCall(BaseModel):

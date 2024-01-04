@@ -1,7 +1,8 @@
-from aiconsole.core.assets.asset import Asset, AssetType
-from aiconsole.core.project import project
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+
+from aiconsole.core.assets.asset import Asset, AssetType
+from aiconsole.core.project import project
 
 
 async def asset_post(asset_type: AssetType, asset: Asset, old_asset_id: str):
