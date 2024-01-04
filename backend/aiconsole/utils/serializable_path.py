@@ -21,6 +21,4 @@ from pathlib import Path
 from typing import Annotated
 
 
-SerializablePath = Annotated[
-    Path, PlainSerializer(lambda x: str(x), return_type=str)
-]
+SerializablePath = Annotated[Path, PlainSerializer(lambda x: str(x), return_type=str)]

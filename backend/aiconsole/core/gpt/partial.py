@@ -111,7 +111,7 @@ class GPTPartialResponse(BaseModel):
 
         if chunk.model is not None:
             self.model = chunk.model
-            
+
         if chunk.choices:
             chunk_choices = chunk.choices
 
@@ -123,8 +123,6 @@ class GPTPartialResponse(BaseModel):
 
                 choice = self.choices[index]
                 choice.index = index
-
-                
 
                 if chunk_choice.finish_reason is not None:
                     choice.finnish_reason = chunk_choice.finish_reason
@@ -152,7 +150,7 @@ class GPTPartialResponse(BaseModel):
 
                         for tool_call in chunk_tool_calls:
                             assert isinstance(tool_call, ChoiceDeltaToolCall)
-                            
+
                             chunk_tool_index: int = tool_call.index
                             chunk_tool_function = tool_call.function
 
