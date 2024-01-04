@@ -16,13 +16,17 @@
 
 import json
 import logging
-from aiconsole.core.chat.locking import chats
-from aiconsole.api.websockets.server_messages import DebugJSONServerMessage, ErrorServerMessage
+
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from aiconsole.core.project import project
 
 from aiconsole.api.websockets import connection_manager
 from aiconsole.api.websockets.handle_incoming_message import handle_incoming_message
+from aiconsole.api.websockets.server_messages import (
+    DebugJSONServerMessage,
+    ErrorServerMessage,
+)
+from aiconsole.core.chat.locking import chats
+from aiconsole.core.project import project
 
 router = APIRouter()
 

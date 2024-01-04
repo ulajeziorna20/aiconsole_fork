@@ -17,7 +17,6 @@ from pathlib import Path
 
 from aiconsole.core.gpt.consts import GPTMode
 
-
 # this is a path to the root of the project - usually the installed one
 # this is pointing to the backend/aiconsole directory
 AICONSOLE_PATH = Path(__file__).parent
