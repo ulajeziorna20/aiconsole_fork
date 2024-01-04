@@ -98,7 +98,7 @@ const ChatOptions = () => {
               </label>
               <AgentsDropdown
                 agents={agents}
-                selectedAgent={agents.find((agent) => agent.id === selectedAgentId)}
+                selectedAgent={agents.find(({ id }) => id === selectedAgentId)}
                 onSelect={setSelectedAgentId}
               />
             </div>
@@ -107,21 +107,9 @@ const ChatOptions = () => {
               <label className="text-xs">Selected materials</label>
               <div className="h-[190px] overflow-y-auto ">
                 <div className="flex flex-col gap-2.5 w-full">
-                  {chosenMaterials.map((option) => {
-                    const OptionIcon = getEditableObjectIcon(option);
-                    return (
-                      <div
-                        key={option.id}
-                        className="flex justify-between items-center max-w-full w-max gap-2.5 bg-gray-700 px-2.5 py-2 rounded-[20px]"
-                      >
-                        <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
-                        <p className="flex-1 truncate font-normal text-sm">{option.name}</p>
-                        <button onClick={() => removeSelectedMaterial(option.id)}>
-                          <Icon icon={X} />
-                        </button>
-                      </div>
-                    );
-                  })}
+                  {chosenMaterials.map((option) => (
+                    <ChatOption option={option} onRemove={removeSelectedMaterial} key={option.id} />
+                  ))}
                 </div>
                 <Autocomplete options={materialsOptions} onOptionSelect={handleMaterialSelect} />
               </div>
@@ -136,6 +124,20 @@ const ChatOptions = () => {
           </div>
         </Collapsible.Content>
       </Collapsible.Root>
+    </div>
+  );
+};
+
+const ChatOption = ({ option, onRemove }: { option: Material; onRemove: (id: string) => void }) => {
+  const OptionIcon = getEditableObjectIcon(option);
+
+  return (
+    <div className="flex justify-between items-center max-w-full w-max gap-2.5 bg-gray-700 px-2.5 py-2 rounded-[20px]">
+      <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
+      <p className="flex-1 truncate font-normal text-sm">{option.name}</p>
+      <button onClick={() => onRemove(option.id)}>
+        <Icon icon={X} />
+      </button>
     </div>
   );
 };
