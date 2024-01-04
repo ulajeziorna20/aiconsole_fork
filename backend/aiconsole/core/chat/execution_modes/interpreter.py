@@ -38,6 +38,7 @@ from aiconsole.core.chat.chat_mutations import (
 from aiconsole.core.chat.convert_messages import convert_messages
 from aiconsole.core.chat.execution_modes.execution_mode import AcceptCodeContext, ExecutionMode, ProcessChatContext
 from aiconsole.core.chat.execution_modes.get_agent_system_message import get_agent_system_message
+from aiconsole.core.chat.types import AICMessageGroup
 from aiconsole.core.code_running.code_interpreters.language import LanguageStr
 from aiconsole.core.code_running.code_interpreters.language_map import language_map
 from aiconsole.core.code_running.run_code import get_code_interpreter
@@ -97,22 +98,20 @@ async def _execution_mode_process(
 
     await _generate_response(message_group, context, system_message, executor)
 
-    # if all code in the current message is ran, continue operation with the same agent
     last_message = context.chat_mutator.chat.message_groups[-1].messages[-1]
 
     if last_message.tool_calls:
         # Run all code in the last message
         for tool_call in last_message.tool_calls:
             if get_aiconsole_settings().get_code_autorun():
-                await _run_code(context, tool_call_id=tool_call.id)
-
-        # if all tools have finished running, continue operation with the same agent
-        finished_running_code = all(
-            (not tool_call.is_executing) and (tool_call.output is not None) for tool_call in last_message.tool_calls
-        )
-
-        if finished_running_code:
-            await _execution_mode_process(context)  # Resume operation with the same agent
+                accept_context = AcceptCodeContext(
+                    chat_mutator=context.chat_mutator,
+                    tool_call_id=tool_call.id,
+                    agent=context.agent,
+                    materials=context.materials,
+                    rendered_materials=context.rendered_materials,
+                )
+                await _execution_mode_accept_code(accept_context)
 
 
 async def _run_code(context: ProcessChatContext, tool_call_id):
@@ -165,7 +164,9 @@ async def _run_code(context: ProcessChatContext, tool_call_id):
         )
 
 
-async def _generate_response(message_group, context, system_message, executor):
+async def _generate_response(
+    message_group: AICMessageGroup, context: ProcessChatContext, system_message: str, executor: GPTExecutor
+):
     tools_requiring_closing_parenthesis: list[str] = []
 
     message_id = str(uuid4())
@@ -343,7 +344,30 @@ async def _generate_response(message_group, context, system_message, executor):
 async def _execution_mode_accept_code(
     context: AcceptCodeContext,
 ):
-    pass
+    tool_call_location = context.chat_mutator.chat.get_tool_call_location(context.tool_call_id)
+
+    if not tool_call_location:
+        raise Exception(f"Tool call {context.tool_call_id} should have been created")
+
+    tool_call = tool_call_location.tool_call
+
+    process_chat_context = ProcessChatContext(
+        chat_mutator=context.chat_mutator,
+        agent=context.agent,
+        materials=context.materials,
+        rendered_materials=context.rendered_materials,
+    )
+
+    await _run_code(process_chat_context, tool_call_id=tool_call.id)
+
+    # if all tools have finished running, continue operation with the same agent
+    finished_running_code = all(
+        (not tool_call.is_executing) and (tool_call.output is not None)
+        for tool_call in tool_call_location.message.tool_calls
+    )
+
+    if finished_running_code:
+        await _execution_mode_process(process_chat_context)  # Resume operation with the same agent
 
 
 execution_mode = ExecutionMode(

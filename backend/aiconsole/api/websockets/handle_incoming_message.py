@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+from dataclasses import dataclass
 import logging
+from typing import cast
 from uuid import uuid4
 
 from aiconsole.api.websockets.client_messages import (
@@ -32,10 +35,15 @@ from aiconsole.api.websockets.server_messages import (
 )
 from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.asset import AssetLocation
+from aiconsole.core.assets.materials.content_evaluation_context import ContentEvaluationContext
+from aiconsole.core.assets.materials.material import Material
+from aiconsole.core.assets.materials.rendered_material import RenderedMaterial
 from aiconsole.core.chat.execution_modes.execution_mode import AcceptCodeContext, ProcessChatContext
 from aiconsole.core.chat.execution_modes.import_and_validate_execution_mode import import_and_validate_execution_mode
 from aiconsole.core.chat.locking import DefaultChatMutator, acquire_lock, release_lock
+from aiconsole.core.chat.types import AICMessageGroup, Chat
 from aiconsole.core.gpt.consts import GPTMode
+from aiconsole.core.project import project
 
 _log = logging.getLogger(__name__)
 
@@ -153,22 +161,62 @@ async def _handle_accept_code_ws_message(connection: AICConnection, message: Acc
             connection=None,  # Source connection is None because the originating mutations come from server
         )
 
-        agent = director_agent
-
-        execution_mode = await import_and_validate_execution_mode(agent)
-
         tool_call_location = chat.get_tool_call_location(message.tool_call_id)
 
         if tool_call_location is None:
             raise Exception(f"Tool call with id {message.tool_call_id} not found")
 
+        agent_id = tool_call_location.message_group.agent_id
+
+        agent = project.get_project_agents().get_asset(agent_id)
+
+        if agent is None:
+            raise Exception(f"Agent with id {agent_id} not found")
+
+        agent = cast(Agent, agent)
+
+        execution_mode = await import_and_validate_execution_mode(agent)
+
+        mats = await _render_materials_from_message_group(tool_call_location.message_group, chat_mutator.chat, agent)
+
         await execution_mode.accept_code(
             AcceptCodeContext(
-                chat_mutator=chat_mutator, agent=agent, rendered_materials=[], tool_call=tool_call_location.tool_call
+                chat_mutator=chat_mutator,
+                agent=agent,
+                materials=mats.materials,
+                rendered_materials=mats.rendered_materials,
+                tool_call_id=tool_call_location.tool_call.id,
             )
         )
     finally:
         await release_lock(chat_id=message.chat_id, request_id=message.request_id)
+
+
+@dataclass
+class MaterialsAndRenderedMaterials:
+    materials: list[Material]
+    rendered_materials: list[RenderedMaterial]
+
+
+async def _render_materials_from_message_group(
+    message_group: AICMessageGroup, chat: Chat, agent: Agent
+) -> MaterialsAndRenderedMaterials:
+    relevant_materials_ids = message_group.materials_ids
+
+    relevant_materials = [
+        cast(Material, project.get_project_materials().get_asset(material_id))
+        for material_id in relevant_materials_ids
+    ]
+
+    content_context = ContentEvaluationContext(
+        chat=chat, agent=agent, gpt_mode=agent.gpt_mode, relevant_materials=relevant_materials
+    )
+
+    rendered_materials = await asyncio.gather(
+        *[material.render(content_context) for material in relevant_materials if material.type == "rendered_material"]
+    )
+
+    return MaterialsAndRenderedMaterials(materials=relevant_materials, rendered_materials=rendered_materials)
 
 
 async def _handle_process_chat_ws_message(connection: AICConnection, message: ProcessChatClientMessage):

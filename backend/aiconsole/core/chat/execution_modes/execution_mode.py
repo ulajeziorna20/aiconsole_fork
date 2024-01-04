@@ -20,8 +20,9 @@ class ProcessChatContext:
 @dataclass
 class AcceptCodeContext:
     chat_mutator: ChatMutator
-    tool_call: AICToolCall
+    tool_call_id: str
     agent: Agent
+    materials: list[Material]
     rendered_materials: list[RenderedMaterial]
 
 
