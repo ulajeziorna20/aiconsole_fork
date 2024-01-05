@@ -12,7 +12,7 @@ class ProjectDirectory:
     def __init__(self) -> None:
         self._root = None
 
-    async def get_initial_directory(self) -> Path | None:
+    async def choose_directory(self) -> Path | None:
         if not self._root:
             self._root = Tk()
         else:

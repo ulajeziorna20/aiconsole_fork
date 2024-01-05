@@ -29,8 +29,8 @@ const chooseProject = (path?: string) =>
 
 const isProjectDirectory = async (path: string) => 
   (await ky
-    .post(`${getBaseURL()}/api/projects/in_directory`, {
-      json: { directory: path },
+    .get(`${getBaseURL()}/api/projects/is_in_directory`, {
+      searchParams:  { directory: path},
       hooks: API_HOOKS,
       timeout: false,
     })
@@ -41,7 +41,7 @@ const isProjectDirectory = async (path: string) =>
 
 const getInitialPath = async () =>
   (await ky
-    .get(`${getBaseURL()}/api/projects/initial_directory`, {
+    .post(`${getBaseURL()}/api/projects/choose_directory`, {
       hooks: API_HOOKS,
       timeout: false,
     })
