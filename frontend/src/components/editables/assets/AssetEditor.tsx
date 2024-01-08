@@ -82,7 +82,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const wasAssetChangedInitially = !isPrevAssetChanged && isAssetChanged;
   const wasAssetUpdate = isPrevAssetChanged && !isAssetChanged;
 
-  const { reset, proceed, state: blockerState } = blocker || {};
+  const { proceed, state: blockerState } = blocker || {};
 
   useEffect(() => {
     if (wasAssetUpdate && newPath) {
@@ -137,7 +137,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     isProjectAsset,
   ]);
 
-  const handleSaveClick = useCallback(async () => {
+  const saveAsset = useCallback(async () => {
     if (asset === undefined) {
       return;
     }
@@ -223,8 +223,12 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const disableSubmit = (!isSubmitEnabled && !isSavedButtonLabel) || checkErrors(errors);
 
   const confirmPageEscape = () => {
-    getInitialAsset();
+    saveAsset();
     proceed?.();
+  };
+
+  const discardChanges = () => {
+    getInitialAsset();
   };
 
   const assetSourceLabel = useCallback(() => {
@@ -291,7 +295,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                   ) : null}
                   <Button
                     disabled={disableSubmit}
-                    onClick={handleSaveClick}
+                    onClick={saveAsset}
                     active={isSavedButtonLabel}
                     classNames="ml-auto"
                   >
@@ -303,7 +307,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
             <AlertDialog
               title="Are you sure you want to close this window?"
               isOpen={blockerState === 'blocked'}
-              onClose={reset}
+              onClose={discardChanges}
               onConfirm={confirmPageEscape}
             >
               {`This ${assetType} is unsaved.\nYou may lose your changes.`}
