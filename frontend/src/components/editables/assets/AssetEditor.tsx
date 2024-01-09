@@ -82,7 +82,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const wasAssetChangedInitially = !isPrevAssetChanged && isAssetChanged;
   const wasAssetUpdate = isPrevAssetChanged && !isAssetChanged;
 
-  const { proceed, state: blockerState } = blocker || {};
+  const { reset, proceed, state: blockerState } = blocker || {};
 
   useEffect(() => {
     if (wasAssetUpdate && newPath) {
@@ -137,7 +137,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     isProjectAsset,
   ]);
 
-  const saveAsset = useCallback(async () => {
+  const handleSaveClick = useCallback(async () => {
     if (asset === undefined) {
       return;
     }
@@ -223,12 +223,15 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const disableSubmit = (!isSubmitEnabled && !isSavedButtonLabel) || checkErrors(errors);
 
   const confirmPageEscape = () => {
-    saveAsset();
+    getInitialAsset();
     proceed?.();
   };
 
   const discardChanges = () => {
     getInitialAsset();
+    if (reset) {
+      reset();
+    }
   };
 
   const assetSourceLabel = useCallback(() => {
@@ -295,7 +298,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                   ) : null}
                   <Button
                     disabled={disableSubmit}
-                    onClick={saveAsset}
+                    onClick={handleSaveClick}
                     active={isSavedButtonLabel}
                     classNames="ml-auto"
                   >
@@ -305,12 +308,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
               </div>
             )}
             <AlertDialog
-              title="Are you sure you want to close this window?"
+              title="Do you want to leave the material settings?"
               isOpen={blockerState === 'blocked'}
               onClose={discardChanges}
               onConfirm={confirmPageEscape}
+              confirmationButtonText="Leave"
             >
-              {`This ${assetType} is unsaved.\nYou may lose your changes.`}
+              Changes that you made may not be saved.
             </AlertDialog>
           </div>
         </div>
