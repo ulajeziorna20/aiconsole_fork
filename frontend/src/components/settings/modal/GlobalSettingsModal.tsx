@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import TopGradient from '@/components/common/TopGradient';
-import { useProjectStore } from '@/store/projects/useProjectStore';
 import { useSettingsStore } from '@/store/settings/useSettingsStore';
 import { useApiKey } from '@/utils/settings/useApiKey';
 import { useDisclosure } from '@mantine/hooks';
@@ -25,14 +24,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../common/Button';
 import { Icon } from '../../common/icons/Icon';
-import GlobalSettingsApiSection from './sections/SettingsApiSection';
-import GlobalSettingsCodeSection from './sections/SettingsCodeSection';
-import GlobalSettingsUserSection from './sections/SettingsUserSection';
+import GlobalSettingsApiSection from './sections/GlobalSettingsApiSection';
+import GlobalSettingsCodeSection from './sections/GlobalSettingsCodeSection';
+import GlobalSettingsUserSection from './sections/GlobalSettingsUserSection';
 
 // TODO: implement other features from figma like api for azure, user profile and tutorial
-export const SettingsModal = () => {
+export const GlobalSettingsModal = () => {
   const { username, userEmail: email, openAiApiKey, alwaysExecuteCode, saveSettings } = useSettingsStore();
-  const isProjectOpen = useProjectStore((state) => state.isProjectOpen);
 
   const [usernameFormValue, setUsernameFormValue] = useState(username || '');
   const [emailFormValue, setEmailFormValue] = useState(email || '');
@@ -105,7 +103,7 @@ export const SettingsModal = () => {
         openai_api_key: apiKeyValue !== openAiApiKey ? apiKeyValue : undefined,
         code_autorun: isAutoRun !== alwaysExecuteCode ? isAutoRun : undefined,
       },
-      !isProjectOpen,
+      true,
       avatarFormData,
     );
     resetFormFields();
