@@ -227,6 +227,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     proceed?.();
   };
 
+  const discardChanges = () => {
+    getInitialAsset();
+    if (reset) {
+      reset();
+    }
+  };
+
   const assetSourceLabel = useCallback(() => {
     switch (asset?.defined_in) {
       case 'aiconsole':
@@ -301,12 +308,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
               </div>
             )}
             <AlertDialog
-              title="Are you sure you want to close this window?"
+              title="Do you want to leave the material settings?"
               isOpen={blockerState === 'blocked'}
-              onClose={reset}
+              onClose={discardChanges}
               onConfirm={confirmPageEscape}
+              confirmationButtonText="Leave"
             >
-              {`This ${assetType} is unsaved.\nYou may lose your changes.`}
+              Changes that you made may not be saved.
             </AlertDialog>
           </div>
         </div>
