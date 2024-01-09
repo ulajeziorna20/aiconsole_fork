@@ -229,9 +229,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
   const discardChanges = () => {
     getInitialAsset();
-    if (reset) {
-      reset();
-    }
+    reset?.();
   };
 
   const assetSourceLabel = useCallback(() => {
