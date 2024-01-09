@@ -30,14 +30,14 @@ def get_version_from_package_json():
 def update_version_in_package_json(version):
     package_json_path = Path("..") / "electron" / "package.json"
     package_content = package_json_path.read_text()
-    package_content = re.sub(r'"version": "\S+"', f'"version": "{version}"', package_content, 1)
+    package_content = re.sub(r'"version": "\S+"', f'"version": "{version}"', package_content)
     package_json_path.write_text(package_content)
 
 
 def update_version_in_pyproject_toml(version):
     pyproject_toml_path = Path("..") / "backend" / "pyproject.toml"
     pyproject_content = pyproject_toml_path.read_text()
-    pyproject_content = re.sub(r'version = "\S+"', f'version = "{version}"', pyproject_content)
+    pyproject_content = re.sub(r'version = "\S+"', f'version = "{version}"', pyproject_content, 1)
     pyproject_toml_path.write_text(pyproject_content)
 
 
