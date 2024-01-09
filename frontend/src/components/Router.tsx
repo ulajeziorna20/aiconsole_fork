@@ -33,7 +33,7 @@ import { AssetEditor } from './editables/assets/AssetEditor';
 import { ChatPage } from './editables/chat/ChatPage';
 import SideBar from './editables/sidebar/SideBar';
 import { Home } from './projects/Home';
-import { GlobalSettingsModal } from './settings/GlobalSettingsModal';
+import { SettingsModal } from './settings/modal/SettingsModal';
 import { useAPIStore } from '@/store/useAPIStore';
 import { useToastsStore } from '@/store/common/useToastsStore';
 
@@ -62,7 +62,7 @@ function NoProject() {
 const HomeRoute = () => (
   <>
     <Home />
-    <GlobalSettingsModal />
+    <SettingsModal />
   </>
 );
 
@@ -103,7 +103,7 @@ export function Router() {
                 path="*"
                 element={
                   <div className="App flex flex-col h-screen fixed top-0 left-0 bottom-0 right-0 bg-gray-900 text-stone-400">
-                    <GlobalSettingsModal />
+                    <SettingsModal />
                     <TopBar>
                       <ProjectTopBarElements />
                     </TopBar>
