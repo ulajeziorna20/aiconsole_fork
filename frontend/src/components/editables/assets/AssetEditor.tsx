@@ -308,7 +308,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
               </div>
             )}
             <AlertDialog
-              title="Do you want to leave the material settings?"
+              title={`Do you want to leave the ${assetType} settings?`}
               isOpen={blockerState === 'blocked'}
               onClose={discardChanges}
               onConfirm={confirmPageEscape}
