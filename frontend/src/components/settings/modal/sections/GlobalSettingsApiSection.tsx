@@ -16,10 +16,10 @@
 
 import { TextInput } from '@/components/editables/assets/TextInput';
 
-type GlobalSectionApiSectionProps = {
+interface GlobalSectionApiSectionProps {
   apiKey: string;
   setApiKey: (value: string) => void;
-};
+}
 
 const GlobalSettingsApiSection = ({ apiKey, setApiKey }: GlobalSectionApiSectionProps) => {
   return (

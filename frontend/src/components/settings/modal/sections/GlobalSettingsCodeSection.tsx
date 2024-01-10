@@ -18,10 +18,10 @@ import { Button } from '@/components/common/Button';
 import { Icon } from '@/components/common/icons/Icon';
 import { Ban, Check } from 'lucide-react';
 
-type GlobalSettingsCodeSectionProps = {
+interface GlobalSettingsCodeSectionProps {
   isAutoRun: boolean;
   setIsAutoRun: (value: boolean) => void;
-};
+}
 
 const GlobalSettingsCodeSection = ({ isAutoRun, setIsAutoRun }: GlobalSettingsCodeSectionProps) => {
   return (

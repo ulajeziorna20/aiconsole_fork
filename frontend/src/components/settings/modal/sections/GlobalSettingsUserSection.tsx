@@ -21,13 +21,13 @@ import { useSettingsStore } from '@/store/settings/useSettingsStore';
 import { Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-type GlobalSettingsUserSectionProps = {
+interface GlobalSettingsUserSectionProps {
   username: string;
   email: string;
   setUsername: (value: string) => void;
   setEmail: (value: string) => void;
   setImage: (avatar: File) => void;
-};
+}
 
 const GlobalSettingsUserSection = ({
   email,
