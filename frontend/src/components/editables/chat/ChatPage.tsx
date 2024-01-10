@@ -166,7 +166,8 @@ export function ChatPage() {
     }
 
     return () => {
-      stopWork();
+      console.log('test');
+      // stopWork();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat?.id, isProjectOpen]); //Initentional trigger when chat_id changes
@@ -284,8 +285,9 @@ export function ChatPage() {
             isOpen={blockerState === 'blocked'}
             onClose={reset}
             onConfirm={confirm}
+            confirmationButtonText="Leave"
           >
-            {`The response is being generated.\nClosing the window cancels the process.`}
+            Changes that you made may not be saved.
           </AlertDialog>
         </div>
       </div>
