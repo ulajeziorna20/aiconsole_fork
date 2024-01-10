@@ -20,8 +20,7 @@ import { useApiKey } from '@/utils/settings/useApiKey';
 import { useDisclosure } from '@mantine/hooks';
 import { Content, Portal, Root } from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Button } from '../../common/Button';
 import { Icon } from '../../common/icons/Icon';
 import GlobalSettingsApiSection from './sections/GlobalSettingsApiSection';
@@ -31,6 +30,8 @@ import GlobalSettingsUserSection from './sections/GlobalSettingsUserSection';
 // TODO: implement other features from figma like api for azure, user profile and tutorial
 export const GlobalSettingsModal = () => {
   const { username, userEmail: email, openAiApiKey, alwaysExecuteCode, saveSettings } = useSettingsStore();
+  const isSettingsModalVisible = useSettingsStore((state) => state.isSettingsModalVisible);
+  const toggleSettingsModal = useSettingsStore((state) => state.toggleSettingsModal);
 
   const [usernameFormValue, setUsernameFormValue] = useState(username || '');
   const [emailFormValue, setEmailFormValue] = useState(email || '');
@@ -40,13 +41,6 @@ export const GlobalSettingsModal = () => {
   const [isAvatarOverwritten, setIsAvatarOverwritten] = useState(false);
 
   const { validating, setApiKey } = useApiKey();
-  const location = useLocation();
-
-  const isSettingsModalVisible = useMemo(
-    () => location.state?.isSettingsModalVisible,
-    [location.state?.isSettingsModalVisible],
-  );
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (isSettingsModalVisible) {
@@ -68,9 +62,7 @@ export const GlobalSettingsModal = () => {
   };
 
   const onClose = () => {
-    navigate(location.pathname, {
-      state: { ...location.state, isSettingsModalVisible: false },
-    });
+    toggleSettingsModal(false);
   };
 
   const [opened, { close, open }] = useDisclosure(isSettingsModalVisible, { onClose, onOpen: handleOpen });
@@ -124,6 +116,7 @@ export const GlobalSettingsModal = () => {
 
   const handleModalClose = () => {
     resetFormFields();
+    toggleSettingsModal(false);
     close();
   };
 
