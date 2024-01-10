@@ -5,10 +5,10 @@ import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 import { ContextMenu, ContextMenuRef } from './ContextMenu';
 import { Icon } from './icons/Icon';
 
-type ImageUploaderProps = {
+interface ImageUploaderProps {
   currentImage?: string;
   onUpload?: (file: File) => void;
-};
+}
 
 // TODO: update this component with generating ai logic and connect with backend
 const ImageUploader = ({ currentImage, onUpload }: ImageUploaderProps) => {
