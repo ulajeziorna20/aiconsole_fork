@@ -166,8 +166,7 @@ export function ChatPage() {
     }
 
     return () => {
-      console.log('test');
-      // stopWork();
+      stopWork();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat?.id, isProjectOpen]); //Initentional trigger when chat_id changes
