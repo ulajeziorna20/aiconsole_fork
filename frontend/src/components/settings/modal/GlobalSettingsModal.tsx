@@ -31,7 +31,7 @@ import GlobalSettingsUserSection from './sections/GlobalSettingsUserSection';
 export const GlobalSettingsModal = () => {
   const { username, userEmail: email, openAiApiKey, alwaysExecuteCode, saveSettings } = useSettingsStore();
   const isSettingsModalVisible = useSettingsStore((state) => state.isSettingsModalVisible);
-  const toggleSettingsModal = useSettingsStore((state) => state.toggleSettingsModal);
+  const setSettingsModalVisibility = useSettingsStore((state) => state.setSettingsModalVisibility);
 
   const [usernameFormValue, setUsernameFormValue] = useState(username || '');
   const [emailFormValue, setEmailFormValue] = useState(email || '');
@@ -62,7 +62,7 @@ export const GlobalSettingsModal = () => {
   };
 
   const onClose = () => {
-    toggleSettingsModal(false);
+    setSettingsModalVisibility(false);
   };
 
   const [opened, { close, open }] = useDisclosure(isSettingsModalVisible, { onClose, onOpen: handleOpen });
@@ -116,7 +116,7 @@ export const GlobalSettingsModal = () => {
 
   const handleModalClose = () => {
     resetFormFields();
-    toggleSettingsModal(false);
+    setSettingsModalVisibility(false);
     close();
   };
 

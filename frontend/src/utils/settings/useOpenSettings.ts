@@ -17,9 +17,9 @@
 import { useSettingsStore } from '@/store/settings/useSettingsStore';
 
 export function useOpenSettings() {
-  const toggleSettingsModal = useSettingsStore((state) => state.toggleSettingsModal);
+  const setSettingsModalVisibility = useSettingsStore((state) => state.setSettingsModalVisibility);
 
   return () => {
-    toggleSettingsModal(true);
+    setSettingsModalVisibility(true);
   };
 }

@@ -28,7 +28,7 @@ export type SettingsStore = {
   userEmail: string | null;
   userAvatarUrl: string | null;
   isSettingsModalVisible: boolean;
-  toggleSettingsModal: (isVisible: boolean) => void;
+  setSettingsModalVisibility: (isVisible: boolean) => void;
   initSettings: () => Promise<void>;
   setAutoCodeExecution: (autoRun: boolean) => void;
   saveSettings: (settings: Settings, isGlobal: boolean, avatar?: FormData | null) => Promise<void>;
@@ -44,7 +44,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   userEmail: null,
   userAvatarUrl: null,
   isSettingsModalVisible: false,
-  toggleSettingsModal: (isVisible: boolean) => {
+  setSettingsModalVisibility: (isVisible: boolean) => {
     set({ isSettingsModalVisible: isVisible });
   },
   setAutoCodeExecution: async (autoRun: boolean) => {
