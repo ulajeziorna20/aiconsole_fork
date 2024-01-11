@@ -285,6 +285,7 @@ export function ChatPage() {
             onClose={reset}
             onConfirm={confirm}
             confirmationButtonText="Leave"
+            cancelButtonText="Cancel"
           >
             Changes that you made may not be saved.
           </AlertDialog>
