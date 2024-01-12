@@ -26,11 +26,6 @@ ORIGINS: list[str] = [
     "http://127.0.0.1:3001",
 ]
 
-LOG_FORMAT: str = "{asctime} {name} [{levelname}] {message}"
-LOG_STYLE: str = "{"
-LOG_LEVEL: str = "DEBUG"
-LOG_HANDLERS: list[str] = ["console"]
-
 DIR_WITH_AICONSOLE_PACKAGE = Path(__file__).parent.parent
 
 HISTORY_LIMIT: int = 1000
@@ -40,6 +35,12 @@ DIRECTOR_MIN_TOKENS: int = 250
 DIRECTOR_PREFERRED_TOKENS: int = 1000
 
 MAX_RECENT_PROJECTS = 8
+
+
+LOG_FORMAT: str = "{name} {funcName} {message}"
+LOG_STYLE: str = "{"
+LOG_LEVEL: str = "DEBUG"
+LOG_HANDLERS: list[str] = ["consoleHandler"]
 
 log_config = {
     "version": 1,
@@ -52,12 +53,10 @@ log_config = {
         }
     },
     "handlers": {
-        "console": {
+        "consoleHandler": {
             "formatter": "console",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",
+            "class": "rich.logging.RichHandler",
         },
-        "sinkhole": {"class": "logging.NullHandler"},
     },
     "loggers": {
         "aiconsole": {
