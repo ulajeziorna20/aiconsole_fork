@@ -21,9 +21,13 @@ import { useState } from 'react';
 import { AICMessageGroup } from '../../../types/editables/chatTypes';
 import { AnalysisClosed, AnalysisOpened } from './Analysis';
 import { MessageComponent } from './messages/MessageComponent';
+import { MessageControls } from './messages/MessageControls';
+import { useChatStore } from '@/store/editables/chat/useChatStore';
 
 export function MessageGroup({ group }: { group: AICMessageGroup }) {
   const [isAnalysisManuallyOpen, setIsAnalysisManuallyOpen] = useState<boolean | undefined>(undefined);
+
+  const lockId = useChatStore((state) => state.chat?.lock_id);
 
   const isOpen = isAnalysisManuallyOpen == undefined ? group.messages.length === 0 : isAnalysisManuallyOpen;
 
@@ -53,6 +57,18 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
             <MessageComponent key={message.id} message={message} group={group} />
           ))}
         </div>
+
+        {group.messages.length === 0 && (
+          <MessageControls
+            hideControls={!!lockId}
+            onRemoveClick={() => {
+              useChatStore.getState().userMutateChat({
+                type: 'DeleteMessageGroupMutation',
+                message_group_id: group.id,
+              });
+            }}
+          />
+        )}
       </div>
     </div>
   );
