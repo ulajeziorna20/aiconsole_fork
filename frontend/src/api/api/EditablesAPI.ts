@@ -66,6 +66,7 @@ async function fetchEditableObject<T extends EditableObject>({
     const response: ChatOpenedServerMessage = (await useWebSocketStore
       .getState()
       .sendMessageAndWaitForResponse({ type: 'OpenChatClientMessage', chat_id: id }, (response: ServerMessage) => {
+        console.log('open', response.type);
         if (response.type === 'ChatOpenedServerMessage') {
           return response.chat.id === id;
         } else {
@@ -82,6 +83,19 @@ async function fetchEditableObject<T extends EditableObject>({
       hooks: API_HOOKS,
     })
     .json() as Promise<T>;
+}
+
+async function closeChat(id: string): Promise<ServerMessage> {
+  const response = await useWebSocketStore.getState().sendMessageAndWaitForResponse(
+    {
+      type: 'CloseChatClientMessage',
+      chat_id: id,
+    },
+    (response: ServerMessage) => {
+      return response.type === 'NotifyAboutChatMutationServerMessage';
+    },
+  );
+  return response;
 }
 
 async function doesEdibleExist(
@@ -112,14 +126,11 @@ async function doesEdibleExist(
 }
 
 async function saveNewEditableObject(editableObjectType: EditableObjectType, asset_id: string, asset: Asset) {
-  return (
-    (await ky
-      .post(`${getBaseURL()}/api/${editableObjectType}s/${asset_id}`, {
-        json: { ...asset },
-        timeout: 60000,
-        hooks: API_HOOKS,
-      }))
-  );
+  return await ky.post(`${getBaseURL()}/api/${editableObjectType}s/${asset_id}`, {
+    json: { ...asset },
+    timeout: 60000,
+    hooks: API_HOOKS,
+  });
 }
 
 async function updateEditableObject(
@@ -168,4 +179,5 @@ export const EditablesAPI = {
   saveNewEditableObject,
   updateEditableObject,
   getPathForEditableObject,
+  closeChat,
 };
