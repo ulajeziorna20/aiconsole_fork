@@ -66,7 +66,6 @@ async function fetchEditableObject<T extends EditableObject>({
     const response: ChatOpenedServerMessage = (await useWebSocketStore
       .getState()
       .sendMessageAndWaitForResponse({ type: 'OpenChatClientMessage', chat_id: id }, (response: ServerMessage) => {
-        console.log('open', response.type);
         if (response.type === 'ChatOpenedServerMessage') {
           return response.chat.id === id;
         } else {
