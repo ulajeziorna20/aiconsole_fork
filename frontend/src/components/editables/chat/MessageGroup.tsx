@@ -35,7 +35,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
           <UserInfo username={group.username} email={group.email} />
         )}
         <div className="flex-grow flex flex-col gap-5 overflow-auto ">
-          {group.messages && <Analysis group={group} />}
+          {group.messages && group.role === 'assistant' && <Analysis group={group} />}
           {group.messages.map((message) => (
             <MessageComponent key={message.id} message={message} group={group} />
           ))}
