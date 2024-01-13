@@ -24,7 +24,7 @@ if typing.TYPE_CHECKING:
 
 from pydantic import BaseModel
 
-from aiconsole.core.assets.asset import AssetType
+from aiconsole.core.assets.models import AssetType
 
 
 class BaseServerMessage(BaseModel):
@@ -100,7 +100,10 @@ class NotifyAboutChatMutationServerMessage(BaseServerMessage):
         # include type of mutation in the dump of "mutation"
         return {
             **super().model_dump(**kwargs),
-            "mutation": {**self.mutation.model_dump(**kwargs), "type": self.mutation.__class__.__name__},
+            "mutation": {
+                **self.mutation.model_dump(**kwargs),
+                "type": self.mutation.__class__.__name__,
+            },
         }
 
 

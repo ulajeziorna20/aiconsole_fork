@@ -64,7 +64,9 @@ def disconnect(connection: AICConnection):
 
 
 async def send_message_to_chat(
-    chat_id: str, msg: BaseServerMessage, source_connection_to_ommit: AICConnection | None = None
+    chat_id: str,
+    msg: BaseServerMessage,
+    source_connection_to_ommit: AICConnection | None = None,
 ):
     # _log.debug(f"Sending message to {chat_id}: {msg}")
     for connection in _active_connections:

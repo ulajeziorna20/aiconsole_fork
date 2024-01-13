@@ -21,14 +21,14 @@ from typing import Any, Literal
 import tiktoken
 from pydantic import BaseModel
 
-from aiconsole.core.gpt.consts import SPEED_GPT_MODE, GPTMode
+from aiconsole.core.gpt.consts import GPTMode
 from aiconsole.core.gpt.token_error import TokenError
 from aiconsole.core.gpt.types import (
     EnforcedFunctionCall,
     GPTRequestMessage,
     GPTRequestTextMessage,
 )
-from aiconsole.core.settings.project_settings import get_aiconsole_settings
+from aiconsole.core.settings.project_settings import settings
 
 _log = logging.getLogger(__name__)
 
@@ -98,7 +98,10 @@ class GPTRequest:
     @property
     def all_messages(self):
         if self.system_message:
-            return [GPTRequestTextMessage(role="system", content=self.system_message), *self.messages]
+            return [
+                GPTRequestTextMessage(role="system", content=self.system_message),
+                *self.messages,
+            ]
         else:
             return self.messages
 
@@ -114,8 +117,18 @@ class GPTRequest:
 
     @property
     def model_config(self):
-        settings = get_aiconsole_settings()
-        return settings.get_mode_config(self.gpt_mode)
+        mode_config = settings().settings_data.gpt_modes.get(self.gpt_mode, None)
+
+        if mode_config is None:
+            raise ValueError(f"Unknown mode {self.gpt_mode}, available modes: {settings().settings_data.gpt_modes}")
+
+        # if api_key refers to any other setting, use that setting
+
+        for extra in settings().settings_data.extra:
+            if mode_config.api_key == extra:
+                mode_config = mode_config.model_copy(update={"api_key": settings().settings_data.extra[extra]})
+
+        return mode_config
 
     def count_tokens(self):
         encoding = tiktoken.encoding_for_model(self.model_config.encoding)

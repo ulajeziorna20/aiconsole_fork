@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from curses.ascii import SP
 from enum import Enum
 from typing import Any
 

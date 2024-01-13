@@ -20,11 +20,11 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from aiconsole.core.assets.agents.agent import Agent
-from aiconsole.core.assets.asset import AssetLocation
 from aiconsole.core.assets.materials.content_evaluation_context import (
     ContentEvaluationContext,
 )
 from aiconsole.core.assets.materials.material import Material
+from aiconsole.core.assets.models import AssetLocation
 from aiconsole.core.chat.types import Chat
 from aiconsole.core.gpt.consts import QUALITY_GPT_MODE, SPEED_GPT_MODE, GPTMode
 
@@ -46,7 +46,13 @@ def create_user_agent():
 @router.post("/preview")
 async def materials_preview(material: Material):
     content_context = ContentEvaluationContext(
-        chat=Chat(id="chat", name="", last_modified=datetime.now(), title_edited=False, message_groups=[]),
+        chat=Chat(
+            id="chat",
+            name="",
+            last_modified=datetime.now(),
+            title_edited=False,
+            message_groups=[],
+        ),
         agent=create_user_agent(),
         gpt_mode=SPEED_GPT_MODE,
         relevant_materials=[],

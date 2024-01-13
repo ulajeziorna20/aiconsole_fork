@@ -53,7 +53,9 @@ async def acquire_lock(chat_id: str, request_id: str, skip_mutating_clients: boo
 
     if not skip_mutating_clients:
         await NotifyAboutChatMutationServerMessage(
-            request_id=request_id, chat_id=chat_id, mutation=LockAcquiredMutation(lock_id=request_id)
+            request_id=request_id,
+            chat_id=chat_id,
+            mutation=LockAcquiredMutation(lock_id=request_id),
         ).send_to_chat(chat_id)
 
     return chats[chat_id]
@@ -67,7 +69,9 @@ async def release_lock(chat_id: str, request_id: str) -> None:
         lock_events[chat_id].set()
 
         await NotifyAboutChatMutationServerMessage(
-            request_id=request_id, chat_id=chat_id, mutation=LockReleasedMutation(lock_id=request_id)
+            request_id=request_id,
+            chat_id=chat_id,
+            mutation=LockReleasedMutation(lock_id=request_id),
         ).send_to_chat(chat_id)
 
 

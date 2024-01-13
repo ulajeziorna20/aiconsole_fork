@@ -30,7 +30,12 @@ _log = logging.getLogger(__name__)
 def run_aiconsole(dev: bool):
     parser = argparse.ArgumentParser(description="Start the backend server.")
     parser.add_argument("--port", type=int, help="Port to listen on.", default=8000)
-    parser.add_argument("--origin", type=str, help="Origin for the frontend.", default="http://localhost:3000")
+    parser.add_argument(
+        "--origin",
+        type=str,
+        help="Origin for the frontend.",
+        default="http://localhost:3000",
+    )
 
     port = parser.parse_args().port
     origin = parser.parse_args().origin

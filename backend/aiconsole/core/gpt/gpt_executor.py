@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import asyncio
 import logging
 from typing import AsyncGenerator
@@ -88,7 +87,11 @@ class GPTExecutor:
 
                 if _log.isEnabledFor(logging.DEBUG):
                     await DebugJSONServerMessage(
-                        message="GPT", object={"request": self.request, "response": self.response.model_dump()}
+                        message="GPT",
+                        object={
+                            "request": self.request,
+                            "response": self.response.model_dump(),
+                        },
                     ).send_to_all()
 
                 return
