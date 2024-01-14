@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import tomlkit
 import tomlkit.items
@@ -13,7 +14,7 @@ def load_settings_file(file_path: Path) -> PartialSettingsData:
     return PartialSettingsData(**d)
 
 
-def save_settings_file(file_path: Path, settings_data: SettingsData):
+def save_settings_file(file_path: Path, settings_data: PartialSettingsData):
     document = _get_document(file_path)
     _update_document(document, settings_data)
     _write_document(file_path, document)
@@ -27,13 +28,17 @@ def _get_document(file_path: Path) -> tomlkit.TOMLDocument:
         return tomlkit.loads(file.read())
 
 
-def _update_document(document: tomlkit.TOMLDocument, settings_data: SettingsData):
-    for key, value in settings_data.model_dump().items():
+def _update_document(document: tomlkit.TOMLDocument, settings_data: PartialSettingsData):
+    for key, value in settings_data.model_dump(exclude_none=True).items():
+        if value is None:
+            continue
+
         item = document.get(key)
+
         if isinstance(item, tomlkit.items.Table) and isinstance(value, dict):
             item.update(value)
         else:
-            item = value
+            document[key] = value
 
 
 def _write_document(file_path: Path, document: tomlkit.TOMLDocument):

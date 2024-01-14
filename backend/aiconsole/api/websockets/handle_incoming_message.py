@@ -142,8 +142,7 @@ async def _handle_open_chat_ws_message(connection: AICConnection, message: OpenC
 
 
 async def _handle_close_chat_ws_message(connection: AICConnection, message: CloseChatClientMessage):
-    if message.chat_id in connection.open_chats_ids:
-        connection.open_chats_ids.remove(message.chat_id)
+    connection.open_chats_ids.remove(message.chat_id)
 
 
 async def _handle_init_chat_mutation_ws_message(
