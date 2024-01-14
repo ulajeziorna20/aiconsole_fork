@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 import os
 import sys
 from pathlib import Path
@@ -141,4 +143,6 @@ async def choose_project(path: Path, background_tasks: BackgroundTasks):
 
     await reinitialize_project()
 
-    background_tasks.add_task(create_dedicated_venv)
+    executor = ThreadPoolExecutor()
+    loop = asyncio.get_running_loop()
+    background_tasks.add_task(loop.run_in_executor, executor, create_dedicated_venv)
