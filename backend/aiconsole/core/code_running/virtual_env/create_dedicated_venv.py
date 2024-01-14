@@ -81,16 +81,16 @@ async def create_dedicated_venv():
         _log.info(f"Creating venv in {venv_path}, using {sys.executable}")
 
         run_subprocess(sys.executable, "-m", "venv", str(venv_path), "--system-site-packages")
+
+        install_and_update_pip(venv_path)
+
+        if is_web_server_dev_editable_version():
+            install_dependencies(get_current_project_venv_python_path(), DIR_WITH_AICONSOLE_PACKAGE)
+        else:
+            _log.info(
+                f"Skipping installation: '{DIR_WITH_AICONSOLE_PACKAGE}' does not contain pyproject.toml (bundled version?)"
+            )
+
+        save_current_app_version_to_venv()
     else:
         _log.info(f"Venv already exists in {venv_path}")
-
-    install_and_update_pip(venv_path)
-
-    if is_web_server_dev_editable_version():
-        install_dependencies(get_current_project_venv_python_path(), DIR_WITH_AICONSOLE_PACKAGE)
-    else:
-        _log.info(
-            f"Skipping installation: '{DIR_WITH_AICONSOLE_PACKAGE}' does not contain pyproject.toml (bundled version?)"
-        )
-
-    save_current_app_version_to_venv()
