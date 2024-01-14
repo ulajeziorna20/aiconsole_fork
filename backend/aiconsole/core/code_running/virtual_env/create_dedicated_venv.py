@@ -92,3 +92,5 @@ async def create_dedicated_venv():
         _log.info(
             f"Skipping installation: '{DIR_WITH_AICONSOLE_PACKAGE}' does not contain pyproject.toml (bundled version?)"
         )
+
+    save_current_app_version_to_venv()
