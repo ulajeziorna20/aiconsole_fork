@@ -33,7 +33,6 @@ import { unstable_useBlocker as useBlocker, useParams, useSearchParams } from 'r
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
 import { v4 as uuidv4 } from 'uuid';
 import { EditorHeader } from '../EditorHeader';
-import { Analysis } from './Analysis';
 import { CommandInput } from './CommandInput';
 import { Spinner } from './Spinner';
 
@@ -276,6 +275,8 @@ export function ChatPage() {
           <AlertDialog
             title="Are you sure you want to exit this chat?"
             isOpen={blockerState === 'blocked'}
+            confirmationButtonText="Yes, exit"
+            cancelButtonText="No, stay"
             onClose={reset}
             onConfirm={proceed}
           >
