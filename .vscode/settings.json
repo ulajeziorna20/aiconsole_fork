@@ -1,5 +1,9 @@
 {
   "python.analysis.typeCheckingMode": "basic",
+  "flake8.args": [
+    "--config",
+    "backend/pyproject.toml"
+  ],
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "eslint.format.enable": true,
