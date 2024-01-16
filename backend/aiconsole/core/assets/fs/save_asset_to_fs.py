@@ -39,13 +39,13 @@ async def save_asset_to_fs(asset: Asset):
         current_version = "0.0.1"
 
     # Parse version number
-    current_version = current_version.split(".")
+    current_version_parts = current_version.split(".")
 
     # Increment version number
-    current_version[-1] = str(int(current_version[-1]) + 1)
+    current_version_parts[-1] = str(int(current_version_parts[-1]) + 1)
 
     # Join version number
-    asset.version = ".".join(current_version)
+    asset.version = ".".join(current_version_parts)
 
     # Save to .toml file
     with (path / f"{asset.id}.toml").open("w") as file:
