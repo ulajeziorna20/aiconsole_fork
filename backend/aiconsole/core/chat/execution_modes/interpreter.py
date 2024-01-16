@@ -185,6 +185,8 @@ async def _generate_response(
 
     message_id = str(uuid4())
 
+    messages = [message for message in convert_messages(context.chat_mutator.chat)]
+
     await context.chat_mutator.mutate(
         CreateMessageMutation(
             message_group_id=message_group.id,
@@ -199,7 +201,7 @@ async def _generate_response(
             GPTRequest(
                 system_message=system_message,
                 gpt_mode=context.agent.gpt_mode,
-                messages=[message for message in convert_messages(context.chat_mutator.chat)],
+                messages=messages,
                 tools=[
                     ToolDefinition(
                         type="function",
