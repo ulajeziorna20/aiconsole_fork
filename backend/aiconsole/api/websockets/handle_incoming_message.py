@@ -24,6 +24,7 @@ from aiconsole.api.websockets.client_messages import (
     AcceptCodeClientMessage,
     AcquireLockClientMessage,
     CloseChatClientMessage,
+    StopChatClientMessage,
     InitChatMutationClientMessage,
     OpenChatClientMessage,
     ProcessChatClientMessage,
@@ -52,7 +53,7 @@ from aiconsole.core.chat.execution_modes.execution_mode import (
 from aiconsole.core.chat.execution_modes.import_and_validate_execution_mode import (
     import_and_validate_execution_mode,
 )
-from aiconsole.core.chat.locking import DefaultChatMutator, acquire_lock, release_lock
+from aiconsole.core.chat.locking import DefaultChatMutator, acquire_lock, release_lock, wait_for_lock
 from aiconsole.core.chat.types import AICMessageGroup, Chat
 from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
     WaitForEnvEvent,
@@ -77,8 +78,12 @@ director_agent = Agent(
     system="",
 )
 
+stop_flag = False
 
-async def handle_incoming_message(connection: AICConnection, json: dict):
+tasks = []
+
+
+async def handle_incoming_message(connection: AICConnection, json: dict, background_tasks):
     message_type = json["type"]
     handler = {
         AcquireLockClientMessage.__name__: lambda connection, json: _handle_acquire_lock_ws_message(
@@ -89,6 +94,9 @@ async def handle_incoming_message(connection: AICConnection, json: dict):
         ),
         OpenChatClientMessage.__name__: lambda connection, json: _handle_open_chat_ws_message(
             connection, OpenChatClientMessage(**json)
+        ),
+        StopChatClientMessage.__name__: lambda connection, json: _handle_stop_chat_ws_message(
+            connection, StopChatClientMessage(**json)
         ),
         CloseChatClientMessage.__name__: lambda connection, json: _handle_close_chat_ws_message(
             connection, CloseChatClientMessage(**json)
@@ -105,8 +113,10 @@ async def handle_incoming_message(connection: AICConnection, json: dict):
     }[message_type]
 
     _log.info(f"Handling message {message_type}")
-
-    return await handler(connection, json)
+    tasks.append(asyncio.ensure_future(handler(connection, json)))
+    if message_type == "StopChatClientMessage":
+        for task in tasks:
+            task.cancel()
 
 
 async def _handle_acquire_lock_ws_message(connection: AICConnection, message: AcquireLockClientMessage):
@@ -152,6 +162,10 @@ async def _handle_open_chat_ws_message(connection: AICConnection, message: OpenC
         )
     finally:
         await release_lock(chat_id=message.chat_id, request_id=temporary_request_id)
+
+
+async def _handle_stop_chat_ws_message(connection: AICConnection, message: StopChatClientMessage):
+    pass
 
 
 async def _handle_close_chat_ws_message(connection: AICConnection, message: CloseChatClientMessage):
