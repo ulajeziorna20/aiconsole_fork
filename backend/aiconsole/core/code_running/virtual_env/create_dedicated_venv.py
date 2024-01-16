@@ -2,6 +2,7 @@ import logging
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 
 import pkg_resources
 
@@ -12,12 +13,18 @@ from aiconsole.core.code_running.virtual_env.install_and_upgrade_pip import (
 from aiconsole.core.code_running.virtual_env.install_dependencies import (
     install_dependencies,
 )
+from aiconsole.utils.events import InternalEvent
 from aiconsole_toolkit.env import (
     get_current_project_venv_path,
     get_current_project_venv_python_path,
 )
 
 _log = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True, slots=True)
+class WaitForEnvEvent(InternalEvent):
+    pass
 
 
 def run_subprocess(*args):
@@ -68,7 +75,7 @@ def get_current_app_version_from_venv():
     return None
 
 
-async def create_dedicated_venv():
+def create_dedicated_venv():
     venv_path = get_current_project_venv_path()
 
     if not venv_path.exists() or get_current_app_version_from_venv() != venv_version_string():
