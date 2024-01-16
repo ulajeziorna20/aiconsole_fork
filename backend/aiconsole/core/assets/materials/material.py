@@ -17,8 +17,6 @@ import traceback
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from traitlets import Any
-
 from aiconsole.core.assets.materials.documentation_from_code import (
     documentation_from_code,
 )
