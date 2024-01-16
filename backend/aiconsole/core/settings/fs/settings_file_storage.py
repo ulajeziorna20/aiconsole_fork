@@ -70,8 +70,6 @@ class SettingsFileStorage(SettingsStorage):
         await internal_events().emit(SettingsUpdatedEvent())
 
     def _start_observer(self):
-        from aiconsole.core.settings.settings import settings
-
         file_paths = [self.global_settings_file_path]
         if self.project_settings_file_path:
             file_paths.append(self.project_settings_file_path)

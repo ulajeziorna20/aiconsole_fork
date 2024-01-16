@@ -3,8 +3,7 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-
-import pkg_resources
+from importlib import metadata
 
 from aiconsole.consts import DIR_WITH_AICONSOLE_PACKAGE
 from aiconsole.core.code_running.virtual_env.install_and_upgrade_pip import (
@@ -55,7 +54,7 @@ def save_current_app_version_to_venv():
 
 
 def venv_version_string():
-    version = pkg_resources.get_distribution("aiconsole").version
+    version = metadata.version("aiconsole")
     version += f" (Python {sys.version.split(' ')[0]})"
     if is_web_server_dev_editable_version():
         version += " (Editable version)"
