@@ -40,7 +40,11 @@ const CounterItem = ({ icon, count, className }: CounterItemProps) => (
   </div>
 );
 
-export function ProjectCard({ name, path, recent_chats, stats }: RecentProject) {
+export type ProjectCardProps = Omit<RecentProject, 'recent_chats'> & {
+  recentChats: string[];
+};
+
+export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps) {
   const chooseProject = useProjectStore((state) => state.chooseProject);
   const removeRecentProject = useRecentProjectsStore((state) => state.removeRecentProject);
   const [isShowingContext, setIsShowingContext] = useState(false);
@@ -191,7 +195,7 @@ export function ProjectCard({ name, path, recent_chats, stats }: RecentProject) 
               },
             )}
           />
-          {recent_chats?.map((command, index) =>
+          {recentChats?.map((command, index) =>
             index < MAX_CHATS_TO_DISPLAY ? (
               <div key={index} className="flex flex-row items-center gap-2 mb-[10px] text-white text-[15px]">
                 <div className="flex-grow truncate">{command} </div>

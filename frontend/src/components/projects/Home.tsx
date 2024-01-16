@@ -54,7 +54,7 @@ export function Home() {
                         key={path}
                         className="w-full md:w-[calc(50%-10px)] xl:w-[calc(33.333%-13.33px)] 2xl:w-[calc(25%-15px)]"
                       >
-                        <ProjectCard name={name} path={path} recent_chats={recent_chats} stats={stats} />
+                        <ProjectCard name={name} path={path} recentChats={recent_chats} stats={stats} />
                       </div>
                     ))}
                   </div>
