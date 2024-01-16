@@ -17,12 +17,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, field_serializer, model_validator
+from pydantic import BaseModel, field_serializer
 
 from aiconsole.core.assets.models import EditableObject
 from aiconsole.core.code_running.code_interpreters.language import LanguageStr
 from aiconsole.core.gpt.types import GPTRole
-from aiconsole.core.settings.settings import settings
 
 
 class AICToolCall(BaseModel):
