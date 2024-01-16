@@ -47,8 +47,6 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
   const userMutateChat = useChatStore((state) => state.userMutateChat);
   const saveCommandAndMessagesToHistory = useChatStore((state) => state.saveCommandAndMessagesToHistory);
 
-  console.log(tool_call);
-
   const alwaysExecuteCode = useSettingsStore((state) => state.alwaysExecuteCode);
 
   const [folded, setFolded] = useState(alwaysExecuteCode);
