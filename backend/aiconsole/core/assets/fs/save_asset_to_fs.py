@@ -74,27 +74,29 @@ async def save_asset_to_fs(asset: Asset):
         doc.append("default_status", tomlkit.string(asset.default_status))
 
         if isinstance(asset, Material):
+            material: Material = asset
+
             doc.append("content_type", tomlkit.string(asset.content_type))
 
             {
                 MaterialContentType.STATIC_TEXT: lambda: doc.append(
                     "content_static_text",
                     tomlkit.string(
-                        make_sure_starts_and_ends_with_newline(asset.content),
+                        make_sure_starts_and_ends_with_newline(material.content),
                         multiline=True,
                     ),
                 ),
                 MaterialContentType.DYNAMIC_TEXT: lambda: doc.append(
                     "content_dynamic_text",
                     tomlkit.string(
-                        make_sure_starts_and_ends_with_newline(asset.content),
+                        make_sure_starts_and_ends_with_newline(material.content),
                         multiline=True,
                     ),
                 ),
                 MaterialContentType.API: lambda: doc.append(
                     "content_api",
                     tomlkit.string(
-                        make_sure_starts_and_ends_with_newline(asset.content),
+                        make_sure_starts_and_ends_with_newline(material.content),
                         multiline=True,
                     ),
                 ),
