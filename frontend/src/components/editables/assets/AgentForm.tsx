@@ -8,6 +8,8 @@ import { CodeInput } from './CodeInput';
 import { HelperLabel } from './HelperLabel';
 import { ErrorObject, TextInput } from './TextInput';
 import { MarkdownSupported } from '../MarkdownSupported';
+import ImageUploader from '@/components/common/ImageUploader';
+import { useAPIStore } from '@/store/useAPIStore';
 
 const executionModes = [
   {
@@ -26,12 +28,14 @@ const executionModes = [
 
 interface AgentFormProps {
   agent: Agent;
+  setAvatarData: React.Dispatch<React.SetStateAction<File | undefined>>;
+  setIsAvatarOverwritten: React.Dispatch<React.SetStateAction<boolean>>;
   errors?: ErrorObject;
   setErrors?: React.Dispatch<React.SetStateAction<ErrorObject>>;
 }
 
 // TODO: all commented lines are ready UI - integrate it with backend when ready
-export const AgentForm = ({ agent, errors, setErrors }: AgentFormProps) => {
+export const AgentForm = ({ agent, errors, setErrors, setAvatarData, setIsAvatarOverwritten }: AgentFormProps) => {
   const [executionMode, setExecutionMode] = useState('');
   const [customExecutionMode, setCustomExecutionMode] = useState('');
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
@@ -60,10 +64,18 @@ export const AgentForm = ({ agent, errors, setErrors }: AgentFormProps) => {
       system: value,
     } as Agent);
 
+  const getBaseURL = useAPIStore((state) => state.getBaseURL);
+  const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${agent.id}/image`;
+
+  const handleSetImage = (avatar: File) => {
+    setAvatarData(avatar);
+    setIsAvatarOverwritten(true);
+  };
+
   return (
     <>
       <div className="flex gap-[20px]">
-        {/* <ImageUploader /> */}
+        <ImageUploader currentImage={userAgentAvatarUrl} onUpload={handleSetImage} />
         <FormGroup className="w-full">
           <TextInput
             label="Usage"
