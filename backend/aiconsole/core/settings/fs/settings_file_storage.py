@@ -10,7 +10,6 @@ from aiconsole.core.settings.fs.settings_file_format import (
     save_settings_file,
 )
 from aiconsole.core.settings.settings_storage import SettingsStorage
-from aiconsole.core.settings.utils.update_settings_data import update_settings_data
 from aiconsole.utils.events import InternalEvent, internal_events
 from aiconsole_toolkit.settings.partial_settings_data import PartialSettingsData
 from aiconsole_toolkit.settings.settings_data import SettingsData
