@@ -60,6 +60,8 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const [errors, setErrors] = useState<ErrorObject>({
     executionMode: '',
   });
+  const [avatarData, setAvatarData] = useState<File>();
+  const [isAvatarOverwritten, setIsAvatarOverwritten] = useState(false);
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
@@ -67,7 +69,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const showToast = useToastsStore((state) => state.showToast);
 
   const navigate = useNavigate();
-  const isAssetChanged = useAssetChanged();
+  const isAssetChanged = useAssetChanged(isAvatarOverwritten);
   const blocker = useBlocker(isAssetChanged);
   const isPrevAssetChanged = usePrevious(isAssetChanged);
   const { updateStatusIfNecessary, isAssetStatusChanged, renameAsset } = useAssets(assetType);
@@ -160,7 +162,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
         variant: 'success',
       });
     } else {
-      if (isAssetChanged) {
+      if (isAssetChanged && !isAvatarOverwritten) {
         await EditablesAPI.updateEditableObject(editableObjectType, asset);
 
         showToast({
@@ -178,22 +180,42 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       setNewPath(`/${editableObjectType}s/${asset.id}`);
     } else {
       // Reload the asset from server
-      const newAsset = await EditablesAPI.fetchEditableObject<Material>({
-        editableObjectType,
-        id: asset.id,
+      if (!isAvatarOverwritten) {
+        const newAsset = await EditablesAPI.fetchEditableObject<Material>({
+          editableObjectType,
+          id: asset.id,
+        });
+        setSelectedAsset(newAsset);
+        useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
+      }
+    }
+
+    let avatarFormData: FormData | null = null;
+
+    if (isAvatarOverwritten && avatarData) {
+      avatarFormData = new FormData();
+      avatarFormData.append('avatar', avatarData);
+      await EditablesAPI.setAgentAvatar(asset.id, avatarFormData);
+      setIsAvatarOverwritten(false);
+
+      showToast({
+        title: 'Saved',
+        message: `The ${assetType} has been successfully saved.`,
+        variant: 'success',
       });
-      setSelectedAsset(newAsset);
-      useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
     }
   }, [
     asset,
-    editableObjectType,
-    isAssetChanged,
     lastSavedAsset,
-    setSelectedAsset,
+    isAvatarOverwritten,
+    avatarData,
+    editableObjectType,
     updateStatusIfNecessary,
-    renameAsset,
     showToast,
+    assetType,
+    renameAsset,
+    isAssetChanged,
+    setSelectedAsset,
   ]);
 
   const getSubmitButtonLabel = useCallback((): SubmitButtonLabels => {
@@ -279,7 +301,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                 {assetType === 'material' ? (
                   <MaterialForm material={asset as Material} />
                 ) : (
-                  <AgentForm agent={asset as Agent} setErrors={setErrors} errors={errors} />
+                  <AgentForm
+                    agent={asset as Agent}
+                    setErrors={setErrors}
+                    errors={errors}
+                    setAvatarData={setAvatarData}
+                    setIsAvatarOverwritten={setIsAvatarOverwritten}
+                  />
                 )}
                 <div className="flex items-center justify-between w-full gap-[10px]">
                   {isProjectAsset ? (
