@@ -6,7 +6,7 @@ import { ContextMenu, ContextMenuRef } from './ContextMenu';
 import { Icon } from './icons/Icon';
 
 interface ImageUploaderProps {
-  currentImage?: string;
+  currentImage?: string | null;
   onUpload?: (file: File) => void;
 }
 
@@ -50,12 +50,16 @@ const ImageUploader = ({ currentImage, onUpload }: ImageUploaderProps) => {
   const triggerRef = useRef<ContextMenuRef>(null);
 
   const openContextMenu = (event: MouseEvent) => {
-    if (triggerRef.current) {
-      triggerRef?.current.handleTriggerClick(event);
+    if (event.type === 'contextmenu') {
+      event.preventDefault();
+      if (triggerRef.current) {
+        triggerRef.current.handleTriggerClick(event);
+      }
     }
-
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+    if (event.type === 'click') {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
     }
   };
 
