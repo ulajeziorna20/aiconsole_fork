@@ -87,5 +87,11 @@ class NotifyAboutChatMutationServerMessage(BaseServerMessage):
         }
 
 
+class ResponseServerMessage(BaseServerMessage):
+    request_id: str
+    payload: dict
+    is_error: bool
+
+
 class ChatOpenedServerMessage(BaseServerMessage):
     chat: Chat

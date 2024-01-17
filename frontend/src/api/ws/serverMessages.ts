@@ -104,6 +104,14 @@ export const ChatOpenedServerMessageSchema = BaseServerMessageSchema.extend({
   chat: ChatSchema,
 });
 
+export const ResponseServerMessageSchema = BaseServerMessageSchema.extend({
+  request_id: z.string(),
+  chat_id: z.string(),
+  // payload
+  // type: z.literal('ChatOpenedServerMessage'),
+  // chat: ChatSchema,
+});
+
 export type ChatOpenedServerMessage = z.infer<typeof ChatOpenedServerMessageSchema>;
 
 export const ServerMessageSchema = z.union([

@@ -46,7 +46,7 @@ class ReleaseLockClientMessage(BaseClientMessage):
 
 
 class OpenChatClientMessage(BaseClientMessage):
-    pass
+    request_id: str
 
 
 class StopChatClientMessage(BaseClientMessage):
@@ -54,7 +54,7 @@ class StopChatClientMessage(BaseClientMessage):
 
 
 class CloseChatClientMessage(BaseClientMessage):
-    pass
+    request_id: str
 
 
 class AcceptCodeClientMessage(BaseClientMessage):
