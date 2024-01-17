@@ -73,7 +73,6 @@ def convert_message(group: AICMessageGroup, message: AICMessage) -> list[GPTRequ
 
 
 def convert_messages(chat: Chat) -> list[GPTRequestMessage]:
-    global last_system_message
     last_system_message = None
 
     messages: list[GPTRequestMessage] = []

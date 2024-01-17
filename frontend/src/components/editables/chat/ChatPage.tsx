@@ -89,7 +89,6 @@ export function ChatPage() {
   const submitCommand = useChatStore((state) => state.submitCommand);
   const stopWork = useChatStore((state) => state.stopWork);
   const newCommand = useChatStore((state) => state.newCommand);
-  const isProjectOpen = useProjectStore((state) => state.isProjectOpen);
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const appendFilePathToCommand = useChatStore((state) => state.appendFilePathToCommand);
   const showToast = useToastsStore((state) => state.showToast);
@@ -169,7 +168,7 @@ export function ChatPage() {
     return () => {
       stopWork();
     };
-  }, [chat?.id, isProjectOpen]); //Initentional trigger when chat_id changes
+  }, [chat?.id, stopWork]); //Initentional trigger when chat_id changes
 
   if (!chat) {
     return (
