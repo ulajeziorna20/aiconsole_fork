@@ -63,15 +63,15 @@ The only module you can safelly access is aiconsole_toolkit, it's built with run
 
 - [x] Initial PIP release
 - [x] Switch to GPT-4 Turbo
-- [ ] Release of the desktop app for MacOS, Windows and Linux
+- [x] Release of the desktop app for MacOS, Windows and Linux
 - [ ] Integrating GPT-V
-- [ ] Integrating Dalle-3
-- [ ] IDE like experience
+- [x] Integrating Dalle-3
+- [x] IDE like experience
 - [ ] Handling of non-text materials and files (pdfs etc)
 - [ ] Better materials and integrations with various tools
 - [ ] Alternative interface to chat for working on a body of text
 - [ ] Ability to run on Azure OpenAI Models
-- [ ] Ability to run on other models than OpenAI
+- [x] Ability to run on other models than OpenAI
 - [ ] Using AI to modify materials
 - [ ] Generative UI
 - [ ] Web Hosted SaaS like version
