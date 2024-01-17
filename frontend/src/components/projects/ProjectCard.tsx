@@ -19,6 +19,7 @@ import { useRecentProjectsStore } from '@/store/projects/useRecentProjectsStore'
 import { ContextMenuItems } from '@/types/common/contextMenu';
 import { RecentProject } from '@/types/projects/RecentProject';
 import { cn } from '@/utils/common/cn';
+import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
 import { Blocks, LucideIcon, MessageSquare, MoreVertical, ScanText, StickyNote, Trash } from 'lucide-react';
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProjectStore } from '../../store/projects/useProjectStore';
@@ -54,6 +55,7 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
   const inputRef = useRef<HTMLInputElement>(null);
   const isProjectSwitchFetching = useProjectStore((state) => state.isProjectSwitchFetching);
   const [isCurrentProjectFetching, setIsCurrentProjectFetching] = useState(false);
+  const { isProjectDirectory } = useProjectFileManager();
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -149,7 +151,7 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
     <ContextMenu options={contextMenuItems} ref={triggerRef} onOpenChange={handleOpenContextChange}>
       <div
         className={cn(
-          'border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient min-h-[240px] flex flex-col justify-between relative',
+          'border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient flex flex-col justify-between relative',
           {
             'bg-project-item-gradient': isShowingContext,
             'opacity-50 hover:bg-gray-900 cursor-default': isProjectSwitchFetching,
@@ -195,25 +197,25 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
             />
           ) : null}
         </div>
-        <div className="relative">
+        <div className="relative flex flex-col gap-2.5 h-[87px]">
           <div
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
               {
-                hidden: isShowingContext,
+                hidden: isShowingContext || isProjectDirectory,
               },
             )}
           />
           {recentChats?.map((command, index) =>
             index < MAX_CHATS_TO_DISPLAY ? (
-              <div key={index} className="flex flex-row items-center gap-2 mb-[10px] text-white text-[15px]">
+              <div key={index} className="flex flex-row items-center gap-2 text-white text-[15px]">
                 <div className="flex-grow truncate">{command} </div>
               </div>
             ) : null,
           )}
         </div>
 
-        <div className="flex gap-2 justify-between w-full mt-[20px] mb-0">
+        <div className="flex gap-2 justify-between w-full mt-[15px] mb-0">
           <CounterItem icon={MessageSquare} count={chats_count} className="text-purple-400" />
           <CounterItem icon={StickyNote} count={materials_note_count} />
           <CounterItem icon={ScanText} count={materials_dynamic_note_count} />
