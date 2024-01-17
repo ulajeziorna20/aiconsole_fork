@@ -46,7 +46,7 @@ export const AgentForm = ({
 }: AgentFormProps) => {
   const [executionMode, setExecutionMode] = useState('');
   const [customExecutionMode, setCustomExecutionMode] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<null | string>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
   const handleUsageChange = (value: string) => setSelectedAsset({ ...agent, usage: value });
   const setExecutionModeState = (value: string) => setSelectedAsset({ ...agent, execution_mode: value } as Asset);
@@ -80,8 +80,7 @@ export const AgentForm = ({
   };
 
   useEffect(() => {
-    const userAgentAvatarUrl =
-      agent.id === 'new_agent' ? null : `${getBaseURL()}/api/agents/${agent.id}/image?time=${new Date()}`;
+    const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${agent.id}/image?time=${new Date()}`;
     setAvatarUrl(userAgentAvatarUrl);
   }, [getBaseURL, avatarData]);
 

@@ -6,7 +6,7 @@ import { ContextMenu, ContextMenuRef } from './ContextMenu';
 import { Icon } from './icons/Icon';
 
 interface ImageUploaderProps {
-  currentImage?: string | null;
+  currentImage?: string;
   onUpload?: (file: File) => void;
 }
 
