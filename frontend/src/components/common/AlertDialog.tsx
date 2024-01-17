@@ -65,7 +65,7 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
           onClick={onBackgroundClick}
         />
         <ReactAlertDialog.Content
-          className="p-10 flex flex-col gap-[30px] text-center text-white data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] max-w-[380px] translate-x-[-50%] translate-y-[-50%] rounded-xl bg-primary-gradient shadow-dark focus:outline-none"
+          className="p-10 flex flex-col gap-[30px] text-center text-white data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] max-w-[380px] translate-x-[-50%] translate-y-[-50%] rounded-xl bg-primary-gradient shadow-dark focus:outline-none z-20"
           onEscapeKeyDown={handleClose}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >

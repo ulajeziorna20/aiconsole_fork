@@ -12,7 +12,7 @@ const isAssetUpdated = (asset: Asset, lastSavedAsset: Asset) =>
     );
   });
 
-export function useAssetChanged() {
+export function useAssetChanged(isAvatarChanged: boolean) {
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const { pathname } = useLocation();
@@ -40,11 +40,11 @@ export function useAssetChanged() {
         return ref.current ? isAssetUpdated(asset, ref.current) : true;
       }
 
-      return isAssetUpdated(asset, lastSavedAsset);
+      return isAssetUpdated(asset, lastSavedAsset) || isAvatarChanged;
 
       //TODO: deep compare usage_examples
     });
-  }, [asset, lastSavedAsset]);
+  }, [asset, lastSavedAsset, isAvatarChanged]);
 
   return isChanged;
 }
