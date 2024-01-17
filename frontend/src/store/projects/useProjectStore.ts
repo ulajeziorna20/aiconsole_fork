@@ -17,20 +17,21 @@
 import { create } from 'zustand';
 
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
+import { ProjectsAPI } from '../../api/api/ProjectsAPI';
 import { useChatStore } from '../editables/chat/useChatStore';
 import { useSettingsStore } from '../settings/useSettingsStore';
-import { ProjectsAPI } from '../../api/api/ProjectsAPI';
 
 export type ProjectSlice = {
   projectPath?: string; //undefined means loading, '' means no project, otherwise path
   tempPath?: string;
   projectName?: string;
-  isProjectDirectory?: boolean | undefined;
+  isProjectDirectory?: boolean;
   chooseProject: (path?: string) => Promise<void>;
   resetIsProjectFlag: () => void;
   checkPath: (path?: string) => Promise<void>;
   isProjectLoading: boolean;
   isProjectOpen: boolean;
+  isProjectSwitchFetching: boolean;
   onProjectOpened: ({ path, name, initial }: { path: string; name: string; initial: boolean }) => Promise<void>;
   onProjectClosed: () => Promise<void>;
   onProjectLoading: () => void;
@@ -44,6 +45,7 @@ export const useProjectStore = create<ProjectSlice>((set, _) => ({
   projectName: undefined,
   isProjectLoading: true,
   isProjectOpen: false,
+  isProjectSwitchFetching: false,
   onProjectOpened: async ({ path, name, initial }: { path: string; name: string; initial: boolean }) => {
     if (!path || !name) {
       throw new Error('Project path or name is not defined');
@@ -54,6 +56,7 @@ export const useProjectStore = create<ProjectSlice>((set, _) => ({
       projectName: name,
       isProjectOpen: true,
       isProjectLoading: false,
+      isProjectSwitchFetching: false,
     }));
 
     await Promise.all([useChatStore.getState().initCommandHistory(), useEditablesStore.getState().initChatHistory()]);
@@ -80,6 +83,7 @@ export const useProjectStore = create<ProjectSlice>((set, _) => ({
       projectName: undefined,
       isProjectOpen: false,
       isProjectLoading: true,
+      isProjectSwitchFetching: false,
     }));
   },
   resetIsProjectFlag: () => {
@@ -93,6 +97,9 @@ export const useProjectStore = create<ProjectSlice>((set, _) => ({
     if (!path && window?.electron?.openDirectoryPicker) {
       const path = await window?.electron?.openDirectoryPicker();
       if (path) {
+        set({
+          isProjectSwitchFetching: true,
+        });
         (await ProjectsAPI.chooseProject(path).json()) as {
           name: string;
           path: string;
@@ -100,6 +107,11 @@ export const useProjectStore = create<ProjectSlice>((set, _) => ({
       }
 
       return;
+    }
+    if (path) {
+      set({
+        isProjectSwitchFetching: true,
+      });
     }
     (await ProjectsAPI.chooseProject(path).json()) as {
       name: string;

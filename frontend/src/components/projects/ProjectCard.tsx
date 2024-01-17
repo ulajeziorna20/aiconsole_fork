@@ -17,6 +17,7 @@
 
 import { useRecentProjectsStore } from '@/store/projects/useRecentProjectsStore';
 import { ContextMenuItems } from '@/types/common/contextMenu';
+import { RecentProject } from '@/types/projects/RecentProject';
 import { cn } from '@/utils/common/cn';
 import { Blocks, LucideIcon, MessageSquare, MoreVertical, ScanText, StickyNote, Trash } from 'lucide-react';
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,7 +25,7 @@ import { useProjectStore } from '../../store/projects/useProjectStore';
 import { ContextMenu, ContextMenuRef } from '../common/ContextMenu';
 import { Icon } from '../common/icons/Icon';
 import { AgentAvatar } from '../editables/chat/AgentAvatar';
-import { RecentProject } from '@/types/projects/RecentProject';
+import { Spinner } from '../editables/chat/Spinner';
 
 const MAX_CHATS_TO_DISPLAY = 3;
 interface CounterItemProps {
@@ -51,6 +52,8 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
   const [isEditing, setIsEditing] = useState(false);
   const [inputText, setInputText] = useState(name);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isProjectSwitchFetching = useProjectStore((state) => state.isProjectSwitchFetching);
+  const [isCurrentProjectFetching, setIsCurrentProjectFetching] = useState(false);
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -61,10 +64,14 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
 
   const goToProjectChat = (event: MouseEvent) => {
     const isFocused = inputRef.current === document.activeElement;
-    if (isFocused) return;
+    if (isFocused || isProjectSwitchFetching) return;
 
     if (!isEditing && !isFocused && event.button === 0) {
       chooseProject(path);
+      // set timeout to prevent flickering
+      setTimeout(() => {
+        setIsCurrentProjectFetching(true);
+      }, 0);
     }
   };
 
@@ -142,9 +149,11 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
     <ContextMenu options={contextMenuItems} ref={triggerRef} onOpenChange={handleOpenContextChange}>
       <div
         className={cn(
-          'group border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient min-h-[240px] flex flex-col justify-between',
+          'border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient min-h-[240px] flex flex-col justify-between relative',
           {
             'bg-project-item-gradient': isShowingContext,
+            'opacity-50 hover:bg-gray-900 cursor-default': isProjectSwitchFetching,
+            group: !isProjectSwitchFetching,
           },
         )}
         onMouseDown={goToProjectChat}
@@ -215,6 +224,12 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
             <span className="-ml-[2px]">{agents.count}</span>
           </div>
         </div>
+
+        {isCurrentProjectFetching && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 z-30">
+            <Spinner width={40} height={40} />
+          </div>
+        )}
       </div>
     </ContextMenu>
   );
