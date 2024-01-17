@@ -25,6 +25,7 @@ import { ContextMenu, ContextMenuRef } from '../common/ContextMenu';
 import { Icon } from '../common/icons/Icon';
 import { AgentAvatar } from '../editables/chat/AgentAvatar';
 import { RecentProject } from '@/types/projects/RecentProject';
+import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
 
 const MAX_CHATS_TO_DISPLAY = 3;
 interface CounterItemProps {
@@ -51,6 +52,7 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
   const [isEditing, setIsEditing] = useState(false);
   const [inputText, setInputText] = useState(name);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { isProjectDirectory } = useProjectFileManager();
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -191,7 +193,7 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
               {
-                hidden: isShowingContext,
+                hidden: isShowingContext || isProjectDirectory,
               },
             )}
           />
