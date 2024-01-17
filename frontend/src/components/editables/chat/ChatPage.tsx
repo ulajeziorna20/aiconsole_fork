@@ -35,6 +35,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EditorHeader } from '../EditorHeader';
 import { CommandInput } from './CommandInput';
 import { Spinner } from './Spinner';
+import { useEditablesStore } from '@/store/editables/useEditablesStore';
 
 // Electron adds the path property to File objects
 interface FileWithPath extends File {
@@ -203,6 +204,9 @@ export function ChatPage() {
         action: async () => {
           await submitCommand(command);
           await newCommand();
+          if (chat.message_groups.length === 0) {
+            useEditablesStore.getState().initChatHistory();
+          }
         },
       };
     } else {
