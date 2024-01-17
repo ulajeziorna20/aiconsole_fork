@@ -60,7 +60,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const [errors, setErrors] = useState<ErrorObject>({
     executionMode: '',
   });
-  const [avatarData, setAvatarData] = useState<File>();
+  const [avatarData, setAvatarData] = useState<File | null>(null);
   const [isAvatarOverwritten, setIsAvatarOverwritten] = useState(false);
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
@@ -162,7 +162,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
         variant: 'success',
       });
     } else {
-      if (isAssetChanged && !isAvatarOverwritten) {
+      if (isAssetChanged) {
         await EditablesAPI.updateEditableObject(editableObjectType, asset);
 
         showToast({
@@ -180,14 +180,12 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       setNewPath(`/${editableObjectType}s/${asset.id}`);
     } else {
       // Reload the asset from server
-      if (!isAvatarOverwritten) {
-        const newAsset = await EditablesAPI.fetchEditableObject<Material>({
-          editableObjectType,
-          id: asset.id,
-        });
-        setSelectedAsset(newAsset);
-        useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
-      }
+      const newAsset = await EditablesAPI.fetchEditableObject<Material>({
+        editableObjectType,
+        id: asset.id,
+      });
+      setSelectedAsset(newAsset);
+      useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
     }
 
     let avatarFormData: FormData | null = null;
@@ -197,12 +195,6 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       avatarFormData.append('avatar', avatarData);
       await EditablesAPI.setAgentAvatar(asset.id, avatarFormData);
       setIsAvatarOverwritten(false);
-
-      showToast({
-        title: 'Saved',
-        message: `The ${assetType} has been successfully saved.`,
-        variant: 'success',
-      });
     }
   }, [
     asset,
@@ -305,6 +297,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                     agent={asset as Agent}
                     setErrors={setErrors}
                     errors={errors}
+                    avatarData={avatarData}
                     setAvatarData={setAvatarData}
                     setIsAvatarOverwritten={setIsAvatarOverwritten}
                   />
