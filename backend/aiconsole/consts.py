@@ -33,7 +33,11 @@ DIR_WITH_AICONSOLE_PACKAGE = Path(__file__).parent.parent
 def AICONSOLE_USER_CONFIG_DIR() -> Path:
     from platformdirs import user_config_dir
 
-    return Path(user_config_dir(APPLICATION_NAME))
+    path = Path(user_config_dir(APPLICATION_NAME))
+    # windows path fix, no author in the path
+    if not path.exists():
+        path = Path(user_config_dir()) / APPLICATION_NAME
+    return path
 
 
 HISTORY_LIMIT: int = 1000
