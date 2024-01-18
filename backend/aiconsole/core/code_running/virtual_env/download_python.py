@@ -41,7 +41,7 @@ def download_python(python_version, date_tag):
 
     try:
         _log.info(f"Downloading standalone Python for {system_name} {arch_name}...")
-        with urllib.request.urlopen(download_url) as response, open(file_name, "wb") as out_file:
+        with urllib.request.urlopen(download_url) as response, open(file_name, "wb", encoding="utf8") as out_file:
             data = response.read()
             out_file.write(data)
 
@@ -51,7 +51,7 @@ def download_python(python_version, date_tag):
 
     _log.info("Extracting Python...")
     try:
-        with tarfile.open(file_name) as tar:
+        with tarfile.open(file_name, encoding="utf8") as tar:
             tar.extractall(path=".")
     except tarfile.TarError as e:
         _log.error(f"Extraction failed: {e}")

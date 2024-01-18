@@ -93,7 +93,7 @@ class UserProfileService:
         )
 
     def _save_avatar_to_fs(self, file: BinaryIO, file_path: Path) -> None:
-        with open(file_path, "wb+") as file_object:
+        with open(file_path, "wb+", encoding="utf8") as file_object:
             file_object.write(file.read())
 
     def _deterministic_choice(self, blob: str, choices: list[Path]) -> Path:

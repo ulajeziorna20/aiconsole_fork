@@ -70,7 +70,7 @@ def generate_image(prompt: str, size: Literal["1024x1024", "1792x1024", "1024x17
         image_path = os.path.join("images", image_name)
         os.makedirs(os.path.join("images"), exist_ok=True)
         r = requests.get(image_url, allow_redirects=True)
-        open(image_path, "wb").write(r.content)
+        open(image_path, "wb", encoding="utf8").write(r.content)
         ret.append(Image(relative_path=image_path, revised_prompt=image.revised_prompt or ""))
 
     return ret
