@@ -104,8 +104,8 @@ export async function handleServerMessage(message: ServerMessage) {
     case 'ResponseServerMessage': {
       if (message.is_error) {
         useProjectStore.getState().onProjectOpened({
-          name: message.payload.name,
-          path: message.payload.path,
+          name: message.payload.project_name,
+          path: message.payload.project_path,
           initial: true,
         });
       }

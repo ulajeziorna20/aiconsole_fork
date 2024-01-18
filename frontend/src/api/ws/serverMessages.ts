@@ -110,8 +110,8 @@ export const ResponseServerMessageSchema = BaseServerMessageSchema.extend({
   request_id: z.string(),
   is_error: z.boolean(),
   payload: z.object({
-    name: z.string(),
-    path: z.string(),
+    project_name: z.string(),
+    project_path: z.string(),
   }),
   type: z.literal('ResponseServerMessage'),
 });

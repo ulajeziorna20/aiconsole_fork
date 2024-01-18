@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+
 from pydantic import BaseModel
 
 from aiconsole.core.assets.models import AssetType
@@ -91,6 +93,14 @@ class ResponseServerMessage(BaseServerMessage):
     request_id: str
     payload: dict
     is_error: bool
+
+    def __init__(self, request_id: str, payload: dict, is_error: bool = False) -> None:
+        from aiconsole.core.project.paths import get_project_directory
+
+        project_path = get_project_directory()
+        payload = {**payload, "project_path": str(project_path), "project_name": os.path.basename(project_path)}
+
+        super().__init__(request_id=request_id, payload=payload, is_error=is_error)
 
 
 class ChatOpenedServerMessage(BaseServerMessage):
