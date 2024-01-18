@@ -51,7 +51,7 @@ def download_python(python_version, date_tag):
 
     _log.info("Extracting Python...")
     try:
-        with tarfile.open(file_name, encoding="utf8") as tar:
+        with tarfile.open(file_name) as tar:
             tar.extractall(path=".")
     except tarfile.TarError as e:
         _log.error(f"Extraction failed: {e}")

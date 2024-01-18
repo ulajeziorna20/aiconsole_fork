@@ -44,7 +44,7 @@ class Agents(_Assets):
     async def set_agent_avatar(self, agent_id: str, avatar: UploadFile) -> None:
         image_path = get_project_assets_directory(AssetType.AGENT) / f"{agent_id}.jpg"
         content = await avatar.read()
-        with open(image_path, "wb+", encoding="utf8") as avatar_file:
+        with open(image_path, "wb+") as avatar_file:
             avatar_file.write(content)
 
 
