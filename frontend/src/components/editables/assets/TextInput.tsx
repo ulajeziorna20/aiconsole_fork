@@ -137,7 +137,7 @@ export function TextInput({
       })}
     >
       {label ? (
-        <div className="font-semibold text-white text-[16px] flex items-center gap-[30px] ">
+        <div className="text-white text-[15px] flex items-center gap-[30px] ">
           <label htmlFor={label} className="min-w-fit">
             {label}
           </label>
