@@ -47,7 +47,8 @@ def _get_document(file_path: Path) -> tomlkit.TOMLDocument:
 
 
 def _update_document(document: tomlkit.TOMLDocument, settings_data: PartialSettingsData):
-    for key, value in settings_data.model_dump(exclude_none=True).items():
+    settings_data_dump = settings_data.model_dump(exclude_none=True)
+    for key, value in settings_data_dump.items():
         if value is None:
             continue
 
@@ -58,7 +59,7 @@ def _update_document(document: tomlkit.TOMLDocument, settings_data: PartialSetti
         if isinstance(item, tomlkit.items.Array) and isinstance(value, list):
             item.extend(value)
         else:
-            document[key] = value
+            document[key] = item
 
 
 def _write_document(file_path: Path, document: tomlkit.TOMLDocument):
