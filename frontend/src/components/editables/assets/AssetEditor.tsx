@@ -17,27 +17,27 @@
 import { useCallback, useEffect, useState } from 'react';
 import { unstable_useBlocker as useBlocker, useNavigate, useParams } from 'react-router-dom';
 
+import AlertDialog from '@/components/common/AlertDialog';
 import { Button } from '@/components/common/Button';
-import { useAssetStore } from '@/store/editables/asset/useAssetStore';
-import { Agent, Asset, AssetType, Material } from '@/types/editables/assetTypes';
-import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
-import { EditablesAPI } from '../../../api/api/EditablesAPI';
-import { useAssetChanged } from '../../../utils/editables/useAssetChanged';
-import { EditorHeader } from '../EditorHeader';
-import { localStorageTyped } from '@/utils/common/localStorage';
-import { usePrevious } from '@mantine/hooks';
-import { useAssets } from '@/utils/editables/useAssets';
-import { CheckCheck, Trash } from 'lucide-react';
 import { Icon } from '@/components/common/icons/Icon';
 import { useToastsStore } from '@/store/common/useToastsStore';
+import { useAssetStore } from '@/store/editables/asset/useAssetStore';
+import { Agent, Asset, AssetType, Material } from '@/types/editables/assetTypes';
+import { cn } from '@/utils/common/cn';
+import { localStorageTyped } from '@/utils/common/localStorage';
+import { useAssets } from '@/utils/editables/useAssets';
+import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
+import { usePrevious } from '@mantine/hooks';
+import { CheckCheck, Trash } from 'lucide-react';
+import { EditablesAPI } from '../../../api/api/EditablesAPI';
+import { useAssetChanged } from '../../../utils/editables/useAssetChanged';
 import { ContextMenu } from '../../common/ContextMenu';
-import AlertDialog from '@/components/common/AlertDialog';
+import { EditorHeader } from '../EditorHeader';
+import { AgentForm } from './AgentForm';
 import { AssetInfoBar, RestoreButton } from './AssetInfoBar';
 import { MaterialForm } from './MaterialForm';
-import { useAssetEditor } from './useAssetEditor';
-import { AgentForm } from './AgentForm';
-import { cn } from '@/utils/common/cn';
 import { ErrorObject, checkErrors } from './TextInput';
+import { useAssetEditor } from './useAssetEditor';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -289,7 +289,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
               />
             )}
             {asset && (
-              <div className="flex-grow flex flex-col overflow-auto h-full px-[60px] py-[40px] pt-[90px] gap-5">
+              <div className="flex-grow flex flex-col overflow-auto h-full px-[60px] py-10 gap-5">
                 {assetType === 'material' ? (
                   <MaterialForm material={asset as Material} />
                 ) : (

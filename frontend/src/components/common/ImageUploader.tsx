@@ -100,7 +100,7 @@ const ImageUploader = ({ currentImage, onUpload }: ImageUploaderProps) => {
         id="imageInput"
         ref={fileInputRef}
       />
-      <p className="text-[16px] text-white text-center">Avatar</p>
+      <p className="text-[15px] text-white text-center">Avatar</p>
       <div className="mt-[15px]">
         <ContextMenu options={menuItems} ref={triggerRef} triggerClassName="ml-auto">
           <div
