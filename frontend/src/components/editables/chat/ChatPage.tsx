@@ -83,6 +83,7 @@ export function ChatPage() {
   const command = useChatStore((state) => state.commandHistory[state.commandIndex]);
 
   const chat = useChatStore((state) => state.chat);
+  const isChatLoading = useChatStore((state) => state.isChatLoading);
   const setLastUsedChat = useChatStore((state) => state.setLastUsedChat);
   const loadingMessages = useChatStore((state) => state.loadingMessages);
   const isAnalysisRunning = useChatStore((state) => state.chat?.is_analysis_in_progress);
@@ -170,6 +171,10 @@ export function ChatPage() {
       stopWork();
     };
   }, [chat?.id, stopWork]); //Initentional trigger when chat_id changes
+
+  if (isChatLoading) {
+    return;
+  }
 
   if (!chat) {
     return (
