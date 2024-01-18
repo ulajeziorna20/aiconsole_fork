@@ -101,6 +101,16 @@ export async function handleServerMessage(message: ServerMessage) {
         chat: message.chat,
       });
       break;
+    case 'ResponseServerMessage': {
+      if (message.is_error) {
+        useProjectStore.getState().onProjectOpened({
+          name: message.payload.name,
+          path: message.payload.path,
+          initial: true,
+        });
+      }
+      break;
+    }
     default:
       console.error('Unknown message type: ', message);
   }

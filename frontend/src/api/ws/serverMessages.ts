@@ -104,15 +104,19 @@ export const ChatOpenedServerMessageSchema = BaseServerMessageSchema.extend({
   chat: ChatSchema,
 });
 
+export type ChatOpenedServerMessage = z.infer<typeof ChatOpenedServerMessageSchema>;
+
 export const ResponseServerMessageSchema = BaseServerMessageSchema.extend({
   request_id: z.string(),
-  chat_id: z.string(),
-  // payload
-  // type: z.literal('ChatOpenedServerMessage'),
-  // chat: ChatSchema,
+  is_error: z.boolean(),
+  payload: z.object({
+    name: z.string(),
+    path: z.string(),
+  }),
+  type: z.literal('ResponseServerMessage'),
 });
 
-export type ChatOpenedServerMessage = z.infer<typeof ChatOpenedServerMessageSchema>;
+export type ResponseServerMessage = z.infer<typeof ResponseServerMessageSchema>;
 
 export const ServerMessageSchema = z.union([
   NotificationServerMessageSchema,
@@ -126,6 +130,7 @@ export const ServerMessageSchema = z.union([
   SettingsServerMessageSchema,
   NotifyAboutChatMutationServerMessageSchema,
   ChatOpenedServerMessageSchema,
+  ResponseServerMessageSchema,
 ]);
 
 export type ServerMessage = z.infer<typeof ServerMessageSchema>;
