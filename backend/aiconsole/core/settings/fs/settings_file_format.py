@@ -56,10 +56,10 @@ def _update_document(document: tomlkit.TOMLDocument, settings_data: PartialSetti
 
         if isinstance(item, tomlkit.items.Table) and isinstance(value, dict):
             item.update(value)
-        if isinstance(item, tomlkit.items.Array) and isinstance(value, list):
+        elif isinstance(item, tomlkit.items.Array) and isinstance(value, list):
             item.extend(value)
         else:
-            document[key] = item
+            document[key] = value
 
 
 def _write_document(file_path: Path, document: tomlkit.TOMLDocument):
