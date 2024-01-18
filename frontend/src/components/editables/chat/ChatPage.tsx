@@ -216,6 +216,9 @@ export function ChatPage() {
       };
     } else {
       if (isProcessesAreNotRunning && isLastMessageFromUser) {
+        if (chat.message_groups.length === 1) {
+          useEditablesStore.getState().initChatHistory();
+        }
         return {
           label: 'Get reply',
           icon: ReplyIcon,
