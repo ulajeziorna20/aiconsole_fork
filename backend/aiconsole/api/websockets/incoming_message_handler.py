@@ -56,6 +56,7 @@ from aiconsole.core.chat.execution_modes.import_and_validate_execution_mode impo
 )
 from aiconsole.core.chat.locking import DefaultChatMutator, acquire_lock, release_lock
 from aiconsole.core.chat.types import AICMessageGroup, Chat
+from aiconsole.core.code_running.run_code import reset_code_interpreters
 from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
     WaitForEnvEvent,
 )
@@ -157,6 +158,7 @@ class IncomingMessageHandler:
 
     async def _handle_stop_chat_ws_message(self, connection: AICConnection, json: dict):
         message = StopChatClientMessage(**json)
+        reset_code_interpreters(chat_id=message.chat_id)
         for task in self._running_tasks[message.chat_id].values():
             task.cancel()
 

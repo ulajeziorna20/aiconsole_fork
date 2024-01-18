@@ -152,7 +152,9 @@ async def _run_code(context: ProcessChatContext, tool_call_id):
         try:
             context.rendered_materials
 
-            async for token in get_code_interpreter(tool_call.language).run(tool_call.code, context.materials):
+            async for token in get_code_interpreter(tool_call.language, context.chat_mutator.chat.id).run(
+                tool_call.code, context.materials
+            ):
                 await context.chat_mutator.mutate(
                     AppendToOutputToolCallMutation(
                         tool_call_id=tool_call_id,
