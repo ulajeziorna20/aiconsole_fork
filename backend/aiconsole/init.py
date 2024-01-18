@@ -26,7 +26,7 @@ from aiconsole.consts import log_config
 config.dictConfig(log_config)
 _log = logging.getLogger(__name__)
 
-os.environ["PYTHONUTF8"] = "1"
+os.environ["PYTHONIOENCODING"] = "utf8"
 
 
 def run_aiconsole(dev: bool):
