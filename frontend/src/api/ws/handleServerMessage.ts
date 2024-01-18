@@ -106,6 +106,7 @@ export async function handleServerMessage(message: ServerMessage) {
       break;
     case 'ResponseServerMessage': {
       if (message.is_error) {
+        EditablesAPI.closeChat(message.payload.chat_id);
         EditablesAPI.fetchEditableObject<Chat>({ editableObjectType: 'chat', id: uuidv4() }).then((chat) => {
           useChatStore.getState().setChat(chat);
         });

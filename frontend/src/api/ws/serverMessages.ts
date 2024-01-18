@@ -112,6 +112,7 @@ export const ResponseServerMessageSchema = BaseServerMessageSchema.extend({
   payload: z.object({
     project_name: z.string(),
     project_path: z.string(),
+    chat_id: z.string(),
   }),
   type: z.literal('ResponseServerMessage'),
 });
