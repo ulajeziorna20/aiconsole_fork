@@ -173,11 +173,14 @@ export function ChatPage() {
     };
   }, [chat?.id, stopWork]); //Initentional trigger when chat_id changes
 
+  const isProcessesAreNotRunning = !isExecutionRunning && !isAnalysisRunning;
+  const hasAnyCommandInput = command.trim() !== '';
+
   useEffect(() => {
-    if (chat && chat.message_groups.length < 2) {
+    if (hasAnyCommandInput || chat?.message_groups.length === 0 || isProcessesAreNotRunning) {
       initChatHistory();
     }
-  }, [chat, initChatHistory]);
+  }, [chat?.message_groups.length, hasAnyCommandInput, initChatHistory, isProcessesAreNotRunning]);
 
   if (isChatLoading) {
     return;
@@ -204,9 +207,6 @@ export function ChatPage() {
       });
     }
   };
-
-  const isProcessesAreNotRunning = !isExecutionRunning && !isAnalysisRunning;
-  const hasAnyCommandInput = command.trim() !== '';
 
   const getActionButton = () => {
     if (hasAnyCommandInput || chat.message_groups.length === 0) {
