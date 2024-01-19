@@ -97,10 +97,9 @@ export function ChatPage() {
   const menuItems = useEditableObjectContextMenu({ editable: chat, editableObjectType: 'chat' });
   const renameChat = useChatStore((state) => state.renameChat);
   const setChat = useChatStore((state) => state.setChat);
-  const commandInputs = useChatStore((state) => state.commandHistory);
-  const isCommandInputEmpty = commandInputs && commandInputs[commandInputs.length - 1].length === 0;
+  const hasAnyCommandInput = command.trim() !== '';
   const setCommand = useChatStore((state) => state.editCommand);
-  const blocker = useBlocker(!isCommandInputEmpty);
+  const blocker = useBlocker(hasAnyCommandInput);
 
   const { reset, proceed, state: blockerState } = blocker || {};
 
@@ -173,7 +172,6 @@ export function ChatPage() {
   }, [chat?.id, stopWork]); //Initentional trigger when chat_id changes
 
   const isProcessesAreNotRunning = !isExecutionRunning && !isAnalysisRunning;
-  const hasAnyCommandInput = command.trim() !== '';
 
   useEffect(() => {
     if (hasAnyCommandInput || chat?.message_groups.length === 0 || isProcessesAreNotRunning) {
