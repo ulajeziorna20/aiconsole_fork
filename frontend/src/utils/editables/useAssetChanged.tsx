@@ -40,7 +40,9 @@ export function useAssetChanged(isAvatarChanged: boolean) {
         return ref.current ? isAssetUpdated(asset, ref.current) : true;
       }
 
-      return isAssetUpdated(asset, lastSavedAsset) || isAvatarChanged;
+      const avatarChange = isAvatarChanged === undefined ? false : isAvatarChanged;
+
+      return isAssetUpdated(asset, lastSavedAsset) || avatarChange;
 
       //TODO: deep compare usage_examples
     });
