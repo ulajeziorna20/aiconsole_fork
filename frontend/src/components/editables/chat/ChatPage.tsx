@@ -88,6 +88,7 @@ export function ChatPage() {
   const loadingMessages = useChatStore((state) => state.loadingMessages);
   const isAnalysisRunning = useChatStore((state) => state.chat?.is_analysis_in_progress);
   const isExecutionRunning = useChatStore((state) => state.isExecutionRunning());
+  const initChatHistory = useEditablesStore((state) => state.initChatHistory);
   const submitCommand = useChatStore((state) => state.submitCommand);
   const stopWork = useChatStore((state) => state.stopWork);
   const newCommand = useChatStore((state) => state.newCommand);
@@ -172,6 +173,15 @@ export function ChatPage() {
     };
   }, [chat?.id, stopWork]); //Initentional trigger when chat_id changes
 
+  const isProcessesAreNotRunning = !isExecutionRunning && !isAnalysisRunning;
+  const hasAnyCommandInput = command.trim() !== '';
+
+  useEffect(() => {
+    if (hasAnyCommandInput || chat?.message_groups.length === 0 || isProcessesAreNotRunning) {
+      initChatHistory();
+    }
+  }, [chat?.message_groups.length, hasAnyCommandInput, initChatHistory, isProcessesAreNotRunning]);
+
   if (isChatLoading) {
     return;
   }
@@ -198,9 +208,6 @@ export function ChatPage() {
     }
   };
 
-  const isProcessesAreNotRunning = !isExecutionRunning && !isAnalysisRunning;
-  const hasAnyCommandInput = command.trim() !== '';
-
   const getActionButton = () => {
     if (hasAnyCommandInput || chat.message_groups.length === 0) {
       return {
@@ -209,16 +216,10 @@ export function ChatPage() {
         action: async () => {
           await submitCommand(command);
           await newCommand();
-          if (chat.message_groups.length === 0) {
-            useEditablesStore.getState().initChatHistory();
-          }
         },
       };
     } else {
       if (isProcessesAreNotRunning && isLastMessageFromUser) {
-        if (chat.message_groups.length === 1) {
-          useEditablesStore.getState().initChatHistory();
-        }
         return {
           label: 'Get reply',
           icon: ReplyIcon,
