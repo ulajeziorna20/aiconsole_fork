@@ -211,16 +211,10 @@ export function ChatPage() {
         action: async () => {
           await submitCommand(command);
           await newCommand();
-          if (chat.message_groups.length === 0) {
-            useEditablesStore.getState().initChatHistory();
-          }
         },
       };
     } else {
       if (isProcessesAreNotRunning && isLastMessageFromUser) {
-        if (chat.message_groups.length === 1) {
-          useEditablesStore.getState().initChatHistory();
-        }
         return {
           label: 'Get reply',
           icon: ReplyIcon,
