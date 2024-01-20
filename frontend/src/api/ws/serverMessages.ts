@@ -106,6 +106,19 @@ export const ChatOpenedServerMessageSchema = BaseServerMessageSchema.extend({
 
 export type ChatOpenedServerMessage = z.infer<typeof ChatOpenedServerMessageSchema>;
 
+export const ResponseServerMessageSchema = BaseServerMessageSchema.extend({
+  request_id: z.string(),
+  is_error: z.boolean(),
+  payload: z.object({
+    project_name: z.string(),
+    project_path: z.string(),
+    chat_id: z.string(),
+  }),
+  type: z.literal('ResponseServerMessage'),
+});
+
+export type ResponseServerMessage = z.infer<typeof ResponseServerMessageSchema>;
+
 export const ServerMessageSchema = z.union([
   NotificationServerMessageSchema,
   DebugJSONServerMessageSchema,
@@ -118,6 +131,7 @@ export const ServerMessageSchema = z.union([
   SettingsServerMessageSchema,
   NotifyAboutChatMutationServerMessageSchema,
   ChatOpenedServerMessageSchema,
+  ResponseServerMessageSchema,
 ]);
 
 export type ServerMessage = z.infer<typeof ServerMessageSchema>;

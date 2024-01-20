@@ -39,6 +39,7 @@ from aiconsole.api.websockets.connection_manager import (
 from aiconsole.api.websockets.server_messages import (
     ChatOpenedServerMessage,
     NotificationServerMessage,
+    ResponseServerMessage,
 )
 from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.materials.content_evaluation_context import (
@@ -106,23 +107,37 @@ class IncomingMessageHandler:
 
         self._log.info(f"Handling message {message_type}")
 
-        task_id = uuid4()
+        task_id = str(uuid4())
         task = asyncio.create_task(handler(connection, json))
         self._running_tasks[json["chat_id"]][task_id] = task
         task.add_done_callback(self._get_done_callback(json["chat_id"], task_id))
 
     async def _handle_acquire_lock_ws_message(self, connection: AICConnection, json: dict):
-        message = AcquireLockClientMessage(**json)
-        await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
+        try:
+            message = AcquireLockClientMessage(**json)
+            await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
 
-        connection.acquired_locks.append(
-            AcquiredLock(
-                chat_id=message.chat_id,
-                request_id=message.request_id,
+            connection.acquired_locks.append(
+                AcquiredLock(
+                    chat_id=message.chat_id,
+                    request_id=message.request_id,
+                )
             )
-        )
 
-        self._log.info(f"Acquired lock {message.request_id} {connection.acquired_locks}")
+            self._log.info(f"Acquired lock {message.request_id} {connection.acquired_locks}")
+            await connection.send(
+                ResponseServerMessage(
+                    request_id=message.request_id, payload={"chat_id": message.chat_id}, is_error=False
+                )
+            )
+        except Exception:
+            await connection.send(
+                ResponseServerMessage(
+                    request_id=message.request_id,
+                    payload={"error": "Error during acquiring lock", "chat_id": message.chat_id},
+                    is_error=True,
+                )
+            )
 
     async def _handle_release_lock_ws_message(self, connection: AICConnection, json: dict):
         message = ReleaseLockClientMessage(**json)
@@ -149,18 +164,46 @@ class IncomingMessageHandler:
             connection.open_chats_ids.add(message.chat_id)
 
             await connection.send(
+                ResponseServerMessage(
+                    request_id=message.request_id, payload={"chat_id": message.chat_id}, is_error=False
+                )
+            )
+
+            await connection.send(
                 ChatOpenedServerMessage(
                     chat=chat,
+                )
+            )
+        except Exception:
+            await connection.send(
+                ResponseServerMessage(
+                    request_id=message.request_id,
+                    payload={"error": "Error during opening chat", "chat_id": message.chat_id},
+                    is_error=True,
                 )
             )
         finally:
             await release_lock(chat_id=message.chat_id, request_id=temporary_request_id)
 
     async def _handle_stop_chat_ws_message(self, connection: AICConnection, json: dict):
-        message = StopChatClientMessage(**json)
-        reset_code_interpreters(chat_id=message.chat_id)
-        for task in self._running_tasks[message.chat_id].values():
-            task.cancel()
+        try:
+            message = StopChatClientMessage(**json)
+            reset_code_interpreters(chat_id=message.chat_id)
+            for task in self._running_tasks[message.chat_id].values():
+                task.cancel()
+            await connection.send(
+                ResponseServerMessage(
+                    request_id=message.request_id, payload={"chat_id": message.chat_id}, is_error=False
+                )
+            )
+        except Exception:
+            await connection.send(
+                ResponseServerMessage(
+                    request_id=message.request_id,
+                    payload={"error": "Error during closing chat", "chat_id": message.chat_id},
+                    is_error=True,
+                )
+            )
 
     async def _handle_close_chat_ws_message(self, connection: AICConnection, json: dict):
         message = CloseChatClientMessage(**json)
