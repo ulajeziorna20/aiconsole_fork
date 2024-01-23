@@ -37,6 +37,7 @@ import { ContextMenu, ContextMenuRef } from '../common/ContextMenu';
 import { Icon } from '../common/icons/Icon';
 import { AgentAvatar } from '../editables/chat/AgentAvatar';
 import { Spinner } from '../editables/chat/Spinner';
+import { ModalProjectProps } from './Home';
 
 const MAX_CHATS_TO_DISPLAY = 3;
 interface CounterItemProps {
@@ -54,9 +55,10 @@ const CounterItem = ({ icon, count, className }: CounterItemProps) => (
 
 export type ProjectCardProps = Omit<RecentProject, 'recent_chats'> & {
   recentChats: string[];
+  openModalProject: (project: ModalProjectProps) => void;
 };
 
-export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps) {
+export function ProjectCard({ name, path, recentChats, stats, openModalProject }: ProjectCardProps) {
   const chooseProject = useProjectStore((state) => state.chooseProject);
   const removeRecentProject = useRecentProjectsStore((state) => state.removeRecentProject);
   const [isShowingContext, setIsShowingContext] = useState(false);
@@ -163,16 +165,16 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
         type: 'item',
         icon: LocateFixed,
         title: 'Locate',
-        action: () => console.log('test'),
+        action: () => openModalProject({ name, title: 'Locate', path }),
       },
       {
         type: 'item',
         icon: Trash,
         title: 'Delete',
-        action: deleteProject,
+        action: () => openModalProject({ name, title: 'Delete', path }),
       },
     ],
-    [deleteProject],
+    [name, openModalProject, path],
   );
 
   const isIncorrectPath = true;
