@@ -20,7 +20,17 @@ import { ContextMenuItems } from '@/types/common/contextMenu';
 import { RecentProject } from '@/types/projects/RecentProject';
 import { cn } from '@/utils/common/cn';
 import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
-import { Blocks, LucideIcon, MessageSquare, MoreVertical, ScanText, StickyNote, Trash } from 'lucide-react';
+import {
+  Blocks,
+  LucideIcon,
+  MessageSquare,
+  MoreVertical,
+  ScanText,
+  StickyNote,
+  Trash,
+  AlertTriangle,
+  LocateFixed,
+} from 'lucide-react';
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProjectStore } from '../../store/projects/useProjectStore';
 import { ContextMenu, ContextMenuRef } from '../common/ContextMenu';
@@ -147,8 +157,32 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
     [deleteProject],
   );
 
+  const contextMenuItemsIncorrectPath: ContextMenuItems = useMemo(
+    () => [
+      {
+        type: 'item',
+        icon: LocateFixed,
+        title: 'Locate',
+        action: () => console.log('test'),
+      },
+      {
+        type: 'item',
+        icon: Trash,
+        title: 'Delete',
+        action: deleteProject,
+      },
+    ],
+    [deleteProject],
+  );
+
+  const isIncorrectPath = true;
+
   return (
-    <ContextMenu options={contextMenuItems} ref={triggerRef} onOpenChange={handleOpenContextChange}>
+    <ContextMenu
+      options={isIncorrectPath ? contextMenuItemsIncorrectPath : contextMenuItems}
+      ref={triggerRef}
+      onOpenChange={handleOpenContextChange}
+    >
       <div
         className={cn(
           'border-2 border-gray-600 p-[30px] pb-[20px] rounded-[20px] w-full transition-bg duration-150  cursor-pointer bg-gray-900 hover:bg-project-item-gradient flex flex-col justify-between relative',
@@ -156,6 +190,7 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
             'bg-project-item-gradient': isShowingContext,
             'opacity-50 hover:bg-gray-900 cursor-default': isProjectSwitchFetching,
             group: !isProjectSwitchFetching,
+            'opacity-50': isIncorrectPath,
           },
         )}
         onMouseDown={goToProjectChat}
@@ -172,16 +207,19 @@ export function ProjectCard({ name, path, recentChats, stats }: ProjectCardProps
                 onChange={(e) => setInputText(e.target.value)}
               />
             ) : (
-              <h3
-                className={cn(
-                  'text-[22px] font-black transition-colors text-gray-400  group-hover:text-white duration-150',
-                  {
-                    'text-white': isShowingContext,
-                  },
-                )}
-              >
-                {name}
-              </h3>
+              <div className="flex items-center gap-[10px]">
+                {isIncorrectPath && <Icon icon={AlertTriangle} width={24} height={24} className="text-gray-400" />}
+                <h3
+                  className={cn(
+                    'text-[22px] font-black transition-colors text-gray-400  group-hover:text-white duration-150',
+                    {
+                      'text-white': isShowingContext,
+                    },
+                  )}
+                >
+                  {name}
+                </h3>
+              </div>
             )}
           </div>
 
