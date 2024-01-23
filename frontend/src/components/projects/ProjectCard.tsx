@@ -37,7 +37,8 @@ import { ContextMenu, ContextMenuRef } from '../common/ContextMenu';
 import { Icon } from '../common/icons/Icon';
 import { AgentAvatar } from '../editables/chat/AgentAvatar';
 import { Spinner } from '../editables/chat/Spinner';
-import { ModalProjectProps } from './Home';
+import { ModalProjectProps, ModalProjectTitle } from './Home';
+import Tooltip from '../common/Tooltip';
 
 const MAX_CHATS_TO_DISPLAY = 3;
 interface CounterItemProps {
@@ -159,22 +160,27 @@ export function ProjectCard({ name, path, recentChats, stats, openModalProject }
     [deleteProject],
   );
 
+  const openModal = useCallback(
+    (title: ModalProjectTitle) => openModalProject({ name, title, path }),
+    [name, openModalProject, path],
+  );
+
   const contextMenuItemsIncorrectPath: ContextMenuItems = useMemo(
     () => [
       {
         type: 'item',
         icon: LocateFixed,
         title: 'Locate',
-        action: () => openModalProject({ name, title: 'Locate', path }),
+        action: () => openModal('Locate'),
       },
       {
         type: 'item',
         icon: Trash,
         title: 'Delete',
-        action: () => openModalProject({ name, title: 'Delete', path }),
+        action: () => openModal('Delete'),
       },
     ],
-    [name, openModalProject, path],
+    [openModal],
   );
 
   const isIncorrectPath = true;
@@ -195,7 +201,7 @@ export function ProjectCard({ name, path, recentChats, stats, openModalProject }
             'opacity-50': isIncorrectPath,
           },
         )}
-        onMouseDown={goToProjectChat}
+        onMouseDown={isIncorrectPath ? () => openModal('Locate') : goToProjectChat}
       >
         <div className="flex flex-row items-center w-full mb-[15px]">
           <div className="flex-grow align-left h-[40px]">
@@ -210,7 +216,20 @@ export function ProjectCard({ name, path, recentChats, stats, openModalProject }
               />
             ) : (
               <div className="flex items-center gap-[10px]">
-                {isIncorrectPath && <Icon icon={AlertTriangle} width={24} height={24} className="text-gray-400" />}
+                {isIncorrectPath && (
+                  <Tooltip
+                    label="We can't find the project"
+                    position="top"
+                    align="center"
+                    sideOffset={10}
+                    disableAnimation
+                    withArrow
+                  >
+                    <div>
+                      <Icon icon={AlertTriangle} width={24} height={24} className="text-gray-400" />
+                    </div>
+                  </Tooltip>
+                )}
                 <h3
                   className={cn(
                     'text-[22px] font-black transition-colors text-gray-400  group-hover:text-white duration-150',

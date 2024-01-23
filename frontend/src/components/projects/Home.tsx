@@ -25,9 +25,10 @@ import AlertDialog from '../common/AlertDialog';
 import { useCallback, useState } from 'react';
 import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
 
+export type ModalProjectTitle = 'Locate' | 'Delete';
 export interface ModalProjectProps {
   name: string;
-  title: 'Locate' | 'Delete';
+  title: ModalProjectTitle;
   path: string;
 }
 
