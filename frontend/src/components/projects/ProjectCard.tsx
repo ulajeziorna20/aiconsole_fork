@@ -54,12 +54,13 @@ const CounterItem = ({ icon, count, className }: CounterItemProps) => (
   </div>
 );
 
-export type ProjectCardProps = Omit<RecentProject, 'recent_chats'> & {
+export type ProjectCardProps = Omit<RecentProject, 'recent_chats' | 'incorrect_path'> & {
   recentChats: string[];
+  incorrectPath: boolean;
   openModalProject: (project: ModalProjectProps) => void;
 };
 
-export function ProjectCard({ name, path, recentChats, incorrect_path, stats, openModalProject }: ProjectCardProps) {
+export function ProjectCard({ name, path, recentChats, incorrectPath, stats, openModalProject }: ProjectCardProps) {
   const chooseProject = useProjectStore((state) => state.chooseProject);
   const removeRecentProject = useRecentProjectsStore((state) => state.removeRecentProject);
   const [isShowingContext, setIsShowingContext] = useState(false);
@@ -185,7 +186,7 @@ export function ProjectCard({ name, path, recentChats, incorrect_path, stats, op
 
   return (
     <ContextMenu
-      options={incorrect_path ? contextMenuItemsIncorrectPath : contextMenuItems}
+      options={incorrectPath ? contextMenuItemsIncorrectPath : contextMenuItems}
       ref={triggerRef}
       onOpenChange={handleOpenContextChange}
     >
@@ -196,10 +197,10 @@ export function ProjectCard({ name, path, recentChats, incorrect_path, stats, op
             'bg-project-item-gradient': isShowingContext,
             'opacity-50 hover:bg-gray-900 cursor-default': isProjectSwitchFetching,
             group: !isProjectSwitchFetching,
-            'opacity-50': incorrect_path,
+            'opacity-50': incorrectPath,
           },
         )}
-        onMouseDown={incorrect_path ? () => openModal('Locate') : goToProjectChat}
+        onMouseDown={incorrectPath ? () => openModal('Locate') : goToProjectChat}
       >
         <div className="flex flex-row items-center w-full mb-[15px]">
           <div className="flex-grow align-left h-[40px]">
@@ -214,7 +215,7 @@ export function ProjectCard({ name, path, recentChats, incorrect_path, stats, op
               />
             ) : (
               <div className="flex items-center gap-[10px]">
-                {incorrect_path && (
+                {incorrectPath && (
                   <Tooltip
                     label="We can't find the project"
                     position="top"
