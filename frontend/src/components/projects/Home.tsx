@@ -38,7 +38,7 @@ export function Home() {
   const isProjectLoading = useProjectStore((state) => state.isProjectLoading);
   const recentProjects = useRecentProjectsStore((state) => state.recentProjects);
   const removeRecentProject = useRecentProjectsStore((state) => state.removeRecentProject);
-  const { openProject } = useProjectFileManager();
+  const { initProject } = useProjectFileManager();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState<ModalProjectProps>({ name: '', title: 'Locate', path: '' });
   const isLocateType = currentProject.title === 'Locate';
@@ -112,7 +112,7 @@ export function Home() {
         title={isLocateType ? "Can't find the project" : 'Delete file'}
         isOpen={isModalOpen}
         onClose={closeModal}
-        onConfirm={isLocateType ? openProject : deleteProject(currentProject.path)}
+        onConfirm={isLocateType ? () => initProject('existing') : deleteProject(currentProject.path)}
         confirmationButtonText={isLocateType ? 'Locate project' : 'Yes, delete'}
         cancelButtonText={isLocateType ? 'Close' : 'No, cancel'}
       >
