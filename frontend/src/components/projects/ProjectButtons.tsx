@@ -55,6 +55,8 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
         }
         onClose={resetProjectOpening}
         onConfirm={openProjectConfirmation}
+        confirmationButtonText="Yes, create"
+        cancelButtonText="No, close"
       >
         Do you want to create one there instead?
       </AlertDialog>
@@ -63,7 +65,7 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
         {addButtonLabel} <Icon icon={Plus} />
       </Button>
 
-      <Button small variant="secondary" onClick={() => initProject('existing')}>
+      <Button small variant="secondary" onClick={() => initProject('existing')} transparent>
         Open an Existing Project
       </Button>
     </div>
