@@ -69,7 +69,7 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
   const inputRef = useRef<HTMLInputElement>(null);
   const isProjectSwitchFetching = useProjectStore((state) => state.isProjectSwitchFetching);
   const [isCurrentProjectFetching, setIsCurrentProjectFetching] = useState(false);
-  const { isProjectDirectory } = useProjectFileManager();
+  const { tempPath } = useProjectFileManager();
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -256,11 +256,12 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
           ) : null}
         </div>
         <div className="relative flex flex-col gap-2.5 h-[87px]">
+          {/* dodaj zmienną */}
           <div
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
               {
-                hidden: isShowingContext || isProjectDirectory,
+                hidden: isShowingContext || Boolean(tempPath),
               },
             )}
           />
