@@ -91,7 +91,7 @@ export function Home() {
                           name={name}
                           path={path}
                           recentChats={recent_chats}
-                          incorrect_path={incorrect_path}
+                          incorrectPath={incorrect_path}
                           stats={stats}
                           openModalProject={openModalProject}
                         />
