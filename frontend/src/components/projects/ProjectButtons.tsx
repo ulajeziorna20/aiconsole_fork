@@ -61,6 +61,8 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
         isOpen={isProjectDirectory === false && isOpenProjectModalOpen && Boolean(tempPath)}
         onClose={handleReset}
         onConfirm={openProjectConfirmation}
+        confirmationButtonText="Yes, create"
+        cancelButtonText="No, close"
       >
         Do you want to create one there instead?
       </AlertDialog>
