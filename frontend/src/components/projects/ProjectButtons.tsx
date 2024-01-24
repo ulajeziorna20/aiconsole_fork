@@ -71,7 +71,7 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
         {addButtonLabel} <Icon icon={Plus} />
       </Button>
 
-      <Button small variant="secondary" onClick={openProject}>
+      <Button small variant="secondary" onClick={openProject} transparent>
         Open an Existing Project
       </Button>
     </div>

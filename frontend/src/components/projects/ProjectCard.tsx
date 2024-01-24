@@ -256,7 +256,6 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
           ) : null}
         </div>
         <div className="relative flex flex-col gap-2.5 h-[87px]">
-          {/* dodaj zmienną */}
           <div
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
