@@ -19,7 +19,6 @@ import { useRecentProjectsStore } from '@/store/projects/useRecentProjectsStore'
 import { ContextMenuItems } from '@/types/common/contextMenu';
 import { RecentProject } from '@/types/projects/RecentProject';
 import { cn } from '@/utils/common/cn';
-import { useProjectFileManager } from '@/utils/projects/useProjectFileManager';
 import {
   Blocks,
   LucideIcon,
@@ -69,7 +68,6 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
   const inputRef = useRef<HTMLInputElement>(null);
   const isProjectSwitchFetching = useProjectStore((state) => state.isProjectSwitchFetching);
   const [isCurrentProjectFetching, setIsCurrentProjectFetching] = useState(false);
-  const { tempPath } = useProjectFileManager();
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -260,7 +258,7 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
               {
-                hidden: isShowingContext || Boolean(tempPath),
+                hidden: isShowingContext,
               },
             )}
           />
