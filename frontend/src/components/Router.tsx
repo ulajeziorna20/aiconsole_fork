@@ -116,12 +116,12 @@ export function Router() {
               <Route index element={<HomeRoute />} />
             </Route>
             <Route path="/" element={<Project />}>
-              <Route path="/chats/:id" element={<ChatPage />} />
-              <Route path="/chats/*" element={<Navigate to={`/chats/${uuid()}`} />} />
-              <Route path="/materials/:id" element={<AssetEditor assetType={'material'} />} />
-              <Route path="/materials/*" element={<></>} />
-              <Route path="/agents/:id" element={<AssetEditor assetType={'agent'} />} />
-              <Route path="/agents/*" element={<></>} />
+              <Route path="chats/:id" element={<ChatPage />} />
+              <Route path="chats/*" element={<Navigate to={`/chats/${uuid()}`} />} />
+              <Route path="materials/:id" element={<AssetEditor assetType={'material'} />} />
+              <Route path="materials/*" element={<></>} />
+              <Route path="agents/:id" element={<AssetEditor assetType={'agent'} />} />
+              <Route path="agents/*" element={<></>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </>,
