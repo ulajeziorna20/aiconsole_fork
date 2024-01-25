@@ -22,15 +22,8 @@ import { useProjectStore } from '../../store/projects/useProjectStore';
 import { ProjectCard } from './ProjectCard';
 import { RecentProjectsEmpty } from './RecentProjectsEmpty';
 import AlertDialog from '../common/AlertDialog';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useProjectFileManagerStore, ProjectModalMode } from '@/store/projects/useProjectFileManagerStore';
-
-export type ModalProjectTitle = 'Locate' | 'Delete';
-export interface ModalProjectProps {
-  name: string;
-  title: ModalProjectTitle;
-  path: string;
-}
 
 export function Home() {
   const openAiApiKey = useSettingsStore((state) => state.openAiApiKey);
@@ -44,44 +37,32 @@ export function Home() {
   const resetProjectOpening = useProjectFileManagerStore((state) => state.resetProjectOpening);
   const openProjectConfirmation = useProjectFileManagerStore((state) => state.openProjectConfirmation);
   const initProject = useProjectFileManagerStore((state) => state.initProject);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentProject, setCurrentProject] = useState<ModalProjectProps>({ name: '', title: 'Locate', path: '' });
-  const isLocateType = currentProject.title === 'Locate';
-
-  const openModalProject = (project: ModalProjectProps) => {
-    setCurrentProject(project);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setCurrentProject({ name: '', title: 'Locate', path: '' });
-  };
+  const projectName = useProjectFileManagerStore((state) => state.projectName);
 
   const deleteProject = useCallback(
     (path: string) => async () => {
       await removeRecentProject(path);
-      closeModal();
+      resetProjectOpening();
     },
-    [removeRecentProject],
+    [removeRecentProject, resetProjectOpening],
   );
 
   const alertDialogConfig = {
     locate: {
       title: "Can't find the project",
-      message: `The "${currentProject.name}" project has been deleted or its location has been changed.`,
+      message: `The "${projectName}" project has been deleted or its location has been changed.`,
       confirmText: 'Locate project',
       cancelText: 'Close',
-      onConfirm: () => initProject('existing'),
-      onCancel: closeModal,
+      onConfirm: () => initProject(ProjectModalMode.OPEN_EXISTING),
+      onCancel: resetProjectOpening,
     },
     delete: {
       title: 'Delete file',
       message: 'Are you sure you want to delete the file?',
       confirmText: 'Yes, delete',
       cancelText: 'No, cancel',
-      onConfirm: deleteProject(currentProject.path),
-      onCancel: closeModal,
+      onConfirm: deleteProject(tempPath),
+      onCancel: resetProjectOpening,
     },
     existingProject: {
       title: 'This folder already contains an AIConsole project',
@@ -102,8 +83,10 @@ export function Home() {
   };
 
   const currentAlertDialogConfig = useMemo(() => {
-    if (isModalOpen) {
-      return isLocateType ? alertDialogConfig.locate : alertDialogConfig.delete;
+    if (projectModalMode === ProjectModalMode.LOCATE) {
+      return alertDialogConfig.locate;
+    } else if (projectModalMode === ProjectModalMode.DELETE) {
+      return alertDialogConfig.delete;
     } else if (isProjectDirectory === true && projectModalMode === ProjectModalMode.OPEN_NEW && Boolean(tempPath)) {
       return alertDialogConfig.existingProject;
     } else if (
@@ -115,15 +98,13 @@ export function Home() {
     }
     return null;
   }, [
-    isModalOpen,
+    alertDialogConfig.delete,
+    alertDialogConfig.existingProject,
+    alertDialogConfig.locate,
+    alertDialogConfig.newProject,
     isProjectDirectory,
     projectModalMode,
     tempPath,
-    isLocateType,
-    alertDialogConfig.locate,
-    alertDialogConfig.delete,
-    alertDialogConfig.existingProject,
-    alertDialogConfig.newProject,
   ]);
 
   return (
@@ -158,7 +139,6 @@ export function Home() {
                           recentChats={recent_chats}
                           incorrectPath={incorrect_path}
                           stats={stats}
-                          openModalProject={openModalProject}
                         />
                       </div>
                     ))}

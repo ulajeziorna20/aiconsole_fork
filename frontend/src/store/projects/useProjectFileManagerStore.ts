@@ -5,6 +5,8 @@ import { useProjectStore } from '@/store/projects/useProjectStore';
 export enum ProjectModalMode {
   OPEN_NEW,
   OPEN_EXISTING,
+  LOCATE,
+  DELETE,
   CLOSED,
 }
 
@@ -12,10 +14,13 @@ export type FileManagerStore = {
   projectModalMode: ProjectModalMode;
   tempPath: string;
   isProjectDirectory?: boolean;
+  projectName: string;
+
   setProjectModalMode: (mode: ProjectModalMode) => void;
   setTempPath: (path: string) => void;
-  setIsProjectDirectory: (isDir: boolean) => void;
-  initProject: (mode: 'new' | 'existing') => Promise<void>;
+  setIsProjectDirectory: (isProject: boolean) => void;
+  initProject: (mode: ProjectModalMode) => Promise<void>;
+  openModal: (mode: ProjectModalMode, path: string, name: string) => void;
   resetIsProjectFlag: () => void;
   openProjectConfirmation: () => void;
   resetProjectOpening: () => void;
@@ -25,6 +30,7 @@ export const useProjectFileManagerStore = create<FileManagerStore>((set, get) =>
   projectModalMode: ProjectModalMode.CLOSED,
   tempPath: '',
   isProjectDirectory: undefined,
+  projectName: '',
 
   setProjectModalMode: (mode) => set({ projectModalMode: mode }),
   setTempPath: (path) => set({ tempPath: path }),
@@ -44,7 +50,12 @@ export const useProjectFileManagerStore = create<FileManagerStore>((set, get) =>
     if (isProject === undefined && !path) {
       await ProjectsAPI.chooseProject(path);
     }
-    set({ projectModalMode: mode === 'new' ? ProjectModalMode.OPEN_NEW : ProjectModalMode.OPEN_EXISTING });
+
+    set({ projectModalMode: mode });
+  },
+
+  openModal: (mode, path, name) => {
+    set({ projectModalMode: mode, tempPath: path, projectName: name });
   },
 
   resetIsProjectFlag: () => {

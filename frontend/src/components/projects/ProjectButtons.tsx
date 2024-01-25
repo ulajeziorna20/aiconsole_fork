@@ -20,7 +20,7 @@ import { useRecentProjectsStore } from '@/store/projects/useRecentProjectsStore'
 import { cn } from '@/utils/common/cn';
 import { Button } from '../common/Button';
 import { Icon } from '../common/icons/Icon';
-import { useProjectFileManagerStore } from '@/store/projects/useProjectFileManagerStore';
+import { ProjectModalMode, useProjectFileManagerStore } from '@/store/projects/useProjectFileManagerStore';
 
 interface ProjectButtonsProps {
   className?: string;
@@ -37,10 +37,10 @@ export function ProjectButtons({ className }: ProjectButtonsProps): JSX.Element 
 
   return (
     <div className={cn(className)}>
-      <Button small onClick={() => initProject('new')}>
+      <Button small onClick={() => initProject(ProjectModalMode.OPEN_NEW)}>
         {addButtonLabel} <Icon icon={Plus} />
       </Button>
-      <Button small variant="secondary" onClick={() => initProject('existing')} transparent>
+      <Button small variant="secondary" onClick={() => initProject(ProjectModalMode.OPEN_EXISTING)} transparent>
         Open an Existing Project
       </Button>
     </div>
