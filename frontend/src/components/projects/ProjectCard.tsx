@@ -38,6 +38,7 @@ import { AgentAvatar } from '../editables/chat/AgentAvatar';
 import { Spinner } from '../editables/chat/Spinner';
 import { ModalProjectProps, ModalProjectTitle } from './Home';
 import Tooltip from '../common/Tooltip';
+import { useProjectFileManagerStore, ProjectModalMode } from '@/store/projects/useProjectFileManagerStore';
 
 const MAX_CHATS_TO_DISPLAY = 3;
 interface CounterItemProps {
@@ -68,6 +69,7 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
   const inputRef = useRef<HTMLInputElement>(null);
   const isProjectSwitchFetching = useProjectStore((state) => state.isProjectSwitchFetching);
   const [isCurrentProjectFetching, setIsCurrentProjectFetching] = useState(false);
+  const projectModalMode = useProjectFileManagerStore((state) => state.projectModalMode);
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -258,7 +260,7 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
               {
-                hidden: isShowingContext,
+                hidden: isShowingContext || projectModalMode !== ProjectModalMode.CLOSED,
               },
             )}
           />
