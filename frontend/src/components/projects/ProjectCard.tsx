@@ -36,8 +36,8 @@ import { ContextMenu, ContextMenuRef } from '../common/ContextMenu';
 import { Icon } from '../common/icons/Icon';
 import { AgentAvatar } from '../editables/chat/AgentAvatar';
 import { Spinner } from '../editables/chat/Spinner';
-import { ModalProjectProps, ModalProjectTitle } from './Home';
 import Tooltip from '../common/Tooltip';
+import { useProjectFileManagerStore, ProjectModalMode } from '@/store/projects/useProjectFileManagerStore';
 
 const MAX_CHATS_TO_DISPLAY = 3;
 interface CounterItemProps {
@@ -56,10 +56,9 @@ const CounterItem = ({ icon, count, className }: CounterItemProps) => (
 export type ProjectCardProps = Omit<RecentProject, 'recent_chats' | 'incorrect_path'> & {
   recentChats: string[];
   incorrectPath: boolean;
-  openModalProject: (project: ModalProjectProps) => void;
 };
 
-export function ProjectCard({ name, path, recentChats, incorrectPath, stats, openModalProject }: ProjectCardProps) {
+export function ProjectCard({ name, path, recentChats, incorrectPath, stats }: ProjectCardProps) {
   const chooseProject = useProjectStore((state) => state.chooseProject);
   const removeRecentProject = useRecentProjectsStore((state) => state.removeRecentProject);
   const [isShowingContext, setIsShowingContext] = useState(false);
@@ -68,6 +67,8 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
   const inputRef = useRef<HTMLInputElement>(null);
   const isProjectSwitchFetching = useProjectStore((state) => state.isProjectSwitchFetching);
   const [isCurrentProjectFetching, setIsCurrentProjectFetching] = useState(false);
+  const projectModalMode = useProjectFileManagerStore((state) => state.projectModalMode);
+  const openModal = useProjectFileManagerStore((state) => state.openModal);
 
   const { chats_count, materials_dynamic_note_count, materials_note_count, materials_python_api_count, agents } =
     stats;
@@ -159,27 +160,22 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
     [deleteProject],
   );
 
-  const openModal = useCallback(
-    (title: ModalProjectTitle) => openModalProject({ name, title, path }),
-    [name, openModalProject, path],
-  );
-
   const contextMenuItemsIncorrectPath: ContextMenuItems = useMemo(
     () => [
       {
         type: 'item',
         icon: LocateFixed,
         title: 'Locate',
-        action: () => openModal('Locate'),
+        action: () => openModal(ProjectModalMode.LOCATE, path, name),
       },
       {
         type: 'item',
         icon: Trash,
         title: 'Delete',
-        action: () => openModal('Delete'),
+        action: () => openModal(ProjectModalMode.DELETE, path, name),
       },
     ],
-    [openModal],
+    [name, openModal, path],
   );
 
   return (
@@ -198,7 +194,7 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
             'opacity-50': incorrectPath,
           },
         )}
-        onMouseDown={incorrectPath ? () => openModal('Locate') : goToProjectChat}
+        onMouseDown={incorrectPath ? () => openModal(ProjectModalMode.LOCATE, path, name) : goToProjectChat}
       >
         <div className="flex flex-row items-center w-full mb-[15px]">
           <div className="flex-grow align-left h-[40px]">
@@ -258,7 +254,7 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats, ope
             className={cn(
               'bg-project-item-gradient-2  w-[calc(100%+40px)] absolute -left-[20px] -right-[20px] top-0 bottom-[-5px] z-10 group-hover:hidden',
               {
-                hidden: isShowingContext,
+                hidden: isShowingContext || projectModalMode !== ProjectModalMode.CLOSED,
               },
             )}
           />
