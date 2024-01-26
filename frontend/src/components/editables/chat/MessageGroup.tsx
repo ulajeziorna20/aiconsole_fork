@@ -29,7 +29,9 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
 
   const lockId = useChatStore((state) => state.chat?.lock_id);
 
-  const isOpen = isAnalysisManuallyOpen == undefined ? group.messages.length === 0 : isAnalysisManuallyOpen;
+  console.log(isAnalysisManuallyOpen);
+
+  const isOpen = isAnalysisManuallyOpen === undefined ? group.messages.length === 0 : isAnalysisManuallyOpen;
 
   return (
     <div
@@ -50,9 +52,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
           )}
         </div>
         <div className="flex-grow flex flex-col gap-5 overflow-auto ">
-          {group.messages && isOpen && (
-            <AnalysisOpened group={group} onClick={() => setIsAnalysisManuallyOpen(!isOpen)} />
-          )}
+          <AnalysisOpened group={group} onClick={() => setIsAnalysisManuallyOpen(!isOpen)} isOpen={isOpen} />
           {group.messages.map((message) => (
             <MessageComponent key={message.id} message={message} group={group} />
           ))}

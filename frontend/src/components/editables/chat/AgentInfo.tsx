@@ -23,8 +23,17 @@ import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuFo
 import { AgentAvatar } from './AgentAvatar';
 import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
 import { cn } from '@/utils/common/cn';
+import { useChatStore } from '@/store/editables/chat/useChatStore';
 
-function AgentInfoMaterialLink({ materialId, isLoaded }: { materialId: string; isLoaded: boolean }) {
+function AgentInfoMaterialLink({
+  materialId,
+  isLoaded,
+  isRunning,
+}: {
+  materialId: string;
+  isLoaded: boolean;
+  isRunning: boolean;
+}) {
   const materials = useEditablesStore((state) => state.materials) || [];
   const material = materials.find((m) => m.id === materialId);
   const menuItems = useEditableObjectContextMenu({ editableObjectType: 'material', editable: material });
@@ -34,9 +43,10 @@ function AgentInfoMaterialLink({ materialId, isLoaded }: { materialId: string; i
       <Link to={`/materials/${materialId}`}>
         <div
           className={cn(
-            'text-[12px] text-center text-gray-400 whitespace-nowrap pb-1 max-w-[120px] px-[10px] truncate transition-opacity duration-500 opacity-0',
+            'text-[12px] text-center text-gray-400 whitespace-nowrap pb-1 max-w-[120px] px-[10px] truncate opacity-0',
             {
-              'opacity-40': isLoaded,
+              'transition-opacity duration-500 opacity-40': isLoaded,
+              'opacity-40': isRunning,
             },
           )}
           title={materialId}
@@ -81,6 +91,10 @@ export function AgentInfo({
   const menuItems = agentId !== 'user' ? editableMenuItems : userMenuItems;
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const loadingMessages = useChatStore((state) => state.loadingMessages);
+  const isAnalysisRunning = useChatStore((state) => state.chat?.is_analysis_in_progress);
+  const isExecutionRunning = useChatStore((state) => state.isExecutionRunning());
+  console.log(agent, loadingMessages, isAnalysisRunning, isExecutionRunning);
   useEffect(() => {
     if (agent) {
       const timer = setTimeout(() => {
@@ -106,9 +120,10 @@ export function AgentInfo({
           />
           <div
             className={cn(
-              'text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap transition-opacity duration-500 opacity-0',
+              'text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap  opacity-0',
               {
-                'opacity-100': isLoaded,
+                'transition-opacity duration-500 opacity-100': isLoaded,
+                'opacity-100': !isAnalysisRunning && !isExecutionRunning,
               },
             )}
             title={`${agent?.id} - ${agent?.usage}`}
@@ -119,15 +134,21 @@ export function AgentInfo({
       </ContextMenu>
       {materialsIds.length > 0 && (
         <div
-          className={cn('text-xs text-center transition-opacity duration-500 opacity-0', {
-            'opacity-40': isLoaded,
+          className={cn('text-xs text-center opacity-0', {
+            'transition-opacity duration-500 opacity-40': isLoaded,
+            'opacity-40': !isAnalysisRunning && !isExecutionRunning,
           })}
         >
           +
         </div>
       )}
       {materialsIds.map((material_id) => (
-        <AgentInfoMaterialLink key={material_id} materialId={material_id} isLoaded={isLoaded} />
+        <AgentInfoMaterialLink
+          key={material_id}
+          materialId={material_id}
+          isLoaded={isLoaded}
+          isRunning={!isAnalysisRunning && !isExecutionRunning}
+        />
       ))}
     </>
   );
