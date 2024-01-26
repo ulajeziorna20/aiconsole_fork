@@ -67,6 +67,9 @@ export function AgentInfo({
   materialsIds: string[];
   task?: string;
 }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isAnalysisRunning = useChatStore((state) => state.chat?.is_analysis_in_progress);
+  const isExecutionRunning = useChatStore((state) => state.isExecutionRunning());
   const agents = useEditablesStore((state) => state.agents) || [];
   const agent = agents.find((m) => m.id === agentId);
 
@@ -87,14 +90,8 @@ export function AgentInfo({
   };
 
   const userMenuItems = useUserContextMenu();
-
   const menuItems = agentId !== 'user' ? editableMenuItems : userMenuItems;
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  const loadingMessages = useChatStore((state) => state.loadingMessages);
-  const isAnalysisRunning = useChatStore((state) => state.chat?.is_analysis_in_progress);
-  const isExecutionRunning = useChatStore((state) => state.isExecutionRunning());
-  console.log(agent, loadingMessages, isAnalysisRunning, isExecutionRunning);
   useEffect(() => {
     if (agent) {
       const timer = setTimeout(() => {

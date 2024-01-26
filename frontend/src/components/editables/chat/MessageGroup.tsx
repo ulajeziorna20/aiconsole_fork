@@ -29,8 +29,6 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
 
   const lockId = useChatStore((state) => state.chat?.lock_id);
 
-  console.log(isAnalysisManuallyOpen);
-
   const isOpen = isAnalysisManuallyOpen === undefined ? group.messages.length === 0 : isAnalysisManuallyOpen;
 
   return (
