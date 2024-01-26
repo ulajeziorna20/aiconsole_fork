@@ -34,7 +34,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
   return (
     <div
       className={cn('group flex flex-row shadow-md border-b border-gray-600 py-[30px] px-[10px] bg-gray-900 ', {
-        'message-gradient': group.role === 'assistant',
+        'message-gradient': group.role === 'assistant' || group.role === 'system',
       })}
     >
       <div className="container flex mx-auto gap-[92px] max-w-[1104px]">
