@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useRef, MouseEvent } from 'react';
+import { useRef, MouseEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
@@ -22,8 +22,9 @@ import { useUserContextMenu } from '@/utils/common/useUserContextMenu';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { AgentAvatar } from './AgentAvatar';
 import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
+import { cn } from '@/utils/common/cn';
 
-function AgentInfoMaterialLink({ materialId }: { materialId: string }) {
+function AgentInfoMaterialLink({ materialId, isLoaded }: { materialId: string; isLoaded: boolean }) {
   const materials = useEditablesStore((state) => state.materials) || [];
   const material = materials.find((m) => m.id === materialId);
   const menuItems = useEditableObjectContextMenu({ editableObjectType: 'material', editable: material });
@@ -32,7 +33,12 @@ function AgentInfoMaterialLink({ materialId }: { materialId: string }) {
     <ContextMenu options={menuItems}>
       <Link to={`/materials/${materialId}`}>
         <div
-          className="text-[12px] text-center text-gray-400 whitespace-nowrap pb-1 max-w-[120px] px-[10px] truncate"
+          className={cn(
+            'text-[12px] text-center text-gray-400 whitespace-nowrap pb-1 max-w-[120px] px-[10px] truncate transition-opacity duration-500 opacity-0',
+            {
+              'opacity-40': isLoaded,
+            },
+          )}
           title={materialId}
         >
           {materialId}
@@ -73,6 +79,17 @@ export function AgentInfo({
   const userMenuItems = useUserContextMenu();
 
   const menuItems = agentId !== 'user' ? editableMenuItems : userMenuItems;
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (agent) {
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [agent]);
 
   return (
     <>
@@ -88,16 +105,29 @@ export function AgentInfo({
             type="small"
           />
           <div
-            className="text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap"
+            className={cn(
+              'text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap transition-opacity duration-500 opacity-0',
+              {
+                'opacity-100': isLoaded,
+              },
+            )}
             title={`${agent?.id} - ${agent?.usage}`}
           >
             {agent?.name || agent?.id}
           </div>
         </Link>
       </ContextMenu>
-      {materialsIds.length > 0 && <div className="text-xs opacity-40 text-center">+</div>}
+      {materialsIds.length > 0 && (
+        <div
+          className={cn('text-xs text-center transition-opacity duration-500 opacity-0', {
+            'opacity-40': isLoaded,
+          })}
+        >
+          +
+        </div>
+      )}
       {materialsIds.map((material_id) => (
-        <AgentInfoMaterialLink key={material_id} materialId={material_id} />
+        <AgentInfoMaterialLink key={material_id} materialId={material_id} isLoaded={isLoaded} />
       ))}
     </>
   );
