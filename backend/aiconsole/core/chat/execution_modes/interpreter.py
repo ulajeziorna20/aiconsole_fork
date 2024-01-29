@@ -206,7 +206,7 @@ async def _generate_response(
     )
 
     try:
-        async for chunk in executor.execute(
+        async for chunk in aiter(executor.execute(
             GPTRequest(
                 system_message=system_message,
                 gpt_mode=context.agent.gpt_mode,
@@ -225,7 +225,7 @@ async def _generate_response(
                 preferred_tokens=2000,
                 temperature=0.2,
             )
-        ):
+        )):
             # What is this?
             if chunk == CLEAR_STR:
                 await context.chat_mutator.mutate(SetContentMessageMutation(message_id=message_id, content=""))
