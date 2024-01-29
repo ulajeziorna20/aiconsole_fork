@@ -91,10 +91,16 @@ async def get_recent_project() -> list[RecentProject]:
             except Exception:
                 _log.exception(f"Error loading chat {id}")
 
+        if path.exists():
+            incorrect_path = False
+        else:
+            incorrect_path = True
+
         recent_projects_real.append(
             RecentProject(
                 name=os.path.basename(path),
                 path=path,
+                incorrect_path=incorrect_path,
                 recent_chats=recent_chat_names,
                 stats=RecentProjectStats(
                     materials_note_count=materials_count.note,
