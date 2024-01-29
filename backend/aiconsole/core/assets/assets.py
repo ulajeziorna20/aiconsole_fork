@@ -74,20 +74,19 @@ class Assets:
         ]
 
     async def save_asset(self, asset: Asset, old_asset_id: str, create: bool):
-        if asset.defined_in != AssetLocation.PROJECT_DIR:
+        if asset.defined_in != AssetLocation.PROJECT_DIR and not create:
             raise Exception("Cannot save asset not defined in project.")
 
         exists_in_project = project_asset_exists_fs(self.asset_type, asset.id)
         old_exists = project_asset_exists_fs(self.asset_type, old_asset_id)
 
         if create and exists_in_project:
-            raise Exception(f"Asset {asset.id} already exists.")
+            create = False
 
         if not create and not exists_in_project:
             raise Exception(f"Asset {asset.id} does not exist.")
 
         rename = False
-
         if create and old_asset_id and not exists_in_project and old_exists:
             await move_asset_in_fs(asset.type, old_asset_id, asset.id)
             Assets.rename_asset(asset.type, old_asset_id, asset.id)
