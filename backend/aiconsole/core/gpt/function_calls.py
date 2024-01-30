@@ -65,7 +65,7 @@ class openai_function:
 
     def __init__(self, func: Callable) -> None:
         self.func = func
-        self.validate_func = validate_arguments(func)
+        self.validate_func = validate_arguments(func)  # type: ignore
         parameters = self.validate_func.model.model_json_schema()
         parameters["properties"] = {
             k: v for k, v in parameters["properties"].items() if k not in ("v__duplicate_kwargs", "args", "kwargs")

@@ -21,6 +21,7 @@ from datetime import datetime
 from typing import cast
 from uuid import uuid4
 
+from litellm import ModelResponse  # type: ignore
 from pydantic import Field
 
 from aiconsole.api.websockets.connection_manager import connection_manager
@@ -206,7 +207,7 @@ async def _generate_response(
     )
 
     try:
-        async for chunk in aiter(
+        async for chunk_or_clear in aiter(
             executor.execute(
                 GPTRequest(
                     system_message=system_message,
@@ -229,9 +230,11 @@ async def _generate_response(
             )
         ):
             # What is this?
-            if chunk == CLEAR_STR:
+            if chunk_or_clear == CLEAR_STR:
                 await context.chat_mutator.mutate(SetContentMessageMutation(message_id=message_id, content=""))
                 continue
+
+            chunk: ModelResponse = chunk_or_clear
 
             # When does this happen?
             if not chunk.get("choices"):
@@ -347,7 +350,8 @@ async def _send_code(tool_calls, context, tools_requiring_closing_parenthesis, m
 
             async def send_code_and_language_if_needed(code, language: LanguageStr = "python", reduce=0):
                 await send_language_if_needed(language)
-                code_delta = code[(len(tool_call_data.code)) - reduce :]
+                start_index = len(tool_call_data.code) - reduce
+                code_delta = code[start_index:]
                 await send_code_delta(code_delta)
 
             if not function_call.arguments:
@@ -376,7 +380,8 @@ async def _send_code(tool_calls, context, tools_requiring_closing_parenthesis, m
                         await send_code_and_language_if_needed(code)
 
                     if headline:
-                        headline_delta = headline[len(tool_call_data.headline) :]
+                        start_index = len(tool_call_data.headline)
+                        headline_delta = headline[start_index:]
                         tool_call_data.headline = headline
                         await send_code_delta(headline_delta=headline_delta)
                     # [1] END

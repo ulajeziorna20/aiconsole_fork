@@ -35,16 +35,16 @@ class ChatTestFramework:
     def __init__(self) -> None:
         os.environ["CORS_ORIGIN"] = "http://localhost:3000"
 
-        self._chat_id = None
-        self._request_id = None
-        self._message_group_id = None
+        self._chat_id: str | None = None
+        self._request_id: str | None = None
+        self._message_group_id: str | None = None
 
         self._project_directory = ProjectDirectory()
         self._background_tasks = BackgroundTasks()
         self._client = TestClient(app())
 
         self._websocket = None
-        self._project_path = None
+        self._project_path: str | None = None
 
     @property
     def chat_id(self) -> str | None:

@@ -2462,6 +2462,17 @@ files = [
 urllib3 = ">=2"
 
 [[package]]
+name = "types-send2trash"
+version = "1.8.2.7"
+description = "Typing stubs for Send2Trash"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-Send2Trash-1.8.2.7.tar.gz", hash = "sha256:f471c0dcb6c0f6682eebdbf4498a2f4fe16b4c9c25e64969450334734ac1649c"},
+    {file = "types_Send2Trash-1.8.2.7-py3-none-any.whl", hash = "sha256:e4796fa3888ad0272ed73e5e2f983f75f5a171ca0b553a7362d902c553478334"},
+]
+
+[[package]]
 name = "types-setuptools"
 version = "69.0.0.20240115"
 description = "Typing stubs for setuptools"
@@ -2736,4 +2747,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "afb0346baf463efbb5f5c8f474c3a77cd4c4aebef203b3977829a8e7ecbcd079"
+content-hash = "a81ee3469b959d149cd2dc9127fb92eb7a0a411064aa0400003b966dfa25e4c7"

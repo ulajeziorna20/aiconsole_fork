@@ -88,7 +88,7 @@ class IncomingMessageHandler:
             system="",
         )
         self._stop_flag = False
-        self._running_tasks = defaultdict(dict)
+        self._running_tasks: dict[str, dict[str, asyncio.Task]] = defaultdict(dict)
 
         self._handlers = {
             AcquireLockClientMessage.__name__: self._handle_acquire_lock_ws_message,
