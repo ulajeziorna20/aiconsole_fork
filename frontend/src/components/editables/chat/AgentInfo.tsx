@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useRef, MouseEvent } from 'react';
+import { useRef, MouseEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
@@ -22,8 +22,18 @@ import { useUserContextMenu } from '@/utils/common/useUserContextMenu';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { AgentAvatar } from './AgentAvatar';
 import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
+import { cn } from '@/utils/common/cn';
+import { useChatStore } from '@/store/editables/chat/useChatStore';
 
-function AgentInfoMaterialLink({ materialId }: { materialId: string }) {
+function AgentInfoMaterialLink({
+  materialId,
+  isLoaded,
+  isRunning,
+}: {
+  materialId: string;
+  isLoaded: boolean;
+  isRunning: boolean;
+}) {
   const materials = useEditablesStore((state) => state.materials) || [];
   const material = materials.find((m) => m.id === materialId);
   const menuItems = useEditableObjectContextMenu({ editableObjectType: 'material', editable: material });
@@ -32,7 +42,13 @@ function AgentInfoMaterialLink({ materialId }: { materialId: string }) {
     <ContextMenu options={menuItems}>
       <Link to={`/materials/${materialId}`}>
         <div
-          className="text-[12px] text-center text-gray-400 whitespace-nowrap pb-1 max-w-[120px] px-[10px] truncate"
+          className={cn(
+            'text-[12px] text-center text-gray-400 whitespace-nowrap pb-1 max-w-[120px] px-[10px] truncate opacity-0',
+            {
+              'transition-opacity duration-500 opacity-40': isLoaded,
+              'opacity-40': isRunning,
+            },
+          )}
           title={materialId}
         >
           {materialId}
@@ -51,6 +67,9 @@ export function AgentInfo({
   materialsIds: string[];
   task?: string;
 }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isAnalysisRunning = useChatStore((state) => state.chat?.is_analysis_in_progress);
+  const isExecutionRunning = useChatStore((state) => state.isExecutionRunning());
   const agents = useEditablesStore((state) => state.agents) || [];
   const agent = agents.find((m) => m.id === agentId);
 
@@ -71,8 +90,13 @@ export function AgentInfo({
   };
 
   const userMenuItems = useUserContextMenu();
-
   const menuItems = agentId !== 'user' ? editableMenuItems : userMenuItems;
+
+  useEffect(() => {
+    if (agent) {
+      setIsLoaded(true);
+    }
+  }, [agent]);
 
   return (
     <>
@@ -88,16 +112,36 @@ export function AgentInfo({
             type="small"
           />
           <div
-            className="text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap"
+            className={cn(
+              'text-[15px] w-32 text-center text-gray-300 max-w-[120px] truncate overflow-ellipsis overflow-hidden whitespace-nowrap  opacity-0',
+              {
+                'transition-opacity duration-500 opacity-100': isLoaded,
+                'opacity-100': !isAnalysisRunning && !isExecutionRunning,
+              },
+            )}
             title={`${agent?.id} - ${agent?.usage}`}
           >
             {agent?.name || agent?.id}
           </div>
         </Link>
       </ContextMenu>
-      {materialsIds.length > 0 && <div className="text-xs opacity-40 text-center">+</div>}
+      {materialsIds.length > 0 && (
+        <div
+          className={cn('text-xs text-center opacity-0', {
+            'transition-opacity duration-500 opacity-40': isLoaded,
+            'opacity-40': !isAnalysisRunning && !isExecutionRunning,
+          })}
+        >
+          +
+        </div>
+      )}
       {materialsIds.map((material_id) => (
-        <AgentInfoMaterialLink key={material_id} materialId={material_id} />
+        <AgentInfoMaterialLink
+          key={material_id}
+          materialId={material_id}
+          isLoaded={isLoaded}
+          isRunning={!isAnalysisRunning && !isExecutionRunning}
+        />
       ))}
     </>
   );
