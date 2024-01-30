@@ -94,11 +94,7 @@ export function AgentInfo({
 
   useEffect(() => {
     if (agent) {
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 200);
-
-      return () => clearTimeout(timer);
+      setIsLoaded(true);
     }
   }, [agent]);
 

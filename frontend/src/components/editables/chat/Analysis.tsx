@@ -34,11 +34,7 @@ export const AnalysisOpened = ({
 
   useEffect(() => {
     if (group.analysis) {
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 0);
-
-      return () => clearTimeout(timer);
+      setIsLoaded(true);
     }
   }, [group.analysis]);
 
