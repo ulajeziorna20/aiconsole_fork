@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from aiconsole.core.chat.chat_mutator import ChatMutator
 from aiconsole.core.chat.execution_modes.analysis.create_agents_str import (
     create_agents_str,
@@ -46,12 +45,12 @@ Materials are special files that contain instructions for agents, you can choose
 
 # Agents
 You have the following agents available to handle the next step of this conversation, it can be one of the following ids (if next step is for user to respond, it should be 'user'):
-{create_agents_str()}
+{create_agents_str(agent_id=chat_mutator.chat.chat_options.agent_id)}
 
 
 # Materials
 A list of ids of materials that are needed to execute the task, make sure that the agent has a prioritised list of those materials to look at, agents are not able to read all of them nor change your choice:
-{create_materials_str()}
+{create_materials_str(materials_ids=chat_mutator.chat.chat_options.materials_ids)}
 
 """.strip(),
         last_system_prompt=f"""
@@ -63,10 +62,10 @@ What happened in the last few messages in the conversation? who wrote last? and 
 If it's agent's turn: briefly describe what the next, atomic, simple step of this conversation is, it can be both an action by a single agent or waiting for user response.
 4. Establish who should handle the next step, it can be one of the following ids:
 * user - if the next step is for the user to respond
-{create_agents_str()}
+{create_agents_str(agent_id=chat_mutator.chat.chat_options.agent_id)}
 
 5. Figure out and provide a list of ids of materials that are needed to execute the task, choose among the following ids:
-{create_materials_str()}
+{create_materials_str(materials_ids=chat_mutator.chat.chat_options.materials_ids)}
 
 Questions to ask yourself:
 - Is there a next step phrased as a next step, and a task for a given agent?

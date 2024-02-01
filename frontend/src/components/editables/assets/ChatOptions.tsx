@@ -30,52 +30,98 @@ import { getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
 
 import { AgentAvatar } from '../chat/AgentAvatar';
 import Autocomplete from './Autocomplete';
+import { ChatAPI } from '@/api/api/ChatAPI';
 
 const ChatOptions = () => {
   const chat = useChatStore((state) => state.chat);
   const agents = useEditablesStore((state) => state.agents);
   const materials = useEditablesStore((state) => state.materials);
+  const setChat = useChatStore((state) => state.setChat);
   const isChatLoading = useChatStore((state) => state.isChatLoading);
   const isChatOptionsExpanded = useChatStore((state) => state.isChatOptionsExpanded);
   const setIsChatOptionsExpanded = useChatStore((state) => state.setIsChatOptionsExpanded);
 
   const [materialsOptions, setMaterialsOptions] = useState<Material[]>([]);
-  const [selectedAgentId, setSelectedAgentId] = useState<string>('aiChoice');
+  const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [chosenMaterials, setChosenMaterials] = useState<Material[]>([]);
   const [allowExtraMaterials, setAllowExtraMaterials] = useState<boolean>(false);
+  const materialsIds = chosenMaterials.map((material) => material.id);
 
   useEffect(() => {
-    // TODO: set options from chat
-    // console.log(chat);
-  }, [chat]);
+    setSelectedAgentId('');
+    setChosenMaterials([]);
+    setAllowExtraMaterials(false);
+  }, [chat?.id]);
 
-  const debounceChatUpdate = useDebounceCallback(() => {
-    // TODO: send data to backend
-    // console.log(`Chat ${chat?.id} options updated`);
-    // console.log('chosenMaterials', chosenMaterials);
-    // console.log('selectedAgentId', selectedAgentId);
-    // console.log('allowExtraMaterials', allowExtraMaterials);
+  useEffect(() => {
+    if (chat?.chat_options.agent_id) {
+      setSelectedAgentId(chat?.chat_options.agent_id);
+    }
+  }, [chat?.chat_options.agent_id, chat?.id]);
+
+  useEffect(() => {
+    const filteredMaterials = materials?.filter(({ id }) => (chat?.chat_options.materials_ids || []).includes(id));
+    if (filteredMaterials) {
+      setChosenMaterials(filteredMaterials);
+    }
+  }, [chat?.chat_options.materials_ids, materials, chat?.id]);
+
+  useEffect(() => {
+    if (chat?.chat_options.let_ai_add_extra_materials) {
+      setAllowExtraMaterials(chat?.chat_options.let_ai_add_extra_materials);
+    }
+  }, [chat?.chat_options.let_ai_add_extra_materials, chat?.id]);
+
+  const debounceChatUpdate = useDebounceCallback(async () => {
+    try {
+      if (chat) {
+        ChatAPI.patchChatOptions(chat?.id, {
+          agent_id: selectedAgentId,
+          materials_ids: ['today', ...materialsIds],
+          let_ai_add_extra_materials: allowExtraMaterials,
+        });
+
+        setChat({
+          ...chat,
+          chat_options: {
+            agent_id: selectedAgentId,
+            materials_ids: materialsIds,
+            let_ai_add_extra_materials: allowExtraMaterials,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('An error occurred while updating chat options:', error);
+    }
   }, 500);
 
-  useEffect(() => {
+  const onSelectAgentId = (id: string) => {
+    setSelectedAgentId(id);
     debounceChatUpdate();
-  }, [chosenMaterials, selectedAgentId, allowExtraMaterials, debounceChatUpdate]);
+  };
 
   const handleMaterialSelect = (material: Material) => {
-    setChosenMaterials((prev) => [...prev, materials?.find(({ id }) => id === material.id) as Material]);
+    setChosenMaterials((prev) => [...prev, material]);
     const filteredOptions = materialsOptions.filter(({ id }) => id !== material.id);
     setMaterialsOptions(filteredOptions);
+    debounceChatUpdate();
   };
 
   const removeSelectedMaterial = (id: string) => {
     const material = chosenMaterials.find((material) => material.id === id) as Material;
     setChosenMaterials((prev) => prev.filter(({ id }) => id !== material.id));
     setMaterialsOptions((prev) => [...prev, material].sort((a, b) => a.name.localeCompare(b.name)));
+    debounceChatUpdate();
+  };
+
+  const changeAllowExtraMaterials = (checked: boolean) => {
+    setAllowExtraMaterials(checked);
+    debounceChatUpdate();
   };
 
   useEffect(() => {
-    setMaterialsOptions(materials as Material[]);
-  }, [materials]);
+    setMaterialsOptions(materials?.filter((material) => !chosenMaterials.includes(material)) as Material[]);
+  }, [chat?.id, materials, chosenMaterials]);
 
   if (!chat && !isChatLoading) {
     return;
@@ -105,7 +151,7 @@ const ChatOptions = () => {
               <AgentsDropdown
                 agents={agents}
                 selectedAgent={agents.find(({ id }) => id === selectedAgentId)}
-                onSelect={setSelectedAgentId}
+                onSelect={onSelectAgentId}
               />
             </div>
 
@@ -125,7 +171,7 @@ const ChatOptions = () => {
               <Checkbox
                 id="extraMaterials"
                 checked={allowExtraMaterials}
-                onChange={setAllowExtraMaterials}
+                onChange={changeAllowExtraMaterials}
                 disabled={isChatLoading}
               />
               <label htmlFor="extraMaterials" className="text-sm">
@@ -198,7 +244,7 @@ const AgentsDropdown = ({ agents, selectedAgent, onSelect }: AgentsDropdownProps
       >
         <Item
           className="group flex p-0 rounded-none hover:bg-gray-600 hover:outline-none w-full cursor-pointer"
-          onClick={() => onSelect('aiChoice')}
+          onClick={() => onSelect('')}
         >
           <div className="flex items-center h-11 gap-[12px] px-[16px] py-[10px] text-[14px] text-gray-300 group-hover:text-white w-full">
             <p>AI Choice</p>
