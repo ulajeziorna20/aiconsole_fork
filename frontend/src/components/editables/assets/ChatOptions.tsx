@@ -44,22 +44,25 @@ const ChatOptions = () => {
   const [materialsOptions, setMaterialsOptions] = useState<Material[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [chosenMaterials, setChosenMaterials] = useState<Material[]>([]);
-  const [allowExtraMaterials, setAllowExtraMaterials] = useState<boolean>(false);
+  const [allowExtraMaterials, setAllowExtraMaterials] = useState<boolean>(true);
   const materialsIds = chosenMaterials.map((material) => material.id);
 
   useEffect(() => {
+    console.log('ChatOptions: chat changed');
     setSelectedAgentId('');
     setChosenMaterials([]);
-    setAllowExtraMaterials(false);
+    setAllowExtraMaterials(true);
   }, [chat?.id]);
 
   useEffect(() => {
+    console.log('#1 ChatOptions: chat changed');
     if (chat?.chat_options.agent_id) {
       setSelectedAgentId(chat?.chat_options.agent_id);
     }
   }, [chat?.chat_options.agent_id, chat?.id]);
 
   useEffect(() => {
+    console.log('#2 ChatOptions: chat changed');
     const filteredMaterials = materials?.filter(({ id }) => (chat?.chat_options.materials_ids || []).includes(id));
     if (filteredMaterials) {
       setChosenMaterials(filteredMaterials);
@@ -67,12 +70,14 @@ const ChatOptions = () => {
   }, [chat?.chat_options.materials_ids, materials, chat?.id]);
 
   useEffect(() => {
+    console.log('#3 ChatOptions: chat changed');
     if (chat?.chat_options.let_ai_add_extra_materials) {
       setAllowExtraMaterials(chat?.chat_options.let_ai_add_extra_materials);
     }
   }, [chat?.chat_options.let_ai_add_extra_materials, chat?.id]);
 
   const debounceChatUpdate = useDebounceCallback(async () => {
+    console.log('1212121 ChatOptions: chat changed');
     try {
       if (chat) {
         ChatAPI.patchChatOptions(chat?.id, {

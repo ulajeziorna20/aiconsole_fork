@@ -16,14 +16,12 @@
 import logging
 from dataclasses import dataclass
 from typing import cast
-from uuid import uuid4
 
 from aiconsole.consts import DIRECTOR_MIN_TOKENS, DIRECTOR_PREFERRED_TOKENS
 from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.assets.models import AssetLocation, AssetStatus
 from aiconsole.core.chat.chat_mutations import (
-    CreateMessageGroupMutation,
     SetAgentIdMessageGroupMutation,
     SetAnalysisMessageGroupMutation,
     SetIsAnalysisInProgressMutation,
@@ -118,6 +116,7 @@ class AnalysisResult:
 
 
 async def gpt_analysis_function_step(
+    message_group_id: str,
     chat_mutator: ChatMutator,
     gpt_mode: GPTMode,
     initial_system_prompt: str,
@@ -125,21 +124,6 @@ async def gpt_analysis_function_step(
     force_call: bool,
 ) -> AnalysisResult:
     gpt_executor = GPTExecutor()
-
-    # Create a new message group for analysis
-    message_group_id = str(uuid4())
-    await chat_mutator.mutate(
-        CreateMessageGroupMutation(
-            message_group_id=message_group_id,
-            agent_id="director",
-            username="",
-            email="",
-            role="system",
-            materials_ids=[],
-            analysis="",
-            task="",
-        )
-    )
 
     # Pick from forced or enabled agents if no agent is forced
     if chat_mutator.chat.chat_options.agent_id:

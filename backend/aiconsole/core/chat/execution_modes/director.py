@@ -75,7 +75,7 @@ async def execution_mode_process(
 ):
     _log.debug("execution_mode_director")
 
-    analysis = await director_analyse(context.chat_mutator)
+    analysis = await director_analyse(context.chat_mutator, context.message_group_id)
 
     if analysis.agent.id != "user" and analysis.next_step:
         content_context = ContentEvaluationContext(
@@ -90,6 +90,7 @@ async def execution_mode_process(
         ]
 
         context = ProcessChatContext(
+            message_group_id=context.message_group_id,
             chat_mutator=context.chat_mutator,
             agent=analysis.agent,
             materials=analysis.relevant_materials,

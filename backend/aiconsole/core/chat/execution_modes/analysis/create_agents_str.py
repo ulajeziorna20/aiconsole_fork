@@ -28,7 +28,7 @@ def create_agents_str(agent_id) -> str:
 
     # Forced agents if available or enabled agents otherwise
     if agent_id:
-        possible_agent_choices = [agent for agent in agents_to_choose_from() if agent.id == agent_id]
+        possible_agent_choices = [agent for agent in agents_to_choose_from(all=True) if agent.id == agent_id]
     else:
         possible_agent_choices = agents_to_choose_from()
 

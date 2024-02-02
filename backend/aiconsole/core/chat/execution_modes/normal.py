@@ -80,9 +80,13 @@ async def render_materials_from_message_group(
         relevant_materials=relevant_materials,
     )
 
-    rendered_materials = await asyncio.gather(
-        *[material.render(content_context) for material in relevant_materials if material.type == "rendered_material"]
-    )
+    # rendered_materials = await asyncio.gather(
+    #     *[material.render(content_context) for material in relevant_materials if material.type == "rendered_material"]
+    # )
+    rendered_materials = []
+    for material in relevant_materials:
+        rendered_material = await material.render(content_context)
+        rendered_materials.append(rendered_material)
 
     return rendered_materials
 
@@ -99,7 +103,7 @@ async def execution_mode_process(
 
     await context.chat_mutator.mutate(
         CreateMessageMutation(
-            message_group_id=context.chat_mutator.chat.message_groups[-1].id,
+            message_group_id=context.message_group_id,
             message_id=message_id,
             timestamp=datetime.now().isoformat(),
             content="",
@@ -113,6 +117,10 @@ async def execution_mode_process(
             is_streaming=True,
         )
     )
+
+    rendered_materials = await render_materials_from_message_group(
+        context.chat_mutator.chat.message_groups[-1], context, context.agent
+    )
     try:
         async for chunk_or_clear in aiter(
             gpt_executor.execute(
@@ -121,7 +129,7 @@ async def execution_mode_process(
                     gpt_mode=context.agent.gpt_mode,
                     system_message=create_full_prompt_with_materials(
                         intro=get_agent_system_message(context.agent),
-                        materials=context.rendered_materials,
+                        materials=rendered_materials or context.rendered_materials,
                     ),
                     min_tokens=250,
                     preferred_tokens=2000,

@@ -25,6 +25,8 @@ class MissingFileName(Exception):
 class UserProfileService:
     def get_profile(self, email: str | None = None) -> UserProfile:
         user_profile = settings().unified_settings.user_profile
+        if not user_profile.avatar_url:
+            user_profile.avatar_url = self._get_default_avatar()
         if email:
             if email == user_profile.email and user_profile.avatar_url:
                 return user_profile

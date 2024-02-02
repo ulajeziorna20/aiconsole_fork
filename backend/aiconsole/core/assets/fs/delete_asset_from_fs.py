@@ -24,11 +24,11 @@ def delete_asset_from_fs(asset_type: AssetType, id):
     """
     Delete a specific agent.
     """
-
+    extensions = [".toml", ".jpeg", ".jpg", ".png", ".gif", ".SVG"]
     # check if the file exists in project directory
-    asset_file_path = get_project_assets_directory(asset_type) / f"{id}.toml"
-    if asset_file_path.exists():
-        send2trash(asset_file_path)
-        return
-
-    raise KeyError(f"{asset_type} with ID {id} not found")
+    for extension in extensions:
+        asset_file_path = get_project_assets_directory(asset_type) / f"{id}{extension}"
+        if asset_file_path.exists():
+            send2trash(asset_file_path)
+            # return
+    # raise KeyError(f"{asset_type} with ID {id} not found")

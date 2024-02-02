@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import json
 import logging
 import traceback
@@ -86,7 +85,7 @@ class python(CodeTask):
         ...,
         description="Python code to execute. Code must be formated. The begging of the code MUST be marked with "
         "# START and end of the code with # END. "
-        "It will be executed in the statefull Jupyter notebook environment.",
+        "It will be executed in the statefull Jupyter notebook environment. Always show result to the user.",
         json_schema_extra={"type": "string"},
     )
 
@@ -369,6 +368,8 @@ async def _send_code(tool_calls, context, tools_requiring_closing_parenthesis, m
                     await send_language_if_needed(cast(LanguageStr, function_call.name))
 
                 # This can now be both a string and a json object
+                START_MARKER = "# START"
+                END_MARKER = "# END"
                 try:
                     arguments = json.loads(arguments_str)
                     _log.debug(f"arguments: {arguments}")
@@ -377,6 +378,15 @@ async def _send_code(tool_calls, context, tools_requiring_closing_parenthesis, m
                     headline = arguments.get("headline")
 
                     if code:
+                        start_index = code.find(START_MARKER)
+                        if start_index != -1:
+                            start_index += len(START_MARKER)
+
+                        end_index = code.find(END_MARKER)
+                        if end_index == -1:
+                            end_index = len(code)
+
+                        code = code[start_index:end_index].lstrip()
                         await send_code_and_language_if_needed(code)
 
                     if headline:
@@ -391,22 +401,19 @@ async def _send_code(tool_calls, context, tools_requiring_closing_parenthesis, m
                     # try exept is here as hack. Json is not valid until the last chunk is received
                     # so this code will execute for every chunk except the last one
                     if arguments_str:
-                        start_marker = "# START"
-                        end_marker = "# END"
-
                         # Fixing code returned by GPT
                         changed_str = arguments_str.replace("\\\\", "\\")
                         changed_str = changed_str.replace("\\n", "\n")
                         changed_str = changed_str.replace("\\\n", "\n")
                         changed_str = changed_str.replace('\\"', '"')
 
-                        start_index = changed_str.find(start_marker)
+                        start_index = changed_str.find(START_MARKER)
                         if start_index != -1:
-                            start_index += len(start_marker)
+                            start_index += len(START_MARKER)
                         else:
                             continue
 
-                        end_index = changed_str.find(end_marker)
+                        end_index = changed_str.find(END_MARKER)
                         if end_index == -1:
                             end_index = len(changed_str)
 
@@ -439,6 +446,7 @@ async def _execution_mode_accept_code(
     tool_call = tool_call_location.tool_call
 
     process_chat_context = ProcessChatContext(
+        message_group_id=None,
         chat_mutator=context.chat_mutator,
         agent=context.agent,
         materials=context.materials,
