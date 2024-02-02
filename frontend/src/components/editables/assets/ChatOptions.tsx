@@ -77,7 +77,7 @@ const ChatOptions = () => {
       if (chat) {
         ChatAPI.patchChatOptions(chat?.id, {
           agent_id: selectedAgentId,
-          materials_ids: ['today', ...materialsIds],
+          materials_ids: materialsIds,
           let_ai_add_extra_materials: allowExtraMaterials,
         });
 
@@ -160,7 +160,12 @@ const ChatOptions = () => {
               <div className="h-[190px] overflow-y-auto ">
                 <div className="flex flex-col gap-2.5 w-full">
                   {chosenMaterials.map((option) => (
-                    <ChatOption option={option} onRemove={removeSelectedMaterial} key={option.id} />
+                    <ChatOption
+                      option={option}
+                      onRemove={removeSelectedMaterial}
+                      key={option.id}
+                      disabled={isChatLoading}
+                    />
                   ))}
                 </div>
                 <Autocomplete options={materialsOptions} onOptionSelect={handleMaterialSelect} />
@@ -185,14 +190,22 @@ const ChatOptions = () => {
   );
 };
 
-const ChatOption = ({ option, onRemove }: { option: Material; onRemove: (id: string) => void }) => {
+const ChatOption = ({
+  option,
+  onRemove,
+  disabled,
+}: {
+  option: Material;
+  onRemove: (id: string) => void;
+  disabled: boolean;
+}) => {
   const OptionIcon = getEditableObjectIcon(option);
 
   return (
     <div className="flex justify-between items-center max-w-full w-max gap-2.5 bg-gray-700 px-2.5 py-2 rounded-[20px]">
       <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
       <p className="flex-1 truncate font-normal text-sm">{option.name}</p>
-      <button onClick={() => onRemove(option.id)}>
+      <button onClick={() => onRemove(option.id)} disabled={disabled}>
         <Icon icon={X} />
       </button>
     </div>
