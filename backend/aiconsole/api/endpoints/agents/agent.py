@@ -89,7 +89,6 @@ async def agent_status_change(agent_id: str, body: StatusChangePostBody):
 async def delete_agent(agent_id: str):
     try:
         await project.get_project_agents().delete_asset(agent_id)
-        
         return JSONResponse({"status": "ok"})
     except KeyError:
         raise HTTPException(status_code=404, detail="Agent not found")

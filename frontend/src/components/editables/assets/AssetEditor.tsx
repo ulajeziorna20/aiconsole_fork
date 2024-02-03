@@ -34,7 +34,7 @@ import { useAssetChanged } from '../../../utils/editables/useAssetChanged';
 import { ContextMenu } from '../../common/ContextMenu';
 import { EditorHeader } from '../EditorHeader';
 import { AgentForm } from './AgentForm';
-import { AssetInfoBar, RestoreButton } from './AssetInfoBar';
+import { AssetInfoBar } from './AssetInfoBar';
 import { MaterialForm } from './MaterialForm';
 import { ErrorObject, checkErrors } from './TextInput';
 import { useAssetEditor } from './useAssetEditor';
@@ -282,7 +282,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
             <p className={cn('text-[15px]', { 'font-bold': isSystemAsset })}>
               {assetSourceLabel()} {hasCore ? <span className="text-gray-300">(overwritten)</span> : null}
             </p>
-            {isProjectAsset ? <RestoreButton onRevert={revertAsset} /> : null}
+            {/* {isProjectAsset ? <RestoreButton onRevert={revertAsset} /> : null} */}
           </div>
         </EditorHeader>
       </ContextMenu>

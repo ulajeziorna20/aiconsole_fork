@@ -206,26 +206,24 @@ async def _generate_response(
     )
 
     try:
-        async for chunk_or_clear in aiter(
-            executor.execute(
-                GPTRequest(
-                    system_message=system_message,
-                    gpt_mode=context.agent.gpt_mode,
-                    messages=messages,
-                    tools=[
-                        ToolDefinition(
-                            type="function",
-                            function=ToolFunctionDefinition(**python.openai_schema()),
-                        ),
-                        ToolDefinition(
-                            type="function",
-                            function=ToolFunctionDefinition(**applescript.openai_schema()),
-                        ),
-                    ],
-                    min_tokens=250,
-                    preferred_tokens=2000,
-                    temperature=0.2,
-                )
+        async for chunk_or_clear in executor.execute(
+            GPTRequest(
+                system_message=system_message,
+                gpt_mode=context.agent.gpt_mode,
+                messages=messages,
+                tools=[
+                    ToolDefinition(
+                        type="function",
+                        function=ToolFunctionDefinition(**python.openai_schema()),
+                    ),
+                    ToolDefinition(
+                        type="function",
+                        function=ToolFunctionDefinition(**applescript.openai_schema()),
+                    ),
+                ],
+                min_tokens=250,
+                preferred_tokens=2000,
+                temperature=0.2,
             )
         ):
             # What is this?

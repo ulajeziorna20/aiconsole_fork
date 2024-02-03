@@ -22,7 +22,7 @@ from aiconsole.core.project.paths import get_project_assets_directory
 
 def delete_asset_from_fs(asset_type: AssetType, id):
     """
-    Delete a specific agent.
+    Delete a specific agent. Need to delete the agent file and the agent avatar file.
     """
     extensions = [".toml", ".jpeg", ".jpg", ".png", ".gif", ".SVG"]
     # check if the file exists in project directory

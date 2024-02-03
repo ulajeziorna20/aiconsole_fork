@@ -60,10 +60,7 @@ export const ChatsSidebarTab = () => {
 
       <div>
         <hr className=" border-gray-600" />
-
-        <div className="w-full px-5">
-          <ChatOptions />
-        </div>
+        <ChatOptions />
       </div>
     </div>
   );

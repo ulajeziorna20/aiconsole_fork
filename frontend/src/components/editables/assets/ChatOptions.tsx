@@ -41,6 +41,8 @@ const ChatOptions = () => {
   const isChatOptionsExpanded = useChatStore((state) => state.isChatOptionsExpanded);
   const setIsChatOptionsExpanded = useChatStore((state) => state.setIsChatOptionsExpanded);
 
+  const [selectingForcedMaterials, setSelectingForcedMaterials] = useState(false);
+
   const [materialsOptions, setMaterialsOptions] = useState<Material[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [chosenMaterials, setChosenMaterials] = useState<Material[]>([]);
@@ -48,21 +50,18 @@ const ChatOptions = () => {
   const materialsIds = chosenMaterials.map((material) => material.id);
 
   useEffect(() => {
-    console.log('ChatOptions: chat changed');
     setSelectedAgentId('');
     setChosenMaterials([]);
     setAllowExtraMaterials(true);
   }, [chat?.id]);
 
   useEffect(() => {
-    console.log('#1 ChatOptions: chat changed');
     if (chat?.chat_options.agent_id) {
       setSelectedAgentId(chat?.chat_options.agent_id);
     }
   }, [chat?.chat_options.agent_id, chat?.id]);
 
   useEffect(() => {
-    console.log('#2 ChatOptions: chat changed');
     const filteredMaterials = materials?.filter(({ id }) => (chat?.chat_options.materials_ids || []).includes(id));
     if (filteredMaterials) {
       setChosenMaterials(filteredMaterials);
@@ -70,14 +69,12 @@ const ChatOptions = () => {
   }, [chat?.chat_options.materials_ids, materials, chat?.id]);
 
   useEffect(() => {
-    console.log('#3 ChatOptions: chat changed');
-    if (chat?.chat_options.let_ai_add_extra_materials) {
+    if (chat?.chat_options) {
       setAllowExtraMaterials(chat?.chat_options.let_ai_add_extra_materials);
     }
-  }, [chat?.chat_options.let_ai_add_extra_materials, chat?.id]);
+  }, [chat?.chat_options, chat?.id]);
 
   const debounceChatUpdate = useDebounceCallback(async () => {
-    console.log('1212121 ChatOptions: chat changed');
     try {
       if (chat) {
         ChatAPI.patchChatOptions(chat?.id, {
@@ -133,64 +130,90 @@ const ChatOptions = () => {
   }
 
   return (
-    <div className="text-gray-300 flex flex-col gap-5 flex-1">
-      <Collapsible.Root open={isChatOptionsExpanded} onOpenChange={setIsChatOptionsExpanded}>
-        <Collapsible.Trigger className="w-full pt-5">
-          <div className="w-full flex justify-between group h-6 transition ease-in-out">
-            <h3 className="text-sm">Chat options</h3>
-            <div className="hidden group-hover:block">
-              {isChatOptionsExpanded ? (
-                <ArrowDownLeftSquare className="stroke-[1.2]" />
-              ) : (
-                <ArrowUpRightSquare className="stroke-[1.2]" />
-              )}
-            </div>
-          </div>
-        </Collapsible.Trigger>
-        <Collapsible.Content className="CollapsibleContent">
-          <div className="pt-5 flex flex-col gap-5">
-            <div className="flex flex-col gap-2.5">
-              <label htmlFor="agents" className="text-xs">
-                Selected agent
-              </label>
-              <AgentsDropdown
-                agents={agents}
-                selectedAgent={agents.find(({ id }) => id === selectedAgentId)}
-                onSelect={onSelectAgentId}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2.5">
-              <label className="text-xs">Selected materials</label>
-              <div className="h-[190px] overflow-y-auto ">
-                <div className="flex flex-col gap-2.5 w-full">
-                  {chosenMaterials.map((option) => (
-                    <ChatOption
-                      option={option}
-                      onRemove={removeSelectedMaterial}
-                      key={option.id}
-                      disabled={isChatLoading}
-                    />
-                  ))}
-                </div>
-                <Autocomplete options={materialsOptions} onOptionSelect={handleMaterialSelect} />
+    <div className="w-full px-5 pb-3 bg-gray-800">
+      <div className="text-gray-300 flex flex-col gap-5 flex-1">
+        <Collapsible.Root open={isChatOptionsExpanded} onOpenChange={setIsChatOptionsExpanded}>
+          <Collapsible.Trigger className="w-full pt-5">
+            <div className="w-full flex justify-between group h-6 transition ease-in-out">
+              <h3 className="text-sm">Chat options</h3>
+              <div className="hidden group-hover:block">
+                {isChatOptionsExpanded ? (
+                  <ArrowDownLeftSquare className="stroke-[1.2]" />
+                ) : (
+                  <ArrowUpRightSquare className="stroke-[1.2]" />
+                )}
               </div>
             </div>
+          </Collapsible.Trigger>
+          <Collapsible.Content className="CollapsibleContent">
+            <div className="pt-5 flex flex-col gap-5">
+              {!selectingForcedMaterials && (
+                <>
+                  <div className="flex flex-col gap-2.5 border-b-2 border-gray-600 pb-5">
+                    <label htmlFor="agents" className="text-xs">
+                      Selected agent
+                    </label>
+                    <AgentsDropdown
+                      agents={agents}
+                      selectedAgent={agents.find(({ id }) => id === selectedAgentId)}
+                      onSelect={onSelectAgentId}
+                    />
+                  </div>
 
-            <div className="flex items-center gap-2.5 mt-auto">
-              <Checkbox
-                id="extraMaterials"
-                checked={allowExtraMaterials}
-                onChange={changeAllowExtraMaterials}
-                disabled={isChatLoading}
-              />
-              <label htmlFor="extraMaterials" className="text-sm">
-                Let AI add extra materials
-              </label>
+                  <div className="flex items-center gap-2.5 mt-auto border-b-2 border-gray-600 pb-5">
+                    <Checkbox
+                      id="extraMaterials"
+                      checked={allowExtraMaterials}
+                      onChange={changeAllowExtraMaterials}
+                      disabled={isChatLoading}
+                    />
+                    <label htmlFor="extraMaterials" className="text-sm">
+                      Let AI add extra materials
+                    </label>
+                  </div>
+                </>
+              )}
+
+              <div className="flex flex-col gap-2.5">
+                <label htmlFor="agents" className="text-xs">
+                  Always used materials
+                </label>
+                {!selectingForcedMaterials && (
+                  <div className="overflow-y-auto my-2">
+                    <div className="flex flex-col gap-2.5 w-full">
+                      {chosenMaterials.map((option) => (
+                        <ChatOption
+                          option={option}
+                          onRemove={removeSelectedMaterial}
+                          key={option.id}
+                          disabled={isChatLoading}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectingForcedMaterials && (
+                  <div className="flex justify-between items-center max-w-full w-max gap-2.5 bg-gray-600 px-2.5 py-2 rounded-[20px]">
+                    <p className="flex-1 truncate font-normal text-xl text-material">{chosenMaterials.length}</p>
+                    <p className="flex-1 font-normal text-sm">{'Selected'}</p>
+                  </div>
+                )}
+                {selectingForcedMaterials && (
+                  <div className="h-[120px]">
+                    <Autocomplete options={materialsOptions} onOptionSelect={handleMaterialSelect} />
+                  </div>
+                )}
+                <button
+                  className="text-s my-3 items-center gap-[12px] rounded-[8px] border border-gray-500 px-[16px] py-[10px] text-gray-300 text-[16px] w-full leading-[23px] hover:border-gray-300 transition duration-200 hover:text-gray-300 disabled:hover:border-gray-500"
+                  onClick={() => setSelectingForcedMaterials(!selectingForcedMaterials)}
+                >
+                  {selectingForcedMaterials ? 'Back' : 'Add materials'}
+                </button>
+              </div>
             </div>
-          </div>
-        </Collapsible.Content>
-      </Collapsible.Root>
+          </Collapsible.Content>
+        </Collapsible.Root>
+      </div>
     </div>
   );
 };
@@ -207,7 +230,7 @@ const ChatOption = ({
   const OptionIcon = getEditableObjectIcon(option);
 
   return (
-    <div className="flex justify-between items-center max-w-full w-max gap-2.5 bg-gray-700 px-2.5 py-2 rounded-[20px]">
+    <div className="flex justify-between items-center max-w-full w-max gap-2.5 bg-gray-600 px-2.5 py-2 rounded-[20px]">
       <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
       <p className="flex-1 truncate font-normal text-sm">{option.name}</p>
       <button onClick={() => onRemove(option.id)} disabled={disabled}>

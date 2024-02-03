@@ -25,7 +25,6 @@ from aiconsole.core.chat.execution_modes.analysis.gpt_analysis_function_step imp
 )
 from aiconsole.core.gpt.consts import ANALYSIS_GPT_MODE
 
-
 INITIAL_SYSTEM_PROMPT = """
 You are a director of a multiple AI Agents, doing everything to help the user.
 You have multiple AI Agents at your disposal, each with their own unique capabilities.

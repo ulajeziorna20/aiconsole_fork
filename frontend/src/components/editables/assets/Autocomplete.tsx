@@ -116,7 +116,7 @@ const Autocomplete = <T extends { id: string; name: string }>({
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        placeholder="Start writing to add..."
+        placeholder="Start typing to add materials ..."
         className="bg-transparent py-2 focus:outline-none border-gray-400 text-white w-full placeholder:text-gray-400 placeholder:text-[15px]"
         disabled={isChatLoading}
       />

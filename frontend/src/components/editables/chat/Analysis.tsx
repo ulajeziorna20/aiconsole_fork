@@ -72,6 +72,7 @@ export const AnalysisOpened = ({
           'ease-in opacity-100 max-h-max mt-[20px]': isLoaded && isOpen,
           'ease-out opacity-0 max-h-[0] mt-[0px]': !isLoaded || !isOpen,
         })}
+        hidden={!isLoaded || !isOpen}
       >
         {group.analysis}{' '}
         {group.task && (

@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import asyncio
 import logging
 from datetime import datetime
 from typing import cast
@@ -81,7 +79,7 @@ async def render_materials_from_message_group(
     )
 
     # rendered_materials = await asyncio.gather(
-    #     *[material.render(content_context) for material in relevant_materials if material.type == "rendered_material"]
+    #    *[material.render(content_context) for material in relevant_materials if material.type == "rendered_material"]
     # )
     rendered_materials = []
     for material in relevant_materials:
