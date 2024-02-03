@@ -15,18 +15,19 @@
 # limitations under the License.
 
 import tomlkit
+import shutil
 
 from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.fs.exceptions import UserIsAnInvalidAgentIdError
 from aiconsole.core.assets.fs.load_asset_from_fs import load_asset_from_fs
 from aiconsole.core.assets.materials.material import Material, MaterialContentType
 from aiconsole.core.assets.models import Asset
-from aiconsole.core.project.paths import get_project_assets_directory
+from aiconsole.core.project.paths import get_core_assets_directory, get_project_assets_directory
 
 _USER_AGENT_ID = "user"
 
 
-async def save_asset_to_fs(asset: Asset):
+async def save_asset_to_fs(asset: Asset, old_asset_id: str) -> Asset:
     if isinstance(asset, Agent):
         if asset.id == _USER_AGENT_ID:
             raise UserIsAnInvalidAgentIdError()
@@ -108,5 +109,12 @@ async def save_asset_to_fs(asset: Asset):
             doc.append("execution_mode", tomlkit.string(asset.execution_mode))
 
         file.write(doc.as_string())
+
+    extensions = [".jpeg", ".jpg", ".png", ".gif", ".SVG"]
+    for extension in extensions:
+        old_file_path = get_core_assets_directory(asset.type) / f"{old_asset_id}{extension}"
+        new_file_path = path / f"{asset.id}{extension}"
+        if old_file_path.exists():
+            shutil.copy(old_file_path, new_file_path)
 
     return asset

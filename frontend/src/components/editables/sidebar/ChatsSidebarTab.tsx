@@ -41,25 +41,25 @@ export const ChatsSidebarTab = () => {
   ];
 
   return (
-    <div className="flex flex-col justify-between content-between overflow-y-auto h-full">
-      <div className="overflow-y-auto mb-5 min-h-[100px] px-5">
-        {sections.map(
-          (section) =>
-            section.headlines.length > 0 && (
-              <div key={section.title}>
-                <h3 className="uppercase px-[9px] py-[5px] text-gray-400 text-[12px] leading-[18px]">
-                  {section.title}
-                </h3>
-                {section.headlines.map((chat) => (
-                  <SideBarItem key={chat.id} editableObject={chat} editableObjectType="chat" />
-                ))}
-              </div>
-            ),
-        )}
+    <div className="h-full flex flex-col justify-between">
+      <div className="flex flex-col justify-between content-between relative overflow-y-auto">
+        <div className="overflow-y-auto min-h-[100px] px-5">
+          {sections.map(
+            (section) =>
+              section.headlines.length > 0 && (
+                <div key={section.title}>
+                  <h3 className="uppercase px-[9px] py-[5px] text-gray-400 text-[12px] leading-[18px]">
+                    {section.title}
+                  </h3>
+                  {section.headlines.map((chat) => (
+                    <SideBarItem key={chat.id} editableObject={chat} editableObjectType="chat" />
+                  ))}
+                </div>
+              ),
+          )}
+        </div>
       </div>
-
-      <div>
-        <hr className=" border-gray-600" />
+      <div className="max-h-[80%] overflow-y-auto">
         <ChatOptions />
       </div>
     </div>

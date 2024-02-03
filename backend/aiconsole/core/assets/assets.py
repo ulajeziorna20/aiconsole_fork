@@ -92,7 +92,7 @@ class Assets:
             Assets.rename_asset(asset.type, old_asset_id, asset.id)
             rename = True
 
-        new_asset = await save_asset_to_fs(asset)
+        new_asset = await save_asset_to_fs(asset, old_asset_id)
 
         if asset.id not in self._assets:
             self._assets[asset.id] = []

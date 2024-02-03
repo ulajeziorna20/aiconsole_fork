@@ -7,7 +7,7 @@ DEFAULT_USERNAME = "user"
 
 class PartialUserProfile(BaseModel):
     username: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[EmailStr | str] = None
     avatar_url: Optional[HttpUrl | str] = None
     gravatar: Optional[bool] = None
 
