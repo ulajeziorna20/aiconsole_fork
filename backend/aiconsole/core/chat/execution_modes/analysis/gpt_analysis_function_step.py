@@ -135,6 +135,20 @@ async def gpt_analysis_function_step(
     if len(possible_agent_choices) == 0:
         raise ValueError("No active agents")
 
+    available_materials = []
+    forced_materials = []
+    if chat_mutator.chat.chat_options.materials_ids:
+        for material in project.get_project_materials()._assets.values():
+            if material[0].id in chat_mutator.chat.chat_options.materials_ids:
+                forced_materials.append(material[0])
+
+    if chat_mutator.chat.chat_options.let_ai_add_extra_materials:
+        available_materials = [
+            *forced_materials,
+            *project.get_project_materials().assets_with_status(AssetStatus.FORCED),
+            *project.get_project_materials().assets_with_status(AssetStatus.ENABLED),
+        ]
+
     plan_class = create_plan_class(
         [
             Agent(
@@ -147,7 +161,8 @@ async def gpt_analysis_function_step(
                 override=False,
             ),
             *possible_agent_choices,
-        ]
+        ],
+        available_materials,
     )
 
     request = GPTRequest(
@@ -272,7 +287,7 @@ async def gpt_analysis_function_step(
         await chat_mutator.mutate(
             SetMaterialsIdsMessageGroupMutation(
                 message_group_id=message_group_id,
-                materials_ids=[material.id for material in relevant_materials],
+                materials_ids=[material.id for material in set(relevant_materials).union(forced_materials)],
             )
         )
 

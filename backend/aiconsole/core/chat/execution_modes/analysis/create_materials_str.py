@@ -30,14 +30,9 @@ def create_materials_str(materials_ids: list | None, let_ai_add_extra_materials:
             if material[0].id in materials_ids:
                 available_materials.append(material[0])
 
-        if let_ai_add_extra_materials:
-            available_materials = [
-                *available_materials,
-                *project.get_project_materials().assets_with_status(AssetStatus.FORCED),
-                *project.get_project_materials().assets_with_status(AssetStatus.ENABLED),
-            ]
-    else:
+    if let_ai_add_extra_materials:
         available_materials = [
+            *available_materials,
             *project.get_project_materials().assets_with_status(AssetStatus.FORCED),
             *project.get_project_materials().assets_with_status(AssetStatus.ENABLED),
         ]
