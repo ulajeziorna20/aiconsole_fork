@@ -15,10 +15,11 @@ class PatchChatOptions(BaseModel):
     let_ai_add_extra_materials: Optional[bool] = None
 
 
-@router.patch("/{chat_id}")
-async def chat_options(chat_id: str, chat_options: PatchChatOptions):
+@router.patch("/{chat_id}/chat_options")
+async def chat_options(chat_id: str, chat_options: Optional[PatchChatOptions] = None):
     chat = await load_chat_history(id=chat_id)
-    for field in chat_options.model_dump(exclude_unset=True):
-        setattr(chat.chat_options, field, getattr(chat_options, field))
-    save_chat_history(chat, scope="chat_options")
+    if chat_options:
+        for field in chat_options.model_dump(exclude_unset=True):
+            setattr(chat.chat_options, field, getattr(chat_options, field))
+        save_chat_history(chat, scope="chat_options")
     return Response(status_code=status.HTTP_200_OK)

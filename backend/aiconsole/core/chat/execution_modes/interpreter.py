@@ -17,6 +17,7 @@ import json
 import logging
 import traceback
 from datetime import datetime
+from turtle import st
 from typing import cast
 from uuid import uuid4
 
@@ -83,8 +84,8 @@ class python(CodeTask):
 
     code: str = Field(
         ...,
-        description="Python code to execute. Code must be formated. The begging of the code MUST be marked with "
-        "# START and end of the code with # END. "
+        description="Python code to execute. Code must be formated. The begging MUST always be marked with "
+        "# START and end of the code with # END in any situation, even user asks to run specific code. "
         "It will be executed in the statefull Jupyter notebook environment. Always show result to the user.",
         json_schema_extra={"type": "string"},
     )
@@ -100,9 +101,11 @@ class applescript(CodeTask):
 
 async def _execution_mode_process(
     context: ProcessChatContext,
+    message_group: AICMessageGroup | None = None,
 ):
     # Assumes an existing message group that was created for us
-    message_group = context.chat_mutator.chat.message_groups[-1]
+    if message_group is None:
+        message_group = context.chat_mutator.chat.message_groups[-1]
 
     system_message = create_full_prompt_with_materials(
         intro=get_agent_system_message(context.agent),
@@ -111,9 +114,9 @@ async def _execution_mode_process(
 
     executor = GPTExecutor()
 
-    await _generate_response(message_group, context, system_message, executor)
+    await _generate_response(message_group, context, system_message, executor, message_group)
 
-    last_message = context.chat_mutator.chat.message_groups[-1].messages[-1]
+    last_message = message_group.messages[-1]
 
     if last_message.tool_calls:
         # Run all code in the last message
@@ -190,11 +193,12 @@ async def _generate_response(
     context: ProcessChatContext,
     system_message: str,
     executor: GPTExecutor,
+    last_message_group: AICMessageGroup | None = None,
 ):
     tools_requiring_closing_parenthesis: list[str] = []
     message_id = str(uuid4())
     # Load the messages from the chat in GPTRequestMessage format
-    messages = [message for message in convert_messages(context.chat_mutator.chat)]
+    messages = [message for message in convert_messages(context.chat_mutator.chat, last_message_group)]
 
     await context.chat_mutator.mutate(
         CreateMessageMutation(
@@ -379,6 +383,8 @@ async def _send_code(tool_calls, context, tools_requiring_closing_parenthesis, m
                         start_index = code.find(START_MARKER)
                         if start_index != -1:
                             start_index += len(START_MARKER)
+                        else:
+                            start_index = 0
 
                         end_index = code.find(END_MARKER)
                         if end_index == -1:
@@ -460,7 +466,8 @@ async def _execution_mode_accept_code(
     )
 
     if finished_running_code:
-        await _execution_mode_process(process_chat_context)  # Resume operation with the same agent
+        # Resume operation with the same agent
+        await _execution_mode_process(process_chat_context, tool_call_location.message_group)
 
 
 execution_mode = ExecutionMode(

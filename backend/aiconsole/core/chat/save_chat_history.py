@@ -46,6 +46,10 @@ def save_chat_history(chat: Chat, scope: str = "default"):
             elif scope == "message_groups":
                 old_content["message_groups"] = new_content["message_groups"]
                 new_content = old_content
+            elif scope == "name":
+                old_content["name"] = new_content["name"]
+                old_content["title_edited"] = True
+                new_content = old_content
 
         # write new content to file
         with open(file_path, "w", encoding="utf8", errors="replace") as f:

@@ -41,7 +41,7 @@ const runCode = async ({
 };
 
 const patchChatOptions = (chatId: string, body: object) =>
-  ky.patch(`${getBaseURL()}/api/chats/${chatId}`, {
+  ky.patch(`${getBaseURL()}/api/chats/${chatId}/chat_options`, {
     json: { ...body },
     timeout: 60000,
     hooks: API_HOOKS,
