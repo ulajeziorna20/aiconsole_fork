@@ -20,7 +20,7 @@ import { Icon } from '@/components/common/icons/Icon';
 import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { cn } from '@/utils/common/cn';
 import { LucideIcon, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import ChatOptions from '../assets/ChatOptions';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
@@ -54,38 +54,47 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
   const materialsIds = chosenMaterials.map((material) => material.id);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCommand(e.target.value);
-    const mentionMatch = e.target.value.match(/@(\s*)$/);
-    setShowChatOptions(!!mentionMatch);
-  };
+  const handleSendMessage = useCallback(
+    async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      if (onSubmit) onSubmit(command);
 
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
+      if (e) e.currentTarget.blur();
+    },
+    [command, onSubmit],
+  );
 
-      await handleSendMessage();
-    }
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setCommand(e.target.value);
+      const mentionMatch = e.target.value.match(/@(\s*)$/);
+      setShowChatOptions(!!mentionMatch);
+    },
+    [setCommand],
+  );
 
-    if (textAreaRef.current) {
-      const caretAtStart = textAreaRef.current.selectionStart === 0 && textAreaRef.current.selectionEnd === 0;
-      const caretAtEnd =
-        textAreaRef.current.selectionStart === textAreaRef.current.value.length &&
-        textAreaRef.current.selectionEnd === textAreaRef.current.value.length;
+  const handleKeyDown = useCallback(
+    async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
 
-      if (e.key === 'ArrowUp' && caretAtStart) {
-        promptUp();
-      } else if (e.key === 'ArrowDown' && caretAtEnd) {
-        promptDown();
+        await handleSendMessage();
       }
-    }
-  };
 
-  const handleSendMessage = async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (onSubmit) onSubmit(command);
+      if (textAreaRef.current) {
+        const caretAtStart = textAreaRef.current.selectionStart === 0 && textAreaRef.current.selectionEnd === 0;
+        const caretAtEnd =
+          textAreaRef.current.selectionStart === textAreaRef.current.value.length &&
+          textAreaRef.current.selectionEnd === textAreaRef.current.value.length;
 
-    if (e) e.currentTarget.blur();
-  };
+        if (e.key === 'ArrowUp' && caretAtStart) {
+          promptUp();
+        } else if (e.key === 'ArrowDown' && caretAtEnd) {
+          promptDown();
+        }
+      }
+    },
+    [handleSendMessage, promptDown, promptUp],
+  );
 
   // auto focus this text area on changes to chatId
   useEffect(() => {
