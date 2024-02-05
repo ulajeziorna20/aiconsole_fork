@@ -16,7 +16,6 @@
 
 import asyncio
 import logging
-import random
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Callable, cast
@@ -52,9 +51,6 @@ from aiconsole.core.assets.models import AssetLocation
 from aiconsole.core.chat.chat_mutations import CreateMessageGroupMutation
 from aiconsole.core.chat.execution_modes.analysis.agents_to_choose_from import (
     agents_to_choose_from,
-)
-from aiconsole.core.chat.execution_modes.analysis.choose_assistant_or_random_if_not_available import (
-    choose_assistant_or_random_if_not_available,
 )
 from aiconsole.core.chat.execution_modes.execution_mode import (
     AcceptCodeContext,
@@ -293,10 +289,7 @@ class IncomingMessageHandler:
                 connection=None,  # Source connection is None because the originating mutations come from server
             )
 
-            if chat_mutator.chat.message_groups:
-                agent = self._director_agent
-            else:
-                agent = choose_assistant_or_random_if_not_available()
+            agent = self._director_agent
 
             if (
                 chat_mutator.chat.chat_options.agent_id

@@ -202,7 +202,7 @@ export function ChatPage() {
   };
 
   const getActionButton = () => {
-    if (hasAnyCommandInput || chat.message_groups.length === 0) {
+    if (hasAnyCommandInput) {
       return {
         label: 'Send',
         icon: SendRotated,
