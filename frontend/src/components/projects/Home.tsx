@@ -118,7 +118,7 @@ export function Home() {
   }, [openProjectConfirmation, projectModalMode, isProjectDirectory]);
 
   return (
-    <div className="min-h-[100vh] relative">
+    <div className="min-h-[100vh] relative overflow-x-hidden">
       <BackgroundGradient />
       <div>
         {openAiApiKey === undefined || isProjectLoading ? (
