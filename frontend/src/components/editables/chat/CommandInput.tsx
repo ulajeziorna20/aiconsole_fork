@@ -181,7 +181,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
               {selectedAgentId && (
                 <div className="w-full flex jusify-between items-center">
                   <div className="flex items-center gap-3 w-full">
-                    <AgentAvatar agentId={selectedAgentId} title="test" type="extraSmall" className="mb-0 mt-0" />
+                    <AgentAvatar agentId={selectedAgentId} title="test" type="extraSmall" className="!mb-0 !mt-0" />
                     <p>
                       Talking to <span className="text-white">{getAgent(selectedAgentId)?.name}</span>
                     </p>

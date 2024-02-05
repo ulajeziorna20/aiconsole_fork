@@ -31,22 +31,14 @@ type ChatOptionsProps = {
   materialsOptions: Material[];
 };
 
-const ChatOption = ({
-  option,
-  selectOption,
-  disabled,
-}: {
-  option: Material;
-  selectOption: (option: Material) => void;
-  disabled: boolean;
-}) => {
+const ChatOption = ({ option, selectOption }: { option: Material; selectOption: (option: Material) => void }) => {
   const OptionIcon = getEditableObjectIcon(option);
 
   return (
     <div className="flex justify-between items-center max-w-full w-max gap-3 hover:bg-gray-600 px-2 py-1 rounded-[8px] max-h-[32px] group">
       <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
       <p className="flex-1 truncate font-normal text-sm text-gray-400 group-hover:text-white">{option.name}</p>
-      <button onClick={() => selectOption(option)} disabled={disabled}>
+      <button onClick={() => selectOption(option)}>
         <Icon icon={Plus} className="group-hover:!text-white" />
       </button>
     </div>
@@ -89,8 +81,8 @@ const ChatOptions = ({ onSelectAgentId, handleMaterialSelect, materialsOptions }
 
   return (
     <div
-      style={{ width: 'calc(100% - 60px)' }}
-      className="flex flex-col py-3 px-2 w-full bg-gray-800 rounded-[8px] min-h-[164px] absolute bottom-[104%] w-full"
+      style={{ width: 'calc(100% - 60px)', bottom: 'calc(100% + 8px)' }}
+      className="flex flex-col py-3 px-2 w-full bg-gray-800 rounded-[8px] min-h-[164px] absolute w-full border border-gray-600"
     >
       <div className="relative flex flex-col gap-2" ref={wrapperRef}>
         <input
@@ -110,11 +102,11 @@ const ChatOptions = ({ onSelectAgentId, handleMaterialSelect, materialsOptions }
                 <li
                   key={option.id}
                   className={cn(
-                    'w-full overflow-hidden p-2 flex items-center cursor-pointer hover:bg-gray-600 rounded-[8px] max-h-[44px] gap-2 group',
+                    'w-full overflow-hidden px-2 py-2.5 flex items-center cursor-pointer hover:bg-gray-600 rounded-[8px] max-h-[44px] gap-2 group',
                   )}
                   onClick={() => onSelectAgentId(option.id)}
                 >
-                  <AgentAvatar agentId={option.id} title={option.name} type="extraSmall" className="mb-0 mt-0" />
+                  <AgentAvatar agentId={option.id} title={option.name} type="extraSmall" className="!mb-0 !mt-0" />
                   <h4 className="text-white ml-[4px] text-[15px]">{option.name}</h4>
                   <span className="text-sm truncate text-gray-400">{option.usage}</span>
                   <Icon icon={Pin} className={cn('w-4 h-4 min-h-4 min-w-4 flex-shrink-0 group-hover:!text-white')} />
@@ -132,12 +124,7 @@ const ChatOptions = ({ onSelectAgentId, handleMaterialSelect, materialsOptions }
           {filteredMaterialOptions.length !== 0 &&
             materialsOptions.length !== 0 &&
             filteredMaterialOptions.map((option) => (
-              <ChatOption
-                option={option}
-                selectOption={handleMaterialSelect}
-                key={option.id}
-                disabled={isChatLoading}
-              />
+              <ChatOption option={option} selectOption={handleMaterialSelect} key={option.id} />
             ))}
         </div>
       </div>
