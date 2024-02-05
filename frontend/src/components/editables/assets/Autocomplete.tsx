@@ -14,135 +14,122 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 
 import { Icon } from '@/components/common/icons/Icon';
 import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { cn } from '@/utils/common/cn';
 import { useClickOutside } from '@/utils/common/useClickOutside';
 import { getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
+import { Agent, Material } from '@/types/editables/assetTypes';
+import { AgentAvatar } from '../chat/AgentAvatar';
+import { Pin, Plus } from 'lucide-react';
 
-type AutocompleteProps<T> = {
-  options: T[];
-  onOptionSelect: (option: T) => void;
+type AutocompleteProps = {
+  materialOptions: Material[];
+  agentOptions: Agent[];
+  onMaterialSelect: (option: Material) => void;
   className?: string;
 };
 
-const Autocomplete = <T extends { id: string; name: string }>({
-  options,
-  onOptionSelect,
-  className,
-}: AutocompleteProps<T>) => {
-  const [inputValue, setInputValue] = useState('');
-  const [filteredOptions, setFilteredOptions] = useState<T[]>([]);
-  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const listEndRef = useRef<HTMLDivElement>(null);
-  const isChatLoading = useChatStore((state) => state.isChatLoading);
+const ChatOption = ({
+  option,
+  selectOption,
+  disabled,
+}: {
+  option: Material;
+  selectOption: (id: string) => void;
+  disabled: boolean;
+}) => {
+  const OptionIcon = getEditableObjectIcon(option);
 
-  useEffect(() => {
-    if (inputValue && listEndRef.current && filteredOptions.length) {
-      listEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [inputValue, filteredOptions]);
+  return (
+    <div className="flex justify-between items-center max-w-full w-max gap-3 hover:bg-gray-600 px-2.5 py-2 rounded-[8px] max-h-[32px]">
+      <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
+      <p className="flex-1 truncate font-normal text-sm">{option.name}</p>
+      <button onClick={() => selectOption(option.id)} disabled={disabled}>
+        <Icon icon={Plus} />
+      </button>
+    </div>
+  );
+};
+
+const Autocomplete = ({ materialOptions, agentOptions, onMaterialSelect, className }: AutocompleteProps) => {
+  const [inputValue, setInputValue] = useState('');
+  const [filteredMaterialOptions, setFilteredMaterialOptions] = useState<Material[]>(materialOptions);
+  const [filteredAgentsOptions, setFilteredAgentsOptions] = useState<Agent[]>(agentOptions);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const isChatLoading = useChatStore((state) => state.isChatLoading);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setInputValue(inputValue);
 
     const regex = new RegExp(`^${inputValue}`, 'i');
-    const filteredOptions = options.filter((item) => regex.test(item.name));
-    setFilteredOptions(filteredOptions);
+    const filteredMaterialOptions = materialOptions.filter((item) => regex.test(item.name));
+    const filteredAgentOptions = agentOptions.filter((item) => regex.test(item.name));
+    setFilteredAgentsOptions(filteredAgentOptions);
+    setFilteredMaterialOptions(filteredMaterialOptions);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Highlight next on down arrow
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (highlightedOptionId === null) {
-        setHighlightedOptionId(filteredOptions[0]?.id);
-      } else {
-        const currentIndex = filteredOptions.findIndex((option) => option.id === highlightedOptionId);
-        const nextIndex = currentIndex + 1;
-        if (nextIndex < filteredOptions.length) {
-          setHighlightedOptionId(filteredOptions[nextIndex]?.id);
-        }
-      }
-    }
-    // Highlight previous on up arrow
-    else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (highlightedOptionId === null) {
-        setHighlightedOptionId(filteredOptions[filteredOptions.length - 1]?.id);
-      } else {
-        const currentIndex = filteredOptions.findIndex((option) => option.id === highlightedOptionId);
-        const nextIndex = currentIndex - 1;
-        if (nextIndex >= 0) {
-          setHighlightedOptionId(filteredOptions[nextIndex]?.id);
-        }
-      }
-    }
-    // Select on enter
-    else if (e.key === 'Enter') {
-      if (highlightedOptionId) {
-        handleOptionSelect(filteredOptions.find((option) => option.id === highlightedOptionId)!);
-      }
-    }
-    // Reset highlighted option on esc
-    else if (e.key === 'Escape') {
-      setHighlightedOptionId(null);
-      setInputValue('');
-    }
-  };
-
-  const handleOptionSelect = (selectedOption: T) => {
-    onOptionSelect(selectedOption);
+  const handleMaterialSelect = (selectedOption: Material) => {
+    onMaterialSelect(selectedOption);
     setInputValue('');
-    setFilteredOptions([]);
-    setHighlightedOptionId(null);
+    setFilteredMaterialOptions([]);
   };
 
   const handleClickOutside = () => {
     setInputValue('');
-    setFilteredOptions([]);
+    setFilteredMaterialOptions([]);
   };
 
   useClickOutside(wrapperRef, handleClickOutside);
 
   return (
-    <div className={cn('relative', className)} ref={wrapperRef}>
+    <div className={cn('relative flex flex-col gap-2', className)} ref={wrapperRef}>
       <input
         type="text"
         value={inputValue}
         onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        placeholder="Start typing to add materials ..."
-        className="bg-transparent py-2 focus:outline-none border-gray-400 text-white w-full placeholder:text-gray-400 placeholder:text-[15px]"
+        placeholder="Search for an agent or material"
+        className="bg-transparent p-2 focus:outline-none border-gray-400 text-white w-full placeholder:text-gray-400 placeholder:text-[15px]"
         disabled={isChatLoading}
       />
-      {inputValue && (
-        <ul className="absolute max-h-[164px] overflow-auto w-3/4 left-1/2 -translate-x-1/2 rounded border-1 border-gray-800">
-          {filteredOptions.map((option) => {
-            const OptionIcon = getEditableObjectIcon(option);
+      <ul className="max-h-[176px] overflow-y-auto border-b border-gray-600">
+        {filteredAgentsOptions.length === 0 ? (
+          <p className="text-sm p-2">There is no agent with this name.</p>
+        ) : (
+          filteredAgentsOptions.map((option) => {
             return (
               <li
                 key={option.id}
-                onClick={() => handleOptionSelect(option)}
                 className={cn(
-                  'w-full overflow-hidden truncate bg-gray-700 px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-gray-600',
-                  {
-                    'bg-gray-600': highlightedOptionId === option.id,
-                  },
+                  'w-full overflow-hidden p-2 flex items-center cursor-pointer hover:bg-gray-600 rounded-[8px] max-h-[44px] gap-2',
                 )}
               >
-                <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
-                <span className="truncate flex-1">{option.name}</span>
+                <AgentAvatar agentId={option.id} title={option.name} type="extraSmall" className="mb-0 mt-0" />
+                <h4 className="text-white ml-[4px]">{option.name}</h4>
+                <span className="text-sm truncate">{option.usage}</span>
+                <Icon icon={Pin} className="w-4 h-4 min-h-4 min-w-4 max-h-4 max-w-4" width={16} height={16} />
               </li>
             );
-          })}
-          <div className="w-0 h-0" ref={listEndRef}></div>
-        </ul>
-      )}
+          })
+        )}
+      </ul>
+      <div className="max-h-[108px] overflow-y-auto flex gap-2 w-full flex-wrap">
+        {filteredMaterialOptions.length === 0 ? (
+          <p className="text-sm p-2">There is no material with this name.</p>
+        ) : (
+          filteredMaterialOptions.map((option) => (
+            <ChatOption
+              option={option}
+              selectOption={() => console.log('test')}
+              key={option.id}
+              disabled={isChatLoading}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 };
