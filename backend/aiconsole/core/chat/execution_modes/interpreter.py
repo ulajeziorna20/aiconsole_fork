@@ -17,7 +17,6 @@ import json
 import logging
 import traceback
 from datetime import datetime
-from turtle import st
 from typing import cast
 from uuid import uuid4
 
@@ -101,11 +100,9 @@ class applescript(CodeTask):
 
 async def _execution_mode_process(
     context: ProcessChatContext,
-    message_group: AICMessageGroup | None = None,
 ):
     # Assumes an existing message group that was created for us
-    if message_group is None:
-        message_group = context.chat_mutator.chat.message_groups[-1]
+    last_message_group = context.chat_mutator.chat.message_groups[-1]
 
     system_message = create_full_prompt_with_materials(
         intro=get_agent_system_message(context.agent),
@@ -114,9 +111,9 @@ async def _execution_mode_process(
 
     executor = GPTExecutor()
 
-    await _generate_response(message_group, context, system_message, executor, message_group)
+    await _generate_response(last_message_group, context, system_message, executor, last_message_group)
 
-    last_message = message_group.messages[-1]
+    last_message = last_message_group.messages[-1]
 
     if last_message.tool_calls:
         # Run all code in the last message
@@ -450,7 +447,7 @@ async def _execution_mode_accept_code(
     tool_call = tool_call_location.tool_call
 
     process_chat_context = ProcessChatContext(
-        message_group_id=None,
+        message_group_id=tool_call_location.message_group.id,
         chat_mutator=context.chat_mutator,
         agent=context.agent,
         materials=context.materials,
@@ -459,15 +456,18 @@ async def _execution_mode_accept_code(
 
     await _run_code(process_chat_context, tool_call_id=tool_call.id)
 
-    # if all tools have finished running, continue operation with the same agent
-    finished_running_code = all(
-        (not tool_call.is_executing) and (tool_call.output is not None)
-        for tool_call in tool_call_location.message.tool_calls
-    )
+    # if is in last message and all tools have finished running, resume operation with the same agent
+    if (
+        tool_call_location.message_group.id == context.chat_mutator.chat.message_groups[-1].id
+        and tool_call_location.message.id == context.chat_mutator.chat.message_groups[-1].messages[-1].id
+    ):
+        finished_running_code = all(
+            (not tool_call.is_executing) and (tool_call.output is not None)
+            for tool_call in tool_call_location.message.tool_calls
+        )
 
-    if finished_running_code:
-        # Resume operation with the same agent
-        await _execution_mode_process(process_chat_context, tool_call_location.message_group)
+        if finished_running_code:
+            await _execution_mode_process(process_chat_context)
 
 
 execution_mode = ExecutionMode(
