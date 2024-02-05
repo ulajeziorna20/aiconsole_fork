@@ -43,14 +43,12 @@ from pathlib import Path
 from typing import AsyncGenerator
 
 from aiconsole.core.assets.materials.material import Material
-from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
-    WaitForEnvEvent,
-)
+from aiconsole.core.code_running.virtual_env.create_dedicated_venv import \
+    WaitForEnvEvent
 from aiconsole.utils.events import internal_events
-from aiconsole_toolkit.env import (
-    get_current_project_venv_bin_path,
-    get_current_project_venv_path,
-)
+from aiconsole_toolkit.env import (get_current_project_venv_bin_path,
+                                   get_current_project_venv_path,
+                                   get_current_project_venv_python_path)
 
 from .base_code_interpreter import BaseCodeInterpreter
 
@@ -91,10 +89,14 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
 
         self.process = subprocess.Popen(
             self.start_cmd.split(),
+            # TODO: add executable, care with Windows. https://docs.python.org/3/library/subprocess.html#popen-constructor
+            # this does not work on windows, with and without str()
+            # executable=str(repr(get_current_project_venv_python_path())),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=self._patched_env(),
+            shell=True,
             text=True,
             bufsize=0,
             universal_newlines=True,
@@ -111,13 +113,13 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
         ).start()
 
     async def run(self, code: str, materials: list[Material]) -> AsyncGenerator[str, None]:
-        _log.debug(f"Running code:\n{code}\n---")
         retry_count = 0
         max_retries = 3
 
         try:
             await self.wait_for_path()
             code = self.preprocess_code(code, materials)
+            _log.info(f"Running code:\n{code}\n---")
             if not self.process:
                 self.start_process()
         except:  # noqa E722
@@ -125,8 +127,6 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
             return
 
         while retry_count <= max_retries:
-            # _log.info(f"Running code:\n{code}\n---")
-
             self.done.clear()
 
             try:
@@ -159,6 +159,7 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
                 await asyncio.sleep(0.1)
             try:
                 output = self.output_queue.get(timeout=0.3)  # Waits for 0.3 seconds
+                _log.info(f"OUTPUT: {output}")
                 yield output
             except queue.Empty:
                 # AIConsole Fix: Added proces.pool check to fix hanging
@@ -195,14 +196,15 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
 
         # replace the first element in the PATH with the venv bin path
         # this is the one we've added to get the correct embedded interpreter when the app is starting
-        _path = os.pathsep.join([str(get_current_project_venv_bin_path())] + path.split(os.pathsep))
-
-        return {
+        sep = str(os.pathsep)
+        _path = sep.join([str(get_current_project_venv_bin_path()), *path.split(sep)])
+        r = {
             **os.environ,
-            "PATH": _path,
             # just in case for correct questions about the venv locations and similar
             "VIRTUAL_ENV": str(get_current_project_venv_path()),
         }
+        r["PATH"] = _path
+        return r
 
     async def wait_for_path(self, timeout: int = 100, check_interval: int = 5):
         """
