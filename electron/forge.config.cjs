@@ -64,6 +64,14 @@ module.exports = {
       },
     },
     {
+      name: '@electron-forge/maker-zip',
+      config: {
+        icon: './assets/icon.png',
+        name: 'AIConsole',
+        options: {},
+      },
+    },
+    {
       name: '@electron-forge/maker-deb',
       config: {
         options: {
