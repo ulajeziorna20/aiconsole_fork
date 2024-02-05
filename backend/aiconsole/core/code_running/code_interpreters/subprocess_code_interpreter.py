@@ -34,6 +34,7 @@
 import asyncio
 import logging
 import os
+import platform
 import queue
 import subprocess
 import threading
@@ -43,12 +44,15 @@ from pathlib import Path
 from typing import AsyncGenerator
 
 from aiconsole.core.assets.materials.material import Material
-from aiconsole.core.code_running.virtual_env.create_dedicated_venv import \
-    WaitForEnvEvent
+from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
+    WaitForEnvEvent,
+)
 from aiconsole.utils.events import internal_events
-from aiconsole_toolkit.env import (get_current_project_venv_bin_path,
-                                   get_current_project_venv_path,
-                                   get_current_project_venv_python_path)
+from aiconsole_toolkit.env import (
+    get_current_project_venv_bin_path,
+    get_current_project_venv_path,
+    get_current_project_venv_python_path,
+)
 
 from .base_code_interpreter import BaseCodeInterpreter
 
@@ -96,7 +100,7 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=self._patched_env(),
-            shell=True,
+            shell=True if platform.system() == "Windows" else False,
             text=True,
             bufsize=0,
             universal_newlines=True,
@@ -159,7 +163,7 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
                 await asyncio.sleep(0.1)
             try:
                 output = self.output_queue.get(timeout=0.3)  # Waits for 0.3 seconds
-                _log.info(f"OUTPUT: {output}")
+                # _log.info(f"OUTPUT: {output}")
                 yield output
             except queue.Empty:
                 # AIConsole Fix: Added proces.pool check to fix hanging
