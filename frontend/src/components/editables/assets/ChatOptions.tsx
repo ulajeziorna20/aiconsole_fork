@@ -89,59 +89,56 @@ const ChatOptions = ({ onSelectAgentId, handleMaterialSelect, materialsOptions }
 
   return (
     <div
-      className={cn('min-h-[290px] flex items-end absolute -top-[300px] w-full max-w-[640px]', {
-        // '-top-[312px]': inputValue.length === 0,
-      })}
+      style={{ width: 'calc(100% - 60px)' }}
+      className="flex flex-col py-3 px-2 w-full bg-gray-800 rounded-[8px] min-h-[164px] absolute bottom-[104%] w-full"
     >
-      <div className="flex flex-col py-3 px-2 w-full bg-gray-800 rounded-[8px] min-h-[164px]">
-        <div className="relative flex flex-col gap-2" ref={wrapperRef}>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder="Search for an agent or material"
-            className="bg-transparent p-2 focus:outline-none border-gray-400 text-white w-full placeholder:text-gray-400 placeholder:text-[15px]"
-            disabled={isChatLoading}
-          />
-          <ul className="max-h-[134px] overflow-y-auto">
-            {filteredAgentsOptions.length === 0 ? (
-              <p className="text-sm p-2 text-gray-400">There is no agent with this name.</p>
-            ) : (
-              filteredAgentsOptions.map((option) => {
-                return (
-                  <li
-                    key={option.id}
-                    className={cn(
-                      'w-full overflow-hidden p-2 flex items-center cursor-pointer hover:bg-gray-600 rounded-[8px] max-h-[44px] gap-2 group',
-                    )}
-                    onClick={() => onSelectAgentId(option.id)}
-                  >
-                    <AgentAvatar agentId={option.id} title={option.name} type="extraSmall" className="mb-0 mt-0" />
-                    <h4 className="text-white ml-[4px] text-[15px]">{option.name}</h4>
-                    <span className="text-sm truncate text-gray-400">{option.usage}</span>
-                    <Icon icon={Pin} className={cn('w-4 h-4 min-h-4 min-w-4 flex-shrink-0 group-hover:!text-white')} />
-                  </li>
-                );
-              })
-            )}
-          </ul>
-          <div className="h-1 border-b border-gray-600" />
-          <div className="max-h-[76px] overflow-y-auto flex gap-2 w-full flex-wrap">
-            {materialsOptions.length === 0 && <p className="text-sm p-2 text-gray-400">There is no more materials.</p>}
-            {filteredMaterialOptions.length === 0 && materialsOptions.length !== 0 && (
-              <p className="text-sm p-2 text-gray-400">There is no material with this name.</p>
-            )}
-            {filteredMaterialOptions.length !== 0 &&
-              materialsOptions.length !== 0 &&
-              filteredMaterialOptions.map((option) => (
-                <ChatOption
-                  option={option}
-                  selectOption={handleMaterialSelect}
+      <div className="relative flex flex-col gap-2" ref={wrapperRef}>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Search for an agent or material"
+          className="bg-transparent p-2 focus:outline-none border-gray-400 text-white w-full placeholder:text-gray-400 placeholder:text-[15px]"
+          disabled={isChatLoading}
+        />
+        <ul className="max-h-[134px] overflow-y-auto">
+          {filteredAgentsOptions.length === 0 ? (
+            <p className="text-sm p-2 text-gray-400">There is no agent with this name.</p>
+          ) : (
+            filteredAgentsOptions.map((option) => {
+              return (
+                <li
                   key={option.id}
-                  disabled={isChatLoading}
-                />
-              ))}
-          </div>
+                  className={cn(
+                    'w-full overflow-hidden p-2 flex items-center cursor-pointer hover:bg-gray-600 rounded-[8px] max-h-[44px] gap-2 group',
+                  )}
+                  onClick={() => onSelectAgentId(option.id)}
+                >
+                  <AgentAvatar agentId={option.id} title={option.name} type="extraSmall" className="mb-0 mt-0" />
+                  <h4 className="text-white ml-[4px] text-[15px]">{option.name}</h4>
+                  <span className="text-sm truncate text-gray-400">{option.usage}</span>
+                  <Icon icon={Pin} className={cn('w-4 h-4 min-h-4 min-w-4 flex-shrink-0 group-hover:!text-white')} />
+                </li>
+              );
+            })
+          )}
+        </ul>
+        <div className="h-1 border-b border-gray-600" />
+        <div className="max-h-[76px] overflow-y-auto flex gap-2 w-full flex-wrap">
+          {materialsOptions.length === 0 && <p className="text-sm p-2 text-gray-400">There is no more materials.</p>}
+          {filteredMaterialOptions.length === 0 && materialsOptions.length !== 0 && (
+            <p className="text-sm p-2 text-gray-400">There is no material with this name.</p>
+          )}
+          {filteredMaterialOptions.length !== 0 &&
+            materialsOptions.length !== 0 &&
+            filteredMaterialOptions.map((option) => (
+              <ChatOption
+                option={option}
+                selectOption={handleMaterialSelect}
+                key={option.id}
+                disabled={isChatLoading}
+              />
+            ))}
         </div>
       </div>
     </div>
