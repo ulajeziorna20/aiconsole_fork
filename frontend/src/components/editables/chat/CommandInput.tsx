@@ -38,7 +38,7 @@ interface MessageInputProps {
 
 export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: MessageInputProps) => {
   const ActionIcon = actionIcon;
-  const [showMentions, setShowMentions] = useState(false);
+  const [showChatOptions, setShowChatOptions] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const command = useChatStore((state) => state.commandHistory[state.commandIndex]);
 
@@ -56,8 +56,8 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCommand(e.target.value);
-    const mentionMatch = e.target.value.match(/@\w*$/);
-    setShowMentions(!!mentionMatch);
+    const mentionMatch = e.target.value.match(/@(\s*)$/);
+    setShowChatOptions(!!mentionMatch);
   };
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -168,7 +168,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
   return (
     <div className={cn(className, 'flex w-full flex-col px-4 py-[20px]  bg-gray-900 z-50 ')}>
       <div className="flex items-end gap-[10px] max-w-[700px] w-full mx-auto relative">
-        {showMentions && (
+        {showChatOptions && (
           <ChatOptions
             onSelectAgentId={onSelectAgentId}
             handleMaterialSelect={handleMaterialSelect}
@@ -218,6 +218,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
             className="w-full bg-transparent text-[15px] text-white resize-none overflow-hidden px-[20px] py-[12px] placeholder:text-gray-400 hover:placeholder:text-gray-300 focus:outline-none"
             value={command}
             onChange={handleChange}
+            onFocus={() => setShowChatOptions(false)}
             onKeyDown={handleKeyDown}
             placeholder={`Type "@" to select a specific agent and materials`}
             rows={1}
