@@ -45,8 +45,11 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     setCommand(e.target.value);
   };
 
+  const isEmptyInput = !(command.trim().length === 0 && chat?.message_groups.length === 0);
+
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && isEmptyInput) {
+      console.log('command run');
       e.preventDefault();
 
       await handleSendMessage();
@@ -93,7 +96,13 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
         />
         <Tooltip label={actionLabel} position="top" align="center" sideOffset={10} disableAnimation withArrow>
           <div>
-            <Button variant="primary" iconOnly={true} onClick={handleSendMessage} classNames={cn('p-[12px]', {})}>
+            <Button
+              variant="primary"
+              iconOnly={true}
+              onClick={handleSendMessage}
+              classNames={cn('p-[12px]', {})}
+              disabled={!isEmptyInput}
+            >
               <Icon icon={ActionIcon} width={24} height={24} className="w-6 h-6" />
             </Button>
           </div>
