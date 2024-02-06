@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { Pin, Plus } from 'lucide-react';
 import { cn } from '@/utils/common/cn';
 import { useChatStore } from '@/store/editables/chat/useChatStore';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
@@ -41,7 +40,6 @@ const ChatOption = ({ option, selectOption }: { option: Material; selectOption: 
     >
       <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
       <p className="flex-1 truncate font-normal text-sm text-gray-400 group-hover:text-white">{option.name}</p>
-      <Icon icon={Plus} className="group-hover:!text-white" />
     </button>
   );
 };
@@ -110,7 +108,6 @@ const ChatOptions = ({ onSelectAgentId, handleMaterialSelect, materialsOptions }
                   <AgentAvatar agentId={option.id} title={option.name} type="extraSmall" className="!mb-0 !mt-0" />
                   <h4 className="text-white ml-[4px] text-[15px]">{option.name}</h4>
                   <span className="text-sm truncate text-gray-400">{option.usage}</span>
-                  <Icon icon={Pin} className={cn('w-4 h-4 min-h-4 min-w-4 flex-shrink-0 group-hover:!text-white')} />
                 </li>
               );
             })
