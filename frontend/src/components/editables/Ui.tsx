@@ -1,6 +1,6 @@
-import initSwc, { transform } from '@swc/wasm-web';
-import React, { useEffect, useState, ReactNode } from 'react';
-import Frame from 'react-frame-component';
+import { createSandbox } from '@/utils/transpilation/createSandbox';
+import { transpileCode } from '@/utils/transpilation/transpileCode';
+import { useEffect, useState, ReactNode } from 'react';
 
 const code = `const Component = () => {
   return <h2>Hi, I am a Car! {window.document.title}</h2>;
@@ -8,41 +8,21 @@ const code = `const Component = () => {
 `;
 
 export const UI = () => {
-  const [isInit, setIsInit] = useState(false);
   const [result, setResult] = useState<ReactNode | null>(null);
 
   useEffect(() => {
-    const init = async () => {
-      await initSwc();
-      setIsInit(true);
+    const transpile = async () => {
+      const finalCode = await transpileCode(code);
+
+      const sandboxed = createSandbox(finalCode);
+
+      if (sandboxed) {
+        setResult(sandboxed());
+      }
     };
 
-    init();
+    transpile();
   }, []);
 
-  useEffect(() => {
-    const transpile = async () => {
-      const res = await transform(code, {
-        jsc: { parser: { syntax: 'typescript', tsx: true } },
-      });
-
-      const finalCode = `${res.code}\n\nreturn Component;`;
-
-      console.log(finalCode);
-
-      const sandboxed = new Function('React', finalCode);
-      setResult(sandboxed(React));
-      console.log(sandboxed);
-    };
-
-    if (isInit) {
-      transpile();
-    }
-  }, [isInit]);
-
-  return (
-    <div>
-      <Frame>{result ? result : 'uiyarn de'}</Frame>
-    </div>
-  );
+  return <div>{result ? result : 'ui'}</div>;
 };
