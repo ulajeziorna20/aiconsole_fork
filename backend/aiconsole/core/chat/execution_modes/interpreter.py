@@ -36,6 +36,7 @@ from aiconsole.core.chat.chat_mutations import (
     SetContentMessageMutation,
     SetHeadlineToolCallMutation,
     SetIsExecutingToolCallMutation,
+    SetIsStreamingMessageMutation,
     SetIsStreamingToolCallMutation,
     SetLanguageToolCallMutation,
     SetOutputToolCallMutation,
@@ -207,6 +208,12 @@ async def _generate_response(
     )
 
     try:
+        await context.chat_mutator.mutate(
+            SetIsStreamingMessageMutation(
+                message_id=message_id,
+                is_streaming=True,
+            )
+        )
         async for chunk_or_clear in executor.execute(
             GPTRequest(
                 system_message=system_message,
@@ -269,6 +276,12 @@ async def _generate_response(
                     is_streaming=False,
                 )
             )
+        await context.chat_mutator.mutate(
+            SetIsStreamingMessageMutation(
+                message_id=message_id,
+                is_streaming=False,
+            )
+        )
         _log.debug(f"tools_requiring_closing_parenthesis: {tools_requiring_closing_parenthesis}")
 
 

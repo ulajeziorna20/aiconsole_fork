@@ -1,5 +1,5 @@
-import subprocess
 import platform
+import subprocess
 
 
 def is_domain_available(domain) -> bool:
