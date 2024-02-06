@@ -174,6 +174,14 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     debounceChatUpdate();
   };
 
+  const handleFocus = useCallback(() => {
+    if (command.endsWith('@')) {
+      const newCommand = command.slice(0, -1);
+      setCommand(newCommand);
+    }
+    setShowChatOptions(false);
+  }, [command, setCommand]);
+
   return (
     <div className={cn(className, 'flex w-full flex-col px-4 py-[20px]  bg-gray-900 z-50 ')}>
       <div className="flex items-end gap-[10px] max-w-[700px] w-full mx-auto relative">
@@ -227,7 +235,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
             className="w-full bg-transparent text-[15px] text-white resize-none overflow-hidden px-[20px] py-[12px] placeholder:text-gray-400 hover:placeholder:text-gray-300 focus:outline-none"
             value={command}
             onChange={handleChange}
-            onFocus={() => setShowChatOptions(false)}
+            onFocus={handleFocus}
             onKeyDown={handleKeyDown}
             placeholder={`Type "@" to select a specific agent and materials`}
             rows={1}
