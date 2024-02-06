@@ -199,7 +199,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
                 <div className="w-full flex jusify-between items-center">
                   <div className="flex items-center gap-3 w-full">
                     <AgentAvatar agentId={selectedAgentId} title="test" type="extraSmall" className="!mb-0 !mt-0" />
-                    <p>
+                    <p className="text-[15px]">
                       Talking to <span className="text-white">{getAgent(selectedAgentId)?.name}</span>
                     </p>
                   </div>
@@ -212,11 +212,11 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
               )}
               {chosenMaterials.length > 0 && (
                 <div className="flex gap-2">
-                  <span className="text-gray-400">Using:</span>
-                  <div className="flex flex-wrap items-center gap-2 overflow-y-auto max-h-[56px]">
+                  <span className="text-gray-400 text-[14px]">Using:</span>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 overflow-y-auto max-h-[52px]">
                     {chosenMaterials.map((material) => (
                       <div key={material.id} className="flex gap-1 items-center">
-                        <span className="text-gray-300">{material.name}</span>
+                        <span className="text-gray-300 text-[14px]">{material.name}</span>
                         <Icon
                           icon={X}
                           className={cn('w-4 h-4 min-h-4 min-w-4 flex-shrink-0 cursor-pointer text-gray-400')}
