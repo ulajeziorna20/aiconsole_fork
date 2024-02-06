@@ -35,13 +35,14 @@ const ChatOption = ({ option, selectOption }: { option: Material; selectOption: 
   const OptionIcon = getEditableObjectIcon(option);
 
   return (
-    <div className="flex justify-between items-center max-w-full w-max gap-3 hover:bg-gray-600 px-2 py-1 rounded-[8px] max-h-[32px] group">
+    <button
+      className="flex justify-between items-center max-w-full w-max gap-3 hover:bg-gray-600 px-2 py-1 rounded-[8px] max-h-[32px] group"
+      onClick={() => selectOption(option)}
+    >
       <Icon icon={OptionIcon} className="w-6 h-6 min-h-6 min-w-6 text-material" />
       <p className="flex-1 truncate font-normal text-sm text-gray-400 group-hover:text-white">{option.name}</p>
-      <button onClick={() => selectOption(option)}>
-        <Icon icon={Plus} className="group-hover:!text-white" />
-      </button>
-    </div>
+      <Icon icon={Plus} className="group-hover:!text-white" />
+    </button>
   );
 };
 
