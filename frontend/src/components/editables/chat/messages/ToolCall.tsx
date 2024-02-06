@@ -75,12 +75,10 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
   }, [tool_call.id, userMutateChat]);
 
   const handleRunClick = () => {
-    handleRemoveClick();
     doAcceptCode(tool_call.id);
   };
 
   const handleAlwaysRunClick = () => {
-    handleRemoveClick();
     enableAutoCodeExecution(true);
     doAcceptCode(tool_call.id);
   };
