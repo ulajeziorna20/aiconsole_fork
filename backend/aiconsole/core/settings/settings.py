@@ -20,7 +20,7 @@ from functools import lru_cache
 from aiconsole.core.settings.fs.settings_file_storage import SettingsUpdatedEvent
 from aiconsole.core.settings.settings_notifications import SettingsNotifications
 from aiconsole.core.settings.settings_storage import SettingsStorage
-from aiconsole.core.settings.utils.update_settings_data import merge_settings_data
+from aiconsole.core.settings.utils.merge_settings_data import merge_settings_data
 from aiconsole.utils.events import internal_events
 from aiconsole_toolkit.settings.partial_settings_data import PartialSettingsData
 from aiconsole_toolkit.settings.settings_data import SettingsData

@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { useUserContextMenu } from '@/utils/common/useUserContextMenu';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
-import { AgentAvatar } from './AgentAvatar';
+import { ActorAvatar } from './ActorAvatar';
 import { ContextMenu, ContextMenuRef } from '@/components/common/ContextMenu';
 import { cn } from '@/utils/common/cn';
 import { useChatStore } from '@/store/editables/chat/useChatStore';
@@ -106,8 +106,9 @@ export function AgentInfo({
           onClick={openContext}
           className="flex-none items-center flex flex-col"
         >
-          <AgentAvatar
-            agentId={agentId}
+          <ActorAvatar
+            actorType="agent"
+            actorId={agentId}
             title={`${agent?.name || agentId}${task ? ` tasked with:\n${task}` : ``}`}
             type="small"
           />
