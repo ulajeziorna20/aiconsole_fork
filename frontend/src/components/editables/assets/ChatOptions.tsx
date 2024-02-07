@@ -49,14 +49,14 @@ const ChatOptions = ({
   const chat = useChatStore((state) => state.chat);
   const agents = useEditablesStore((state) => state.agents);
   const [inputValue, setInputValue] = useState('');
-  const [filteredMaterialOptions, setFilteredMaterialOptions] = useState<Material[]>([]);
+  const [filteredMaterialsOptions, setFilteredMaterialsOptions] = useState<Material[]>([]);
   const [filteredAgentsOptions, setFilteredAgentsOptions] = useState<Agent[]>(agents);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isChatLoading = useChatStore((state) => state.isChatLoading);
   const [focusedIndex, setFocusedIndex] = useState(0);
 
   useEffect(() => {
-    setFilteredMaterialOptions(materialsOptions);
+    setFilteredMaterialsOptions(materialsOptions);
   }, [materialsOptions]);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const ChatOptions = ({
     const filteredMaterialOptions = materialsOptions.filter((item) => regex.test(item.name));
     const filteredAgentOptions = agents.filter((item) => regex.test(item.name));
     setFilteredAgentsOptions(filteredAgentOptions);
-    setFilteredMaterialOptions(filteredMaterialOptions);
+    setFilteredMaterialsOptions(filteredMaterialOptions);
   };
 
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -103,7 +103,7 @@ const ChatOptions = ({
   useClickOutside(wrapperRef, handleClickOutside);
 
   const handleListKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
-    const itemCount = filteredAgentsOptions.length + filteredMaterialOptions.length;
+    const itemCount = filteredAgentsOptions.length + filteredMaterialsOptions.length;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setFocusedIndex((prevIndex) => {
@@ -153,10 +153,10 @@ const ChatOptions = ({
           ref={inputRef}
         />
         <ul className="options-list max-h-[266px] overflow-y-auto" onKeyDown={handleListKeyDown} tabIndex={0}>
-          {filteredAgentsOptions.length === 0 ? (
+          {[...filteredAgentsOptions, ...filteredMaterialsOptions].length === 0 ? (
             <p className="text-sm p-2 text-gray-400">There is no agent or material with this name.</p>
           ) : (
-            [...filteredAgentsOptions, ...filteredMaterialOptions]
+            [...filteredAgentsOptions, ...filteredMaterialsOptions]
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((option) => {
                 return (
