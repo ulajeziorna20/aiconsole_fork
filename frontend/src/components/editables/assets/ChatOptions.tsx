@@ -82,10 +82,7 @@ const ChatOptions = ({
     if ((e.nativeEvent.key === 'Backspace' && inputValue === '') || e.nativeEvent.key === 'Escape') {
       setShowChatOptions(false);
       setFocusedIndex(-1);
-
-      setTimeout(() => {
-        textAreaRef?.current?.focus();
-      }, 0);
+      textAreaRef?.current?.focus();
     }
     if (e.nativeEvent.key === 'ArrowDown') {
       e.preventDefault();
