@@ -235,6 +235,12 @@ async def _generate_response(
             )
         ):
             # What is this?
+            await context.chat_mutator.mutate(
+                SetIsStreamingMessageMutation(
+                    message_id=message_id,
+                    is_streaming=False,
+                )
+            )
             if chunk_or_clear == CLEAR_STR:
                 await context.chat_mutator.mutate(SetContentMessageMutation(message_id=message_id, content=""))
                 continue
@@ -276,12 +282,6 @@ async def _generate_response(
                     is_streaming=False,
                 )
             )
-        await context.chat_mutator.mutate(
-            SetIsStreamingMessageMutation(
-                message_id=message_id,
-                is_streaming=False,
-            )
-        )
         _log.debug(f"tools_requiring_closing_parenthesis: {tools_requiring_closing_parenthesis}")
 
 
