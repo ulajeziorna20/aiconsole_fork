@@ -136,6 +136,8 @@ const ChatOptions = ({
     return;
   }
 
+  const options = [...filteredAgentsOptions, ...filteredMaterialsOptions];
+
   return (
     <div
       style={{ width: 'calc(100% - 60px)', bottom: 'calc(100% + 8px)' }}
@@ -153,10 +155,10 @@ const ChatOptions = ({
           ref={inputRef}
         />
         <ul className="options-list max-h-[266px] overflow-y-auto" onKeyDown={handleListKeyDown} tabIndex={0}>
-          {[...filteredAgentsOptions, ...filteredMaterialsOptions].length === 0 ? (
+          {options.length === 0 ? (
             <p className="text-sm p-2 text-gray-400">There is no agent or material with this name.</p>
           ) : (
-            [...filteredAgentsOptions, ...filteredMaterialsOptions]
+            options
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((option) => {
                 return (
@@ -167,17 +169,19 @@ const ChatOptions = ({
                         option.type === 'agent' ? onSelectAgentId(option.id) : handleMaterialSelect(option as Material)
                       }
                     >
-                      {option.type === 'agent' ? (
-                        <ActorAvatar
-                          actorType="agent"
-                          actorId={option.id}
-                          title={option.name}
-                          type="extraSmall"
-                          className="!mb-0 !mt-0"
-                        />
-                      ) : (
-                        <MaterialIcon option={option as Material} />
-                      )}
+                      <div className="w-6 h-6 flex-shrink-0">
+                        {option.type === 'agent' ? (
+                          <ActorAvatar
+                            actorType="agent"
+                            actorId={option.id}
+                            title={option.name}
+                            type="extraSmall"
+                            className="!mb-0 !mt-0"
+                          />
+                        ) : (
+                          <MaterialIcon option={option as Material} />
+                        )}
+                      </div>
                       <h4 className="text-white ml-[4px] text-[15px] flex-shrink-0">{option.name}</h4>
                       <span className="text-sm truncate text-gray-400">{option.usage}</span>
                     </button>
