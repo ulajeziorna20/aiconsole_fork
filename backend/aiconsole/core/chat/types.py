@@ -26,8 +26,11 @@ from aiconsole.core.gpt.types import GPTRole
 
 
 class ActorId(BaseModel):
-    type: Literal["user"] | Literal["agent"]
+    type: Literal["user", "agent"]
     id: str
+
+    def __hash__(self):
+        return hash((self.type, self.id))
 
 
 class AICToolCall(BaseModel):
