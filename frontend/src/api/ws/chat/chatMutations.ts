@@ -18,7 +18,7 @@ export type LockReleasedMutation = z.infer<typeof LockReleasedMutationSchema>;
 export const CreateMessageGroupMutationSchema = z.object({
   type: z.literal('CreateMessageGroupMutation'),
   message_group_id: z.string(),
-  agent_id: z.string(),
+  actor_id: z.string(),
   username: z.string(),
   email: z.string(),
   role: GPTRoleSchema, // Replace with actual GPTRole schema
@@ -70,7 +70,7 @@ export type SetRoleMessageGroupMutation = z.infer<typeof SetRoleMessageGroupMuta
 export const SetActorIdMessageGroupMutationSchema = z.object({
   type: z.literal('SetActorIdMessageGroupMutation'),
   message_group_id: z.string(),
-  agent_id: z.string(),
+  actor_id: z.string(),
 });
 
 export type SetActorIdMessageGroupMutation = z.infer<typeof SetActorIdMessageGroupMutationSchema>;

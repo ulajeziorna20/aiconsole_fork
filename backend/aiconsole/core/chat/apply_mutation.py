@@ -58,7 +58,7 @@ def _handle_CreateMessageGroupMutation(chat: Chat, mutation: CreateMessageGroupM
 
     message_group = AICMessageGroup(
         id=mutation.message_group_id,
-        actor_id=mutation.agent_id,
+        actor_id=mutation.actor_id,
         username=username,
         email=email,
         role=mutation.role,
@@ -97,9 +97,9 @@ def _handle_SetMessageGroupRoleMutation(chat, mutation: SetRoleMessageGroupMutat
 
 def _handle_SetMessageGroupAgentIdMutation(chat, mutation: SetActorIdMessageGroupMutation) -> None:
     message_group = _get_message_group(chat, mutation.message_group_id)
-    message_group.actor_id = mutation.agent_id
+    message_group.actor_id = mutation.actor_id
 
-    if mutation.agent_id == "user":
+    if mutation.actor_id == "user":
         message_group.role = "user"
     else:
         message_group.role = "assistant"

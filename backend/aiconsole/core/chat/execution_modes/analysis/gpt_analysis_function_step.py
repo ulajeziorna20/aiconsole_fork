@@ -215,7 +215,7 @@ async def gpt_analysis_function_step(
                             await chat_mutator.mutate(
                                 SetActorIdMessageGroupMutation(
                                     message_group_id=message_group_id,
-                                    agent_id=arguments_dict["agent_id"],
+                                    actor_id=arguments_dict["agent_id"],
                                 )
                             )
 
@@ -279,7 +279,7 @@ async def gpt_analysis_function_step(
         await chat_mutator.mutate(
             SetActorIdMessageGroupMutation(
                 message_group_id=message_group_id,
-                agent_id=picked_agent.id,
+                actor_id=picked_agent.id,
             )
         )
 

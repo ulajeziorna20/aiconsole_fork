@@ -15,7 +15,7 @@ export function applyMutation(chat: Chat, mutation: ChatMutation) {
     case 'CreateMessageGroupMutation':
       chat.message_groups.push({
         id: mutation.message_group_id,
-        actor_id: mutation.agent_id,
+        actor_id: mutation.actor_id,
         username: mutation.username,
         email: mutation.email,
         role: mutation.role,
@@ -44,8 +44,8 @@ export function applyMutation(chat: Chat, mutation: ChatMutation) {
       break;
     case 'SetActorIdMessageGroupMutation': {
       const messageGroup = getMessageGroup(chat, mutation.message_group_id);
-      messageGroup.actor_id = mutation.agent_id;
-      if (mutation.agent_id === 'user') {
+      messageGroup.actor_id = mutation.actor_id;
+      if (mutation.actor_id === 'user') {
         messageGroup.role = 'user';
       } else {
         messageGroup.role = 'assistant';
