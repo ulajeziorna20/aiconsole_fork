@@ -76,11 +76,12 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
 
   const handleRunClick = () => {
     doAcceptCode(tool_call.id);
+    tool_call.output = '';
   };
 
   const handleAlwaysRunClick = () => {
     enableAutoCodeExecution(true);
-    doAcceptCode(tool_call.id);
+    handleRunClick();
   };
 
   //Either executing or streaming while there are still no output messages
