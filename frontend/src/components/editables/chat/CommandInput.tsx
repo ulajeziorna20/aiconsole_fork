@@ -96,9 +96,19 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
         } else if (e.key === 'ArrowDown' && caretAtEnd) {
           promptDown();
         }
+
+        if (e.key === 'Backspace' && caretAtStart) {
+          if (chosenMaterials.length > 0) {
+            const newChosenMaterials = [...chosenMaterials];
+            newChosenMaterials.pop();
+            setChosenMaterials(newChosenMaterials);
+          } else {
+            setSelectedAgentId('');
+          }
+        }
       }
     },
-    [handleSendMessage, promptDown, promptUp],
+    [handleSendMessage, promptDown, promptUp, chosenMaterials, setSelectedAgentId, setChosenMaterials],
   );
 
   // auto focus this text area on changes to chatId

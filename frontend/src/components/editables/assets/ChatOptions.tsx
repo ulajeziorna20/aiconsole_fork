@@ -22,6 +22,7 @@ import { useClickOutside } from '@/utils/common/useClickOutside';
 import { getEditableObjectIcon } from '@/utils/editables/getEditableObjectIcon';
 import { Agent, Material } from '@/types/editables/assetTypes';
 import { ActorAvatar } from '../chat/ActorAvatar';
+import clsx from 'clsx';
 
 type ChatOptionsProps = {
   onSelectAgentId: (id: string) => void;
@@ -63,7 +64,7 @@ const ChatOptions = ({
     if (focusedIndex >= 0) {
       const buttons = wrapperRef.current?.querySelectorAll('.options-list button') as NodeListOf<HTMLButtonElement>;
       const buttonToFocus = buttons?.[focusedIndex];
-      buttonToFocus?.focus();
+      buttonToFocus?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [focusedIndex]);
 
@@ -79,18 +80,49 @@ const ChatOptions = ({
   };
 
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const itemCount = filteredAgentsOptions.length + filteredMaterialsOptions.length;
     if ((e.nativeEvent.key === 'Backspace' && inputValue === '') || e.nativeEvent.key === 'Escape') {
       setShowChatOptions(false);
-      setFocusedIndex(-1);
+      setFocusedIndex(0);
       textAreaRef?.current?.focus();
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusedIndex((prevIndex) => {
+        const nextIndex = prevIndex - 1;
+        if (nextIndex < 0) {
+          return prevIndex;
+        }
+        return nextIndex;
+      });
     }
     if (e.nativeEvent.key === 'ArrowDown') {
       e.preventDefault();
+      setFocusedIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
+        if (nextIndex >= itemCount) {
+          return prevIndex;
+        }
+        return nextIndex;
+      });
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
       setFocusedIndex(0);
-      const buttons = wrapperRef.current?.querySelectorAll('.options-list button') as NodeListOf<HTMLButtonElement>;
-      const firstButton = buttons?.[0];
-      if (firstButton) {
-        firstButton?.focus();
+      setShowChatOptions(false);
+      textAreaRef?.current?.focus();
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const currentOption = options[focusedIndex];
+      if (currentOption) {
+        currentOption.type === 'agent'
+          ? onSelectAgentId(currentOption.id)
+          : handleMaterialSelect(currentOption as Material);
+        setInputValue('');
+        setShowChatOptions(false);
+        textAreaRef?.current?.focus();
       }
     }
   };
@@ -103,32 +135,8 @@ const ChatOptions = ({
   useClickOutside(wrapperRef, handleClickOutside);
 
   const handleListKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
-    const itemCount = filteredAgentsOptions.length + filteredMaterialsOptions.length;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setFocusedIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-        if (nextIndex >= itemCount) {
-          return prevIndex;
-        }
-        return nextIndex;
-      });
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setFocusedIndex((prevIndex) => {
-        const nextIndex = prevIndex - 1;
-        if (nextIndex < 0) {
-          return prevIndex;
-        }
-        return nextIndex;
-      });
-    }
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      setFocusedIndex(-1);
-      setShowChatOptions(false);
-      textAreaRef?.current?.focus();
     }
   };
 
@@ -145,6 +153,9 @@ const ChatOptions = ({
     >
       <div className="relative flex flex-col gap-2" ref={wrapperRef}>
         <input
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
           type="text"
           value={inputValue}
           onChange={handleInputChange}
@@ -164,7 +175,10 @@ const ChatOptions = ({
                 return (
                   <li key={option.id}>
                     <button
-                      className="w-full overflow-hidden px-2 py-2.5 flex items-center cursor-pointer hover:bg-gray-600 focus:bg-gray-600 rounded-[8px] max-h-[44px] gap-2 group focus:outline-none"
+                      className={clsx(
+                        'w-full overflow-hidden px-2 py-2.5 flex items-center cursor-pointer hover:bg-gray-600 rounded-[8px] max-h-[44px] gap-2 group focus:outline-none',
+                        focusedIndex === options.indexOf(option) && 'bg-gray-600',
+                      )}
                       onClick={() =>
                         option.type === 'agent' ? onSelectAgentId(option.id) : handleMaterialSelect(option as Material)
                       }
