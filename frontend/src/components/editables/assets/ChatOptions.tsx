@@ -115,6 +115,7 @@ const ChatOptions = ({
 
     if (e.key === 'Enter') {
       e.preventDefault();
+      e.stopPropagation();
       const currentOption = options[focusedIndex];
       if (currentOption) {
         currentOption.type === 'agent'
