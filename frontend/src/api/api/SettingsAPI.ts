@@ -25,12 +25,15 @@ const checkKey = (key: string) => {
   });
 };
 
-async function getUserAvatar(email?: string) {
+async function getUserAvatar(email?: string): Promise<Avatar> {
   const response = await ky
     .get(`${getBaseURL()}/profile`, { searchParams: email ? { email } : undefined })
     .json<Avatar>();
 
-  return response;
+  return {
+    avatar_url: `${getBaseURL()}/${response.avatar_url}`,
+    username: response.username,
+  };
 }
 
 // TODO: this is not working now - backend is not ready
