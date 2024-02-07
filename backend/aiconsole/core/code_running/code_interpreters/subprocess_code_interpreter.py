@@ -65,6 +65,9 @@ class SubprocessCodeInterpreter(BaseCodeInterpreter):
         self.output_queue: "queue.Queue[str]" = queue.Queue()
         self.done = threading.Event()
 
+    async def initialize(self):
+        pass
+
     def detect_end_of_execution(self, line):
         return None
 

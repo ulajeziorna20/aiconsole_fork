@@ -56,18 +56,13 @@ DEBUG_MODE = True
 
 
 class Python(BaseCodeInterpreter):
-    def __init__(self):
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            asyncio.ensure_future(self.configure())
-        else:
-            loop.run_until_complete(self.configure())
 
-    async def configure(self):
+    async def initialize(self):
         self.km = KernelManager(kernel_name="python3")
         self.km.start_kernel()
         self.kc = self.km.client()
         self.kc.start_channels()
+
         while not self.kc.is_alive():
             await asyncio.sleep(0.1)
         await asyncio.sleep(0.5)

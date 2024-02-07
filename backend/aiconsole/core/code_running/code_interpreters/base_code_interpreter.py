@@ -43,6 +43,9 @@ class BaseCodeInterpreter(Protocol):
     .run is a generator that yields a dict with attributes: active_line, output
     """
 
+    async def initialize(self):  # fmt: off
+        ...
+
     async def run(self, code: str, materials: list[Material]) -> AsyncGenerator[str, None]:  # fmt: off
         ...
 

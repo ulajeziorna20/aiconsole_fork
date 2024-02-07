@@ -157,7 +157,7 @@ async def _run_code(context: ProcessChatContext, tool_call_id):
             context.rendered_materials
 
             assert tool_call.language is not None
-            async for token in get_code_interpreter(tool_call.language, context.chat_mutator.chat.id).run(
+            async for token in (await get_code_interpreter(tool_call.language, context.chat_mutator.chat.id)).run(
                 tool_call.code, context.materials
             ):
                 await context.chat_mutator.mutate(
