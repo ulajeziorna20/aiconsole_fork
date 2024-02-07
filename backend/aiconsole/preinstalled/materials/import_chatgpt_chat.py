@@ -1,7 +1,5 @@
 """
 
-You have the below functions available and can use them without import.
-
 Example usage:
 
 chat_link = "https://chat.openai.com/share/5fa0b36f-ac97-4660-a648-e9c1ce935744"
