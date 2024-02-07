@@ -7,7 +7,7 @@ from typing import BinaryIO
 from aiconsole.consts import AICONSOLE_USER_CONFIG_DIR
 from aiconsole.core.clients.gravatar import GravatarUserProfile, gravatar_client
 from aiconsole.core.settings.settings import settings
-from aiconsole.core.users.models import (
+from backend.aiconsole.core.users.types import (
     DEFAULT_USERNAME,
     PartialUserProfile,
     UserProfile,
