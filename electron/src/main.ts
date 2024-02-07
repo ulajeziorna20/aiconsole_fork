@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import {
   app,
   BrowserWindow,
@@ -24,10 +25,10 @@ import {
   shell,
   Notification,
 } from 'electron';
-import { initialize, trackEvent } from '@aptabase/electron/main';
 import { ChildProcess, spawn } from 'child_process';
-import net from 'net';
 import path from 'path';
+import net from 'net';
+import { initialize } from '@aptabase/electron/main';
 
 import { windowStateTracker } from './windowStateTracker';
 
@@ -333,49 +334,10 @@ ipcMain.on('request-backend-port', async (event) => {
 });
 
 app.whenReady().then(() => {
-  trackEvent('app_started');
-
   ipcMain.handle('open-dir-picker', handleDirPicker);
   ipcMain.handle('open-finder', async (event, path) => {
     shell.showItemInFolder(path);
   });
-
-  ipcMain.on('register-beforeunload-listener', (event, shouldConfirm) => {
-    const window: AIConsoleWindow | undefined = windowManager.windows.find(
-      (win) => event.sender === win.browserWindow.webContents
-    );
-
-    if (!shouldConfirm) {
-      window?.browserWindow.removeAllListeners('close');
-      return;
-    }
-
-    const handleBeforeUnload = (e: Electron.IpcMainEvent) => {
-      if (!shouldConfirm) {
-        window?.browserWindow.close();
-      }
-      const choice = dialog.showMessageBoxSync(window.browserWindow, {
-        type: 'question',
-        buttons: ['Yes', 'No'],
-        title: 'Confirm',
-        message: 'Are you sure you want to quit?',
-      });
-
-      if (choice === 1) {
-        e.preventDefault();
-      }
-    };
-    window.browserWindow.addListener('close', handleBeforeUnload);
-  });
-
-  ipcMain.on('dispose-beforeunload-listener', (event) => {
-    const window: AIConsoleWindow | undefined = windowManager.windows.find(
-      (win) => event.sender === win.browserWindow.webContents
-    );
-
-    window.browserWindow.removeAllListeners('close');
-  });
-
   createLoaderWindow();
 
   app.on('will-quit', () => {
