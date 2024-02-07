@@ -39,12 +39,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
     >
       <div className="container flex mx-auto gap-[92px] max-w-[1104px]">
         <div className="flex-none items-center flex flex-col max-w-[120px] ">
-          <ActorInfo
-            agentId={group.actor_id}
-            materialsIds={group.materials_ids}
-            task={group.task}
-            username={group.username}
-          />
+          <ActorInfo actorId={group.actor_id} materialsIds={group.materials_ids} task={group.task} />
 
           {group.messages && !isOpen && (
             <AnalysisClosed group={group} onClick={() => setIsAnalysisManuallyOpen(!isOpen)} />
