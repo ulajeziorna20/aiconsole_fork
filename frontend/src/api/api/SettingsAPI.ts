@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Avatar, Settings } from '@/types/settings/Settings';
+import { Avatar, Settings } from '@/types/settings/settingsTypes';
 import ky from 'ky';
 import { API_HOOKS, getBaseURL } from '../../store/useAPIStore';
 
