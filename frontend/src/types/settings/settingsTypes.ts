@@ -19,6 +19,7 @@ export type Settings = {
   openai_api_key?: string;
   user_profile?: {
     username?: string;
+    email?: string;
     avatar_url?: string;
   };
 };
