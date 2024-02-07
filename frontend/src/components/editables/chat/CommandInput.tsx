@@ -53,6 +53,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
   const [chosenMaterials, setChosenMaterials] = useState<Material[]>([]);
   const materialsIds = chosenMaterials.map((material) => material.id);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const chatOptionsInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = useCallback(
     async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -68,6 +69,10 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
       setCommand(e.target.value);
       const mentionMatch = e.target.value.match(/@(\s*)$/);
       setShowChatOptions(!!mentionMatch);
+
+      setTimeout(() => {
+        chatOptionsInputRef?.current?.focus();
+      }, 0);
     },
     [setCommand],
   );
@@ -150,9 +155,18 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     }
   }, 500);
 
+  const removeLastAt = () => {
+    if (command.endsWith('@')) {
+      const newCommand = command.slice(0, -1);
+      setCommand(newCommand);
+    }
+  };
+
   const onSelectAgentId = (id: string) => {
     setSelectedAgentId(id);
     debounceChatUpdate();
+    setShowChatOptions(false);
+    removeLastAt();
   };
 
   const removeAgentId = () => {
@@ -165,6 +179,8 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     const filteredOptions = materialsOptions.filter(({ id }) => id !== material.id);
     setMaterialsOptions(filteredOptions);
     debounceChatUpdate();
+    setShowChatOptions(false);
+    removeLastAt();
   };
 
   const removeSelectedMaterial = (id: string) => () => {
@@ -175,12 +191,8 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
   };
 
   const handleFocus = useCallback(() => {
-    if (command.endsWith('@')) {
-      const newCommand = command.slice(0, -1);
-      setCommand(newCommand);
-    }
     setShowChatOptions(false);
-  }, [command, setCommand]);
+  }, []);
 
   return (
     <div className={cn(className, 'flex w-full flex-col px-4 py-[20px]  bg-gray-900 z-50 ')}>
@@ -189,7 +201,10 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
           <ChatOptions
             onSelectAgentId={onSelectAgentId}
             handleMaterialSelect={handleMaterialSelect}
+            setShowChatOptions={setShowChatOptions}
             materialsOptions={materialsOptions}
+            inputRef={chatOptionsInputRef}
+            textAreaRef={textAreaRef}
           />
         )}
         <div className="w-full max-h-[200px] overflow-y-auto border border-gray-500 bg-gray-800 hover:bg-gray-600 focus-within:bg-gray-600 focus-within:border-gray-400 transition duration-100 rounded-[8px] flex flex-col flex-grow resize-none">
