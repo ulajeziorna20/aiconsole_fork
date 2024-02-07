@@ -25,7 +25,6 @@ export type SettingsStore = {
   isApiKeyValid?: boolean;
   alwaysExecuteCode: boolean;
   username?: string;
-  userEmail?: string;
   userAvatarUrl?: string;
   isSettingsModalVisible: boolean;
   setSettingsModalVisibility: (isVisible: boolean) => void;
@@ -41,7 +40,6 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   isApiKeyValid: false,
   alwaysExecuteCode: false,
   username: undefined,
-  userEmail: undefined,
   userAvatarUrl: undefined,
   isSettingsModalVisible: false,
   setSettingsModalVisibility: (isVisible: boolean) => {
@@ -65,9 +63,6 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     }
     if (user_profile && user_profile.username) {
       set({ username: user_profile.username });
-    }
-    if (user_profile && user_profile.email) {
-      set({ userEmail: user_profile.email });
     }
     if (typeof code_autorun === 'boolean') {
       set({ alwaysExecuteCode: code_autorun });

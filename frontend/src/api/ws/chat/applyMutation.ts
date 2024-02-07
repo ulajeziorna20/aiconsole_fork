@@ -16,8 +16,6 @@ export function applyMutation(chat: Chat, mutation: ChatMutation) {
       chat.message_groups.push({
         id: mutation.message_group_id,
         actor_id: mutation.actor_id,
-        username: mutation.username,
-        email: mutation.email,
         role: mutation.role,
         task: mutation.task,
         materials_ids: mutation.materials_ids,

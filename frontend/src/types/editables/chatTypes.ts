@@ -26,8 +26,6 @@ export type AICMessage = z.infer<typeof AICMessageSchema>;
 export const AICMessageGroupSchema = z.object({
   id: z.string(),
   actor_id: z.string(),
-  username: z.string().optional(),
-  email: z.string().optional(),
   role: GPTRoleSchema,
   task: z.string(),
   materials_ids: z.array(z.string()),

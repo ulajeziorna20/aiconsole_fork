@@ -49,18 +49,9 @@ _log = logging.getLogger(__name__)
 
 
 def _handle_CreateMessageGroupMutation(chat: Chat, mutation: CreateMessageGroupMutation) -> None:
-    if mutation.role == "user":
-        username = mutation.username or settings().unified_settings.user_profile.username
-        email = mutation.email or settings().unified_settings.user_profile.email
-    else:
-        username = None
-        email = None
-
     message_group = AICMessageGroup(
         id=mutation.message_group_id,
         actor_id=mutation.actor_id,
-        username=username,
-        email=email,
         role=mutation.role,
         task=mutation.task,
         materials_ids=mutation.materials_ids,

@@ -19,7 +19,6 @@ export type Settings = {
   openai_api_key?: string;
   user_profile?: {
     username?: string;
-    email?: string;
     avatar_url?: string;
   };
 };
@@ -27,5 +26,4 @@ export type Settings = {
 export type Avatar = {
   avatar_url: string;
   username: string;
-  gravatar: boolean;
 };
