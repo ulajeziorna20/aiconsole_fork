@@ -167,6 +167,9 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     debounceChatUpdate();
     setShowChatOptions(false);
     removeLastAt();
+    setTimeout(() => {
+      textAreaRef?.current?.focus();
+    }, 0);
   };
 
   const removeAgentId = () => {
@@ -181,6 +184,9 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
     debounceChatUpdate();
     setShowChatOptions(false);
     removeLastAt();
+    setTimeout(() => {
+      textAreaRef?.current?.focus();
+    }, 0);
   };
 
   const removeSelectedMaterial = (id: string) => () => {
@@ -258,7 +264,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
             onChange={handleChange}
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}
-            placeholder={`Type "@" to select a specific agent and materials`}
+            placeholder={`Type "@" to select a specific agent or materials`}
             rows={1}
           />
         </div>
