@@ -22,7 +22,7 @@ from aiconsole.core.assets.agents.agent import Agent
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.assets.models import AssetLocation, AssetStatus
 from aiconsole.core.chat.chat_mutations import (
-    SetAgentIdMessageGroupMutation,
+    SetActorIdMessageGroupMutation,
     SetAnalysisMessageGroupMutation,
     SetIsAnalysisInProgressMutation,
     SetMaterialsIdsMessageGroupMutation,
@@ -213,7 +213,7 @@ async def gpt_analysis_function_step(
                     if arguments_dict:
                         if "agent_id" in arguments_dict:
                             await chat_mutator.mutate(
-                                SetAgentIdMessageGroupMutation(
+                                SetActorIdMessageGroupMutation(
                                     message_group_id=message_group_id,
                                     agent_id=arguments_dict["agent_id"],
                                 )
@@ -277,7 +277,7 @@ async def gpt_analysis_function_step(
 
         picked_agent = pick_agent(plan, chat_mutator.chat, possible_agent_choices)
         await chat_mutator.mutate(
-            SetAgentIdMessageGroupMutation(
+            SetActorIdMessageGroupMutation(
                 message_group_id=message_group_id,
                 agent_id=picked_agent.id,
             )

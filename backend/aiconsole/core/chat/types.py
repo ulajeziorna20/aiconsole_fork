@@ -47,7 +47,7 @@ class AICMessage(BaseModel):
 
 class AICMessageGroup(BaseModel):
     id: str
-    agent_id: str
+    actor_id: str
     username: str | None = None
     email: str | None = None
     role: GPTRole

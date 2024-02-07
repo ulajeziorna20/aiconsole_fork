@@ -56,8 +56,8 @@ class SetRoleMessageGroupMutation(BaseModel):
     role: GPTRole
 
 
-class SetAgentIdMessageGroupMutation(BaseModel):
-    type: Literal["SetAgentIdMessageGroupMutation"] = "SetAgentIdMessageGroupMutation"
+class SetActorIdMessageGroupMutation(BaseModel):
+    type: Literal["SetActorIdMessageGroupMutation"] = "SetActorIdMessageGroupMutation"
     message_group_id: str
     agent_id: str
 
@@ -198,7 +198,7 @@ ChatMutation = (
     | SetTaskMessageGroupMutation
     | AppendToTaskMessageGroupMutation
     | SetRoleMessageGroupMutation
-    | SetAgentIdMessageGroupMutation
+    | SetActorIdMessageGroupMutation
     | SetMaterialsIdsMessageGroupMutation
     | AppendToMaterialsIdsMessageGroupMutation
     | SetAnalysisMessageGroupMutation
