@@ -37,19 +37,18 @@ def save_chat_history(chat: Chat, scope: str = "default"):
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf8", errors="replace") as f:
                 old_content = json.load(f)
-                if old_content == new_content:
+                if scope == "chat_options" and old_content["chat_options"] != new_content["chat_options"]:
+                    old_content["chat_options"] = new_content["chat_options"]
+                    new_content = old_content
+                elif scope == "message_groups" and old_content["message_groups"] != new_content["message_groups"]:
+                    old_content["message_groups"] = new_content["message_groups"]
+                    new_content = old_content
+                elif scope == "name" and old_content["name"] != new_content["name"]:
+                    old_content["name"] = new_content["name"]
+                    old_content["title_edited"] = True
+                    new_content = old_content
+                else:
                     return  # contents are the same, no need to write to file
-
-            if scope == "chat_options":
-                old_content["chat_options"] = new_content["chat_options"]
-                new_content = old_content
-            elif scope == "message_groups":
-                old_content["message_groups"] = new_content["message_groups"]
-                new_content = old_content
-            elif scope == "name":
-                old_content["name"] = new_content["name"]
-                old_content["title_edited"] = True
-                new_content = old_content
 
         # write new content to file
         with open(file_path, "w", encoding="utf8", errors="replace") as f:
