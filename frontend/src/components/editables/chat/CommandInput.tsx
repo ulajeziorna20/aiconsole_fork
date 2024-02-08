@@ -148,7 +148,6 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
         ChatAPI.patchChatOptions(chat?.id, {
           agent_id: selectedAgentId,
           materials_ids: materialsIds,
-          let_ai_add_extra_materials: false,
         });
 
         setChat({
@@ -156,7 +155,6 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
           chat_options: {
             agent_id: selectedAgentId,
             materials_ids: materialsIds,
-            let_ai_add_extra_materials: false,
           },
         });
       }

@@ -69,7 +69,7 @@ def extract_and_format_chat_data(chat_link: str) -> dict:
         "title_edited": False,
         "name": "Imported Chat",
         "last_modified": datetime.now(timezone.utc).isoformat(),
-        "chat_options": {"agent_id": "", "materials_ids": [], "let_ai_add_extra_materials": True},
+        "chat_options": {"agent_id": "", "materials_ids": []},
         "message_groups": [],
         "is_analysis_in_progress": False,
     }

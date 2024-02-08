@@ -87,10 +87,13 @@ class AICToolCallLocation:
 class ChatOptions(BaseModel):
     agent_id: Optional[str] = ""
     materials_ids: Optional[list[str]] = Field(default_factory=list)
-    let_ai_add_extra_materials: bool = True
+
+    @property
+    def let_ai_add_extra_materials(self):
+        return self.materials_ids == []
 
     def is_default(self):
-        return self.agent_id == "" and self.materials_ids == [] and self.let_ai_add_extra_materials
+        return self.agent_id == "" and self.materials_ids == []
 
 
 class Chat(ChatHeadline):
