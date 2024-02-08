@@ -269,7 +269,7 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
 
           <TextareaAutosize
             ref={textAreaRef}
-            className="w-full bg-transparent text-[15px] text-white resize-none overflow-hidden px-[20px] py-[12px] placeholder:text-gray-400 hover:placeholder:text-gray-300 focus:outline-none"
+            className="w-full bg-transparent text-[15px] text-white resize-none overflow-y-auto px-[20px] py-[12px] placeholder:text-gray-400 hover:placeholder:text-gray-300 focus:outline-none"
             value={command}
             onChange={handleChange}
             onFocus={handleFocus}
