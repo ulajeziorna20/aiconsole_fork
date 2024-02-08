@@ -138,7 +138,7 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
         </div>
       </div>
       {!folded && (
-        <div className="px-[30px] pr-[14px] py-[15px] border-2 border-gray-600 border-t-0">
+        <div className="px-[30px] pr-[14px] py-[15px] border-2 border-gray-600 border-t-0 min-h-[196px]">
           <div className="flex flex-row w-full">
             <div className="flex-grow overflow-auto">
               <span className="text-[15px] w-20 flex-none">{upperFirst(tool_call.language || '')}: </span>
