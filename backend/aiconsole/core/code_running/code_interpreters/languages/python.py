@@ -56,7 +56,6 @@ DEBUG_MODE = True
 
 
 class Python(BaseCodeInterpreter):
-
     async def initialize(self):
         self.km = KernelManager(kernel_name="python3")
         self.km.start_kernel()
@@ -90,7 +89,6 @@ matplotlib.use('{backend}')
         self.km.shutdown_kernel()
 
     async def run(self, code: str, materials: list[Material]) -> AsyncGenerator[str, None]:
-
         self.finish_flag = False
         try:
             preprocessed_code = preprocess_python(code, materials)
