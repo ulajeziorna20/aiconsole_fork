@@ -174,7 +174,9 @@ async def _handle_open_chat_ws_message(connection: AICConnection, json: dict):
 
         if message.chat_id in connection.open_chats_ids:
             await connection.send(
-                ResponseServerMessage(request_id=message.request_id, payload={"chat_id": message.chat_id}, is_error=False)
+                ResponseServerMessage(
+                    request_id=message.request_id, payload={"chat_id": message.chat_id}, is_error=False
+                )
             )
 
             await connection.send(

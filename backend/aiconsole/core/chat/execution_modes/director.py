@@ -17,6 +17,7 @@
 import asyncio
 import logging
 from typing import cast
+from uuid import uuid4
 
 from aiconsole.api.websockets.connection_manager import connection_manager
 from aiconsole.api.websockets.server_messages import NotificationServerMessage
@@ -26,7 +27,10 @@ from aiconsole.core.assets.materials.content_evaluation_context import (
 )
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.assets.materials.rendered_material import RenderedMaterial
-from aiconsole.core.chat.chat_mutations import DeleteMessageGroupMutation
+from aiconsole.core.chat.chat_mutations import (
+    CreateMessageGroupMutation,
+    DeleteMessageGroupMutation,
+)
 from aiconsole.core.chat.execution_modes.analysis.director import director_analyse
 from aiconsole.core.chat.execution_modes.execution_mode import (
     AcceptCodeContext,
@@ -36,7 +40,7 @@ from aiconsole.core.chat.execution_modes.execution_mode import (
 from aiconsole.core.chat.execution_modes.import_and_validate_execution_mode import (
     import_and_validate_execution_mode,
 )
-from aiconsole.core.chat.types import AICMessageGroup
+from aiconsole.core.chat.types import ActorId, AICMessageGroup
 from aiconsole.core.project import project
 
 _log = logging.getLogger(__name__)
@@ -99,17 +103,50 @@ async def execution_mode_process(
             await material.render(content_context) for material in content_context.relevant_materials
         ]
 
-        context = ProcessChatContext(
-            message_group_id=context.message_group_id,
-            chat_mutator=context.chat_mutator,
-            agent=analysis.agent,
-            materials=analysis.relevant_materials,
-            rendered_materials=rendered_materials,
-        )
-
         execution_mode = await import_and_validate_execution_mode(analysis.agent)
 
-        await execution_mode.process_chat(context)
+        await execution_mode.process_chat(
+            ProcessChatContext(
+                message_group_id=context.message_group_id,
+                chat_mutator=context.chat_mutator,
+                agent=analysis.agent,
+                materials=analysis.relevant_materials,
+                rendered_materials=rendered_materials,
+            )
+        )
+
+        # Repeat the process for the next step
+
+        message_group_id = str(uuid4())
+
+        if context.chat_mutator.chat.chat_options.materials_ids:
+            materials_ids = context.chat_mutator.chat.chat_options.materials_ids
+        else:
+            materials_ids = []
+
+        await context.chat_mutator.mutate(
+            CreateMessageGroupMutation(
+                message_group_id=message_group_id,
+                actor_id=ActorId(type="agent", id=context.agent.id),
+                role="assistant",
+                materials_ids=materials_ids,
+                analysis="",
+                task="",
+            )
+        )
+
+        await execution_mode_process(
+            ProcessChatContext(
+                message_group_id=message_group_id,
+                chat_mutator=context.chat_mutator,
+                agent=context.agent,
+                materials=[],
+                rendered_materials=[],
+            )
+        )
+    else:
+        # Delete the current message group
+        await context.chat_mutator.mutate(DeleteMessageGroupMutation(message_group_id=context.message_group_id))
 
 
 async def execution_mode_accept_code(
