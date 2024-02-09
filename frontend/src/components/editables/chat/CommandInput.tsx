@@ -137,7 +137,6 @@ export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: M
   }, [chat?.chat_options.materials_ids, materials, chat?.id]);
 
   useEffect(() => {
-    console.log('test');
     setMaterialsOptions(
       materials
         ?.filter((material) => !chosenMaterials.includes(material))
