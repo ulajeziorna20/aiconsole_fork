@@ -121,7 +121,7 @@ export function Home() {
     <div className="min-h-[100vh] relative overflow-x-hidden">
       <BackgroundGradient />
       <div>
-        {openAiApiKey === undefined || isProjectLoading ? (
+        {(openAiApiKey === undefined && isProjectLoading) || isApiKeyValid === undefined ? (
           <>{/* the request is in progress - don't render anything to avoid flickering */}</>
         ) : (
           <>
