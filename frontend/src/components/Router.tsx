@@ -117,7 +117,8 @@ export function Router() {
               <Route index element={<HomeRoute />} />
             </Route>
             <Route path="/" element={<Project />}>
-              <Route path="chats/:id" element={<UI />} />
+              <Route path="chats/:id" element={<ChatPage />} />
+              <Route path="uigen" element={<UI />} />
               <Route path="chats/*" element={<Navigate to={`/chats/${uuid()}`} />} />
               <Route path="materials/:id" element={<AssetEditor assetType={'material'} />} />
               <Route path="materials/*" element={<></>} />
