@@ -89,6 +89,12 @@ async def execution_mode_process(
 
         return
 
+    last_messages = context.chat_mutator.chat.message_groups[-2].messages
+    for message in last_messages:
+        if message.tool_calls and not all(call.output for call in message.tool_calls):
+            await context.chat_mutator.mutate(DeleteMessageGroupMutation(message_group_id=context.message_group_id))
+            return
+
     analysis = await director_analyse(context.chat_mutator, context.message_group_id)
 
     if analysis.agent.id != "user" and analysis.next_step:
