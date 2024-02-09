@@ -69,7 +69,7 @@ export function Home() {
       title: 'This folder already contains an AIConsole project',
       message: 'Do you want to open it instead?',
       confirmText: 'Yes, open',
-      cancelText: 'Close',
+      cancelText: 'No, Close',
       onConfirm: openProjectConfirmation,
       onCancel: resetProjectOpening,
     },
