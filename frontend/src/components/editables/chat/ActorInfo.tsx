@@ -118,12 +118,11 @@ export function ActorInfo({
     };
 
     const menuItems = actorId.type === 'agent' ? editableMenuItems : userMenuItems;
-
     return (
       <>
         <ContextMenu options={menuItems} ref={triggerRef}>
           <Link
-            to={actorId.type === 'agent' ? `/agents/${actorId}` : ''}
+            to={actorId.type === 'agent' ? `/agents/${actorId.id}` : ''}
             onClick={openContext}
             className="flex-none items-center flex flex-col"
           >
