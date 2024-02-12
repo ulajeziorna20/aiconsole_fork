@@ -45,7 +45,7 @@ export function MessageGroup({ group }: { group: AICMessageGroup }) {
             <AnalysisClosed group={group} onClick={() => setIsAnalysisManuallyOpen(!isOpen)} />
           )}
         </div>
-        <div className="flex-grow flex flex-col gap-5">
+        <div className="flex-grow flex flex-col gap-5 overflow-x-auto">
           <AnalysisOpened group={group} onClick={() => setIsAnalysisManuallyOpen(!isOpen)} isOpen={isOpen} />
           {group.messages.map((message) => (
             <MessageComponent key={message.id} message={message} group={group} />
