@@ -252,11 +252,11 @@ export function ChatPage() {
         <EditorHeader editableObjectType="chat" editable={chat} onRename={handleRename} isChanged={false} />
       </ContextMenu>
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow">
         <div className="flex w-full h-full flex-col justify-between">
           {!isProjectLoading && !loadingMessages ? ( // This is needed because of https://github.com/compulim/react-scroll-to-bottom/issues/61#issuecomment-1608456508
             <ScrollToBottom
-              className="h-full overflow-y-auto flex flex-col"
+              className="h-full flex flex-col"
               scrollViewClassName="main-chat-window"
               initialScrollBehavior="auto"
               mode={'bottom'}
@@ -275,7 +275,7 @@ export function ChatPage() {
               )}
             </ScrollToBottom>
           ) : (
-            <div className="h-full overflow-y-auto flex flex-col"></div>
+            <div className="h-full flex flex-col"></div>
           )}
 
           <CommandInput
