@@ -29,31 +29,31 @@ export const AddAssetDropdown = () => {
       {
         key: 'chat',
         icon: <Icon icon={ChatIcon} className="w-6 h-6 !text-chat" />,
-        title: 'New chat',
+        title: 'Chat',
         path: `/chats/${uuid}`,
       },
       {
         key: 'agent',
         icon: <Icon icon={AgentIcon} className="w-6 h-6 !text-agent" />,
-        title: 'New agent',
+        title: 'Agent',
         path: `/agents/new`,
       },
       {
         key: 'note',
         icon: <Icon icon={MaterialNoteIcon} className="w-6 h-6 !text-material" />,
-        title: 'New note',
+        title: 'Note',
         path: `/materials/new?type=static_text`,
       },
       {
         key: 'dynamic_note',
         icon: <Icon icon={MaterialDynamicNoteIcon} className="w-6 h-6 !text-material" />,
-        title: 'New dynamic note',
+        title: 'Dynamic Note',
         path: `/materials/new?type=dynamic_text`,
       },
       {
         key: 'python_api',
         icon: <Icon icon={MaterialPythonAPIIcon} className="w-6 h-6 !text-material" />,
-        title: 'New Python API',
+        title: 'Python API',
         path: `/materials/new?type=api`,
       },
     ],
@@ -65,7 +65,7 @@ export const AddAssetDropdown = () => {
       <Trigger asChild>
         <button
           className={cn(
-            'group flex justify-center align-center gap-[12px] rounded-[8px] px-[16px] py-[6px] border border-gray-500  text-gray-300 text-[16px] font-semibold w-[200px] leading-[23px] hover:border-gray-300 transition duration-200 hover:text-gray-300',
+            'group flex justify-center align-center gap-[12px] rounded-[8px] py-[6px] border border-gray-500  text-gray-300 text-[16px] font-semibold w-[180px] leading-[23px] hover:border-gray-300 transition duration-200 hover:text-gray-300',
             {
               'rounded-b-none text-gray-500': opened,
             },
@@ -76,31 +76,45 @@ export const AddAssetDropdown = () => {
       </Trigger>
 
       <Content
-        className={cn('bg-gray-700 border-t-0 border-gray-800 p-0 w-[200px]', {
+        className={cn('bg-gray-700 border-t-0 border-gray-800 p-0 w-[180px]', {
           'rounded-t-none ': opened,
         })}
       >
-        {dropdownItems.map(({ icon, title, path, key, disabled }: { icon: JSX.Element; title: string; path: string; key: string; disabled?: boolean }) => (
-          <Item
-            key={key}
-            onClick={handleClick(path)}
-            className={cn('group flex p-0 rounded-none hover:bg-gray-600 hover:outline-none w-full cursor-pointer', {
-              'pointer-events-none': disabled,
-            })}
-          >
-            <div
-              className={cn(
-                'flex items-center gap-[12px] px-[16px] py-[10px] text-[14px] text-gray-300 group-hover:text-white w-full',
-                {
-                  'text-gray-400 pb-0 ': disabled,
-                },
-              )}
+        {dropdownItems.map(
+          ({
+            icon,
+            title,
+            path,
+            key,
+            disabled,
+          }: {
+            icon: JSX.Element;
+            title: string;
+            path: string;
+            key: string;
+            disabled?: boolean;
+          }) => (
+            <Item
+              key={key}
+              onClick={handleClick(path)}
+              className={cn('group flex p-0 rounded-none hover:bg-gray-600 hover:outline-none w-full cursor-pointer', {
+                'pointer-events-none': disabled,
+              })}
             >
-              {icon}
-              <p>{title}</p>
-            </div>
-          </Item>
-        ))}
+              <div
+                className={cn(
+                  'flex items-center gap-[12px] px-[16px] py-[10px] text-[14px] text-gray-300 group-hover:text-white w-full',
+                  {
+                    'text-gray-400 pb-0 ': disabled,
+                  },
+                )}
+              >
+                {icon}
+                <p>{title}</p>
+              </div>
+            </Item>
+          ),
+        )}
       </Content>
     </DropdownMenu>
   );
