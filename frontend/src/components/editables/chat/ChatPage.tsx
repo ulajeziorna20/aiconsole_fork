@@ -247,13 +247,17 @@ export function ChatPage() {
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-h-full overflow-auto">
+    <div className="flex flex-col w-full h-full max-h-full overflow-hidden">
       <ContextMenu options={menuItems}>
         <EditorHeader editableObjectType="chat" editable={chat} onRename={handleRename} isChanged={false} />
       </ContextMenu>
 
-      <div className="flex-grow">
-        <div className="flex w-full h-full flex-col justify-between">
+      <div className="flex-grow overflow-y-auto">
+        <div
+          className={cn('flex w-full h-full flex-col justify-between overflow-y-hidden pt-[80px]', {
+            'pt-[90px]': chat.message_groups.length !== 0,
+          })}
+        >
           {!isProjectLoading && !loadingMessages ? ( // This is needed because of https://github.com/compulim/react-scroll-to-bottom/issues/61#issuecomment-1608456508
             <ScrollToBottom
               className="h-full flex flex-col"
@@ -266,7 +270,7 @@ export function ChatPage() {
               {chat.message_groups.length === 0 ? (
                 <EmptyChat />
               ) : (
-                <div>
+                <div className="">
                   <ScrollToBottomButton />
                   {chat.message_groups.map((group) => (
                     <MessageGroup group={group} key={group.id} />
