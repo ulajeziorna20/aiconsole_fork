@@ -44,8 +44,6 @@ export function EditableContentMessage({
   setIsEditing,
 }: EditableContentMessageProps) {
   const isBeingProcessed = useChatStore((state) => !!state.chat?.lock_id);
-
-  // const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(initialContent);
 
   const handleEditClick = () => {
