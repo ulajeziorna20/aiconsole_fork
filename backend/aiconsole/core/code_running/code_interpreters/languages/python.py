@@ -194,7 +194,7 @@ matplotlib.use('{backend}')
         if DEBUG_MODE:
             print("thread is on:", self.listener_thread.is_alive(), self.listener_thread)
 
-        self.kc.execute(code)
+        self.kc.execute(code)  # execute_interactive
 
     async def _capture_output(self, message_queue):
         while True:
@@ -219,7 +219,14 @@ matplotlib.use('{backend}')
 def preprocess_python(code: str, materials: list[Material]):
     # If a line starts with "!" then it's a shell command, we need to wrap it appropriately
     code = "\n".join(
-        [f"import os; os.system({line[1:]!r})" if line.startswith("!") else line for line in code.split("\n")]
+        [
+            (
+                f"import subprocess; out = subprocess.check_output({line[1:]!r}, shell=True); print(out.decode('utf-8'))"
+                if line.startswith("!")
+                else line
+            )
+            for line in code.split("\n")
+        ]
     )
 
     # Check for syntax errors in user's code
