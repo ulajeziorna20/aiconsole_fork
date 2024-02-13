@@ -44,6 +44,7 @@ interface MessageProps {
 }
 
 export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
+  const [isEditing, setIsEditing] = useState(false);
   const userMutateChat = useChatStore((state) => state.userMutateChat);
   const saveCommandAndMessagesToHistory = useChatStore((state) => state.saveCommandAndMessagesToHistory);
   const chat = useChatStore((state) => state.chat);
@@ -74,14 +75,22 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
     });
   }, [tool_call.id, userMutateChat]);
 
-  const handleRunClick = () => {
+  const runCode = () => {
+    console.log(tool_call);
     doAcceptCode(tool_call.id);
     tool_call.output = '';
+    setIsEditing(false);
   };
 
-  const handleAlwaysRunClick = () => {
+  const handleRunClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation();
+    runCode();
+  };
+
+  const handleAlwaysRunClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation();
     enableAutoCodeExecution(true);
-    handleRunClick();
+    runCode();
   };
 
   //Either executing or streaming while there are still no output messages
@@ -148,6 +157,8 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
                 handleAcceptedContent={handleAcceptedContent}
                 handleRemoveClick={handleRemoveClick}
                 className="mt-2"
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
               >
                 <SyntaxHighlighter
                   style={customVs2015}

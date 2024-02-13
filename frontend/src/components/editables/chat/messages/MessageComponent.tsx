@@ -1,4 +1,4 @@
-import { Ref, useCallback } from 'react';
+import { Ref, useCallback, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import rehypeRaw from 'rehype-raw';
@@ -22,6 +22,7 @@ export function MessageComponent({ message, group }: MessageProps) {
   const userMutateChat = useChatStore((state) => state.userMutateChat);
   const saveCommandAndMessagesToHistory = useChatStore((state) => state.saveCommandAndMessagesToHistory);
   const getBaseURL = useAPIStore((state) => state.getBaseURL);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleRemoveClick = useCallback(() => {
     userMutateChat({
@@ -52,6 +53,8 @@ export function MessageComponent({ message, group }: MessageProps) {
         handleAcceptedContent={handleSaveClick}
         handleRemoveClick={handleRemoveClick}
         hideControls
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
       >
         <div className="flex flex-col gap-2">
           {message.is_streaming && !message.content && message.tool_calls.length === 0 && <BlinkingCursor />}
