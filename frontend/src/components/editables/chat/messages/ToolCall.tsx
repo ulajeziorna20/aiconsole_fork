@@ -76,7 +76,6 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
   }, [tool_call.id, userMutateChat]);
 
   const runCode = () => {
-    console.log(tool_call);
     doAcceptCode(tool_call.id);
     tool_call.output = '';
     setIsEditing(false);

@@ -62,7 +62,6 @@ export function EditableContentMessage({
   const handleOnChange = (value: string) => setContent(value);
 
   const handleSaveClick = useCallback(() => {
-    console.log('test run');
     handleAcceptedContent(content);
     setIsEditing(false);
   }, [content, handleAcceptedContent, setIsEditing]);
