@@ -47,6 +47,7 @@ interface MessageProps {
 }
 
 export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
+  const [isEditing, setIsEditing] = useState(false);
   const userMutateChat = useChatStore((state) => state.userMutateChat);
   const saveCommandAndMessagesToHistory = useChatStore((state) => state.saveCommandAndMessagesToHistory);
   const chat = useChatStore((state) => state.chat);
@@ -79,24 +80,30 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
     });
   }, [tool_call.id, userMutateChat]);
 
+  const runCode = () => {
+    doAcceptCode(tool_call.id);
+    tool_call.output = '';
+    setIsEditing(false);
+  };
   const renderUIResult = async () => {
     const finalCode = await transpileCode(tool_call.code);
     const sandbox = createSandbox(finalCode);
     setUIResult(sandbox);
   };
 
-  const handleRunClick = async () => {
+  const handleRunClick = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation();
     if (tool_call.language !== 'react_ui') {
-      doAcceptCode(tool_call.id);
-      tool_call.output = '';
+      runCode();
     } else {
       await renderUIResult();
     }
   };
 
-  const handleAlwaysRunClick = () => {
+  const handleAlwaysRunClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation();
     enableAutoCodeExecution(true);
-    handleRunClick();
+    runCode();
   };
 
   function translateLanguageToRealLanguage(language: string | undefined) {
@@ -202,6 +209,8 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
                   handleAcceptedContent={handleAcceptedContent}
                   handleRemoveClick={handleRemoveClick}
                   className="mt-2"
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
                 >
                   <SyntaxHighlighter
                     style={customVs2015}
