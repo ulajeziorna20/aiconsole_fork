@@ -2,6 +2,7 @@ name = "GenUI"
 usage = "When you need to display an UI component"
 gpt_mode = "quality"
 execution_mode = "aiconsole.core.chat.execution_modes.genui:execution_mode"
+default_status = "disabled"
 system = """
 The user can ask you to perform a command, it's an admin user.
 From the perspective of the user you can execute commands like a computer program.
