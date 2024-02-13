@@ -62,6 +62,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   });
   const [avatarData, setAvatarData] = useState<File | null>(null);
   const [isAvatarOverwritten, setIsAvatarOverwritten] = useState(false);
+  const [isVisibleInfoBar, setIsVisibleInfoBar] = useState(true);
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
@@ -290,6 +291,8 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
 
   const revertAsset = () => handleRevert(asset?.id);
 
+  const hideInfoBar = () => setIsVisibleInfoBar(false);
+
   return (
     <div className="flex flex-col w-full h-full max-h-full overflow-hidden">
       <ContextMenu options={menuItems}>
@@ -318,12 +321,14 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                 assetType={assetType}
                 lastSavedAsset={lastSavedAsset}
                 onRevert={revertAsset}
+                isVisible={isVisibleInfoBar}
+                hideBar={hideInfoBar}
               />
             )}
             {asset && (
               <div
-                className={cn('flex-grow flex flex-col overflow-auto px-[60px] py-10 gap-5 h-[calc(100%-50px)]', {
-                  'h-full': assetType === 'material',
+                className={cn('flex-grow flex flex-col overflow-auto px-[60px] py-10 gap-5 h-full', {
+                  'h-[calc(100%-50px)]': isVisibleInfoBar,
                 })}
               >
                 {assetType === 'material' ? (
