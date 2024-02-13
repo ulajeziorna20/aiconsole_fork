@@ -41,8 +41,7 @@ import threading
 import traceback
 from typing import Any, AsyncGenerator
 
-from jupyter_client.asynchronous.client import AsyncKernelClient
-from jupyter_client.manager import AsyncKernelManager
+from jupyter_client.manager import start_new_async_kernel
 
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.code_running.code_interpreters.base_code_interpreter import (
@@ -57,15 +56,7 @@ DEBUG_MODE = True
 
 class Python(BaseCodeInterpreter):
     async def initialize(self):
-        self.km = AsyncKernelManager(kernel_name="python3", env=self.get_environment_variables())
-        await self.km.start_kernel()
-        self.kc: AsyncKernelClient = self.km.client()
-        self.kc.start_channels()
-
-        while not await self.kc.is_alive():
-            await asyncio.sleep(0.1)
-        await asyncio.sleep(0.5)
-
+        self.km, self.kc = await start_new_async_kernel(kernel_name="python3", env=self.get_environment_variables())
         self.listener_thread = None
         self.finish_flag = False
 
