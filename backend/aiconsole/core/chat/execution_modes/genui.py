@@ -13,7 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
+
+from pydantic import Field
 
 from aiconsole.core.assets.agents.agent import AICAgent
 from aiconsole.core.assets.materials.material import Material
@@ -29,8 +30,25 @@ from aiconsole.core.chat.execution_modes.utils.get_agent_system_message import (
 from aiconsole.core.gpt.create_full_prompt_with_materials import (
     create_full_prompt_with_materials,
 )
+from aiconsole.core.gpt.function_calls import OpenAISchema
 
-_log = logging.getLogger(__name__)
+
+class react_ui(OpenAISchema):
+    """
+    Execute react typescript code in a browser.
+    """
+
+    headline: str = Field(
+        ...,
+        description="Must have. Title of this task with maximum 15 characters.",
+        json_schema_extra={"type": "string"},
+    )
+
+    code: str = Field(
+        ...,
+        description="React typescript code to execute. It will be executed in the browser environment.",
+        json_schema_extra={"type": "string"},
+    )
 
 
 async def _execution_mode_process(
@@ -39,16 +57,13 @@ async def _execution_mode_process(
     materials: list[Material],
     rendered_materials: list[RenderedMaterial],
 ):
-    _log.debug("execution_mode_normal")
+    system_message = create_full_prompt_with_materials(
+        intro=get_agent_system_message(agent),
+        materials=rendered_materials,
+    )
 
     await generate_response_message_with_code(
-        chat_mutator,
-        agent,
-        system_message=create_full_prompt_with_materials(
-            intro=get_agent_system_message(agent),
-            materials=rendered_materials or rendered_materials,
-        ),
-        language_classes=[],
+        chat_mutator, agent, system_message, language_classes=[react_ui], enforced_language=react_ui
     )
 
 
