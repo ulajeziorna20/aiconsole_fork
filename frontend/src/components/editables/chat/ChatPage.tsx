@@ -252,7 +252,7 @@ export function ChatPage() {
         <EditorHeader editableObjectType="chat" editable={chat} onRename={handleRename} isChanged={false} />
       </ContextMenu>
       <div className="overflow-y-hidden h-full w-full">
-        <div className={cn('h-full w-full overflow-hidden')}>
+        <div className="h-full w-full overflow-hidden">
           {!isProjectLoading && !loadingMessages ? ( // This is needed because of https://github.com/compulim/react-scroll-to-bottom/issues/61#issuecomment-1608456508
             <ScrollToBottom
               className="h-[calc(100%-100px)] w-full"

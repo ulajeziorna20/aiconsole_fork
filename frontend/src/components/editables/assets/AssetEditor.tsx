@@ -291,7 +291,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const revertAsset = () => handleRevert(asset?.id);
 
   return (
-    <div className="flex flex-col w-full h-full max-h-full overflow-auto">
+    <div className="flex flex-col w-full h-full max-h-full overflow-hidden">
       <ContextMenu options={menuItems}>
         <EditorHeader
           editable={asset}
@@ -308,9 +308,9 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
         </EditorHeader>
       </ContextMenu>
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-hidden">
         <div className="flex w-full h-full flex-col justify-between">
-          <div className="w-full h-full overflow-auto relative">
+          <div className="w-full h-full overflow-hidden relative">
             {asset && (
               <AssetInfoBar
                 asset={asset}
@@ -321,7 +321,11 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
               />
             )}
             {asset && (
-              <div className="flex-grow flex flex-col overflow-auto h-full px-[60px] py-10 gap-5">
+              <div
+                className={cn('flex-grow flex flex-col overflow-auto px-[60px] py-10 gap-5 h-[calc(100%-50px)]', {
+                  'h-full': assetType === 'material',
+                })}
+              >
                 {assetType === 'material' ? (
                   <MaterialForm material={asset as Material} />
                 ) : (
