@@ -256,6 +256,7 @@ export function ChatPage() {
         <div className="h-full w-full overflow-hidden">
           {!isProjectLoading && !loadingMessages ? ( // This is needed because of https://github.com/compulim/react-scroll-to-bottom/issues/61#issuecomment-1608456508
             <div
+              className="transition-height duration-200"
               style={{
                 height: `calc(100% - ${commandInputHeight}px)`,
                 width: '100%',
