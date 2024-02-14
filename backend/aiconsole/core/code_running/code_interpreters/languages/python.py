@@ -40,13 +40,16 @@ import re
 import threading
 import traceback
 from typing import Any, AsyncGenerator
+from jupyter_client import kernelspec
+from jupyter_client.asynchronous.client import AsyncKernelClient
 
-from jupyter_client.manager import start_new_async_kernel
+from jupyter_client.manager import AsyncKernelManager
 
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.code_running.code_interpreters.base_code_interpreter import (
     BaseCodeInterpreter,
 )
+from aiconsole_toolkit.env import get_current_project_venv_python_path
 
 _log = logging.getLogger(__name__)
 
@@ -54,9 +57,33 @@ _log = logging.getLogger(__name__)
 DEBUG_MODE = True
 
 
+async def start_new_async_kernel(
+    startup_timeout: float = 60, kernel_name: str = "python", **kwargs: Any
+) -> tuple[AsyncKernelManager, AsyncKernelClient]:
+    """Start a new kernel, and return its Manager and Client"""
+    km = AsyncKernelManager(kernel_name=kernel_name)
+    if km.kernel_spec is not None:
+        km.kernel_spec.argv = [str(get_current_project_venv_python_path()), "-m", "ipykernel_launcher", "-f", "{connection_file}"]
+    await km.start_kernel(**kwargs)
+    kc = km.client()
+    kc.start_channels()
+    try:
+        await kc.wait_for_ready(timeout=startup_timeout)
+    except RuntimeError:
+        kc.stop_channels()
+        await km.shutdown_kernel()
+        raise
+
+    return (km, kc)
+
+
 class Python(BaseCodeInterpreter):
     async def initialize(self):
-        self.km, self.kc = await start_new_async_kernel(kernel_name="python3", env=self.get_environment_variables())
+        self.km, self.kc = await start_new_async_kernel(
+            env=self.get_environment_variables(),
+            # executable=str(get_current_project_venv_python_path()),
+            # argv=[f"{get_current_project_venv_python_path()}", "-m", "ipykernel_launcher", "-f", "{connection_file}"],
+        )
         self.listener_thread = None
         self.finish_flag = False
 
