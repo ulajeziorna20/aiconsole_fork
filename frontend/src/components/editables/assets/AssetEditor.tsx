@@ -340,6 +340,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                     errors={errors}
                     avatarData={avatarData}
                     setAvatarData={setAvatarData}
+                    isAvatarOverwritten={isAvatarOverwritten}
                     setIsAvatarOverwritten={setIsAvatarOverwritten}
                     onRevert={revertAsset}
                   />
