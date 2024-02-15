@@ -345,9 +345,10 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                   />
                 )}
                 <div className="flex items-center justify-between w-full gap-[10px]">
-                  {isProjectAsset ? (
+                  {isProjectAsset && lastSavedAsset ? (
                     <AlertDialog
                       title={`Are you sure you want to delete this ${editableObjectType}?`}
+                      confirmationButtonText="Okay"
                       onConfirm={() => handleDeleteWithInteraction(asset.id)}
                       openModalButton={
                         <Button variant="tertiary">
