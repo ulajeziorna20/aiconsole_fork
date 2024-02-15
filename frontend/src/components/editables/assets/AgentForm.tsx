@@ -85,7 +85,7 @@ export const AgentForm = ({
     // new Date is used to refresh image url
     const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${agent.id}/image?time=${new Date()}`;
     setAvatarUrl(userAgentAvatarUrl);
-  }, [getBaseURL, avatarData, onRevert]);
+  }, [agent.id, getBaseURL]);
 
   return (
     <>
