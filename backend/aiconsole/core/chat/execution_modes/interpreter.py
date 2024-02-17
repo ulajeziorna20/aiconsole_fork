@@ -42,14 +42,14 @@ _log = logging.getLogger(__name__)
 class CodeTask(OpenAISchema):
     headline: str = Field(
         ...,
-        description="Must have. Title of this task with maximum 15 characters.",
+        description="Must have. Title of this tool call (maximum 15 characters).",
         json_schema_extra={"type": "string"},
     )
 
 
 class python_tool(CodeTask):
     """
-    Execute python code in a stateful Jupyter notebook environment.
+    Execute code in a stateful Jupyter notebook environment.
     You can execute shell commands by prefixing code lines with "!".
     Make sure to pass the code and headline as json and not python variables.
     """

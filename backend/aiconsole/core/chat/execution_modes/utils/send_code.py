@@ -110,7 +110,7 @@ async def send_code(
 
         async def send_code_delta_for_code(code: str):
             if not code.startswith(tool_call_data.code):
-                _log.warning(f"Reseting code to: {code}")
+                _log.warning(f"Reseting code, code={repr(code)} original={repr(tool_call_data.code)}")
                 await chat_mutator.mutate(
                     SetCodeToolCallMutation(
                         tool_call_id=tool_call.id,
