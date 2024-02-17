@@ -9,7 +9,7 @@ from aiconsole.core.chat.chat_mutations import (
     SetOutputToolCallMutation,
 )
 from aiconsole.core.chat.chat_mutator import ChatMutator
-from aiconsole.core.code_running.run_code import get_code_interpreter
+from aiconsole.core.code_running.run_code import run_in_code_interpreter
 
 
 async def run_code(
@@ -41,8 +41,8 @@ async def run_code(
 
         try:
             assert tool_call.language is not None
-            async for token in (await get_code_interpreter(tool_call.language, chat_mutator.chat.id)).run(
-                tool_call.code, materials
+            async for token in await run_in_code_interpreter(
+                tool_call.language, chat_mutator.chat.id, tool_call.code, materials
             ):
                 await chat_mutator.mutate(
                     AppendToOutputToolCallMutation(

@@ -13,8 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import cast
+import asyncio
+from typing import AsyncGenerator, cast
 
+from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.code_running.code_interpreters.base_code_interpreter import (
     BaseCodeInterpreter,
 )
@@ -22,6 +24,17 @@ from aiconsole.core.code_running.code_interpreters.language import LanguageStr
 from aiconsole.core.code_running.code_interpreters.language_map import language_map
 
 code_interpreters: dict[str, dict[str, BaseCodeInterpreter]] = {}
+
+
+_global_code_running_lock = asyncio.Lock()
+
+
+async def run_in_code_interpreter(
+    language: str, chat_id: str, code: str, materials: list[Material]
+) -> AsyncGenerator[str, None]:
+    async with _global_code_running_lock:
+        interpreter = await get_code_interpreter(language, chat_id)
+        return interpreter.run(code, materials)
 
 
 async def get_code_interpreter(language_raw: str, chat_id: str) -> BaseCodeInterpreter:

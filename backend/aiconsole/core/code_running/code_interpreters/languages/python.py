@@ -40,9 +40,8 @@ import re
 import threading
 import traceback
 from typing import Any, AsyncGenerator
-from jupyter_client import kernelspec
-from jupyter_client.asynchronous.client import AsyncKernelClient
 
+from jupyter_client.asynchronous.client import AsyncKernelClient
 from jupyter_client.manager import AsyncKernelManager
 
 from aiconsole.core.assets.materials.material import Material
@@ -54,16 +53,19 @@ from aiconsole_toolkit.env import get_current_project_venv_python_path
 _log = logging.getLogger(__name__)
 
 
-DEBUG_MODE = True
-
-
 async def start_new_async_kernel(
     startup_timeout: float = 60, kernel_name: str = "python", **kwargs: Any
 ) -> tuple[AsyncKernelManager, AsyncKernelClient]:
     """Start a new kernel, and return its Manager and Client"""
     km = AsyncKernelManager(kernel_name=kernel_name)
     if km.kernel_spec is not None:
-        km.kernel_spec.argv = [str(get_current_project_venv_python_path()), "-m", "ipykernel_launcher", "-f", "{connection_file}"]
+        km.kernel_spec.argv = [
+            str(get_current_project_venv_python_path()),
+            "-m",
+            "ipykernel_launcher",
+            "-f",
+            "{connection_file}",
+        ]
     await km.start_kernel(**kwargs)
     kc = km.client()
     kc.start_channels()
@@ -125,8 +127,7 @@ matplotlib.use('{backend}')
             while True:
                 # If self.finish_flag = True, and we didn't set it (we do below), we need to stop. That's our "stop"
                 if self.finish_flag:
-                    if DEBUG_MODE:
-                        print("interrupting kernel!!!!!")
+                    _log.debug("Interrupting kernel.")
                     await self.km.interrupt_kernel()
                     return
                 try:
@@ -134,15 +135,11 @@ matplotlib.use('{backend}')
                 except queue.Empty:
                     continue
 
-                if DEBUG_MODE:
-                    print("-----------" * 10)
-                    print("Message recieved:", msg["content"])
-                    print("-----------" * 10)
+                _log.debug("Received message: %s", msg["content"])
 
                 if msg["header"]["msg_type"] == "status" and msg["content"]["execution_state"] == "idle":
                     # Set finish_flag and return when the kernel becomes idle
-                    if DEBUG_MODE:
-                        print("from thread: kernel is idle")
+                    _log.debug("Kernel is idle, setting finish_flag to True.")
                     self.finish_flag = True
                     return
 
@@ -218,8 +215,7 @@ matplotlib.use('{backend}')
         # self.listener_thread.daemon = True
         self.listener_thread.start()
 
-        if DEBUG_MODE:
-            print("thread is on:", self.listener_thread.is_alive(), self.listener_thread)
+        _log.debug("Listener thread is alive: %s", self.listener_thread.is_alive())
 
         self.kc.execute(code)  # execute_interactive
 
@@ -228,15 +224,14 @@ matplotlib.use('{backend}')
             if self.listener_thread:
                 try:
                     output = message_queue.get(timeout=0.1)
-                    if DEBUG_MODE:
-                        print(output)
+                    _log.debug("Output from queue: %s", output)
                     if content := output.get("content", None):
                         yield content
                 except queue.Empty:
                     if self.finish_flag:
-                        if DEBUG_MODE:
-                            print("we're done")
+                        _log.debug("Finish flag is set, stopping output capture.")
                         break
+
             await asyncio.sleep(0.1)
 
     def stop(self):
@@ -290,10 +285,10 @@ def preprocess_python(code: str, materials: list[Material]):
     insert_code = "\n".join(filter(bool, insert_code.split("\n")))
 
     if not insert_code.strip():
-        insert_code = "'No input recieved'"
+        insert_code = "'No input received'"
 
     code = f"""
 {insert_code}
 """.strip()
-    _log.info(code)
+    _log.info("Preprocessed code: %s", code)
     return code

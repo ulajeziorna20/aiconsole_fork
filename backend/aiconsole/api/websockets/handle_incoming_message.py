@@ -48,7 +48,12 @@ from aiconsole.core.assets.agents.agent import AICAgent
 from aiconsole.core.chat.execution_modes.utils.import_and_validate_execution_mode import (
     import_and_validate_execution_mode,
 )
-from aiconsole.core.chat.locking import DefaultChatMutator, acquire_lock, release_lock
+from aiconsole.core.chat.locking import (
+    DefaultChatMutator,
+    SequentialChatMutator,
+    acquire_lock,
+    release_lock,
+)
 from aiconsole.core.code_running.run_code import reset_code_interpreters
 from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
     WaitForEnvEvent,
@@ -114,29 +119,46 @@ async def _handle_acquire_lock_ws_message(connection: AICConnection, json: dict)
 
 
 async def _handle_release_lock_ws_message(connection: AICConnection, json: dict):
+
     message = ReleaseLockClientMessage(**json)
-    await release_lock(chat_id=message.chat_id, request_id=message.request_id)
 
-    lock_data = AcquiredLock(chat_id=message.chat_id, request_id=message.request_id)
+    chat_mutator = SequentialChatMutator(
+        DefaultChatMutator(
+            chat_id=message.chat_id,
+            request_id=message.request_id,
+            connection=None,  # Source connection is None because the originating mutations come from server
+        )
+    )
 
-    if lock_data in connection.acquired_locks:
-        connection.acquired_locks.remove(lock_data)
-    else:
-        _log.error(f"Lock {lock_data} not found in {connection.acquired_locks}")
+    async def f():
+        await release_lock(chat_id=message.chat_id, request_id=message.request_id)
+
+        lock_data = AcquiredLock(chat_id=message.chat_id, request_id=message.request_id)
+
+        if lock_data in connection.acquired_locks:
+            connection.acquired_locks.remove(lock_data)
+        else:
+            _log.error(f"Lock {lock_data} not found in {connection.acquired_locks}")
+
+    await chat_mutator.in_sequence(f)
 
 
 async def _handle_open_chat_ws_message(connection: AICConnection, json: dict):
+
     message = OpenChatClientMessage(**json)
-    temporary_request_id = str(uuid4())
 
     try:
         connection.open_chats_ids.add(message.chat_id)
 
-        chat = await acquire_lock(
-            chat_id=message.chat_id,
-            request_id=temporary_request_id,
-            skip_mutating_clients=True,  # Skip because they do not yet have the chat
+        chat_mutator = SequentialChatMutator(
+            DefaultChatMutator(
+                chat_id=message.chat_id,
+                request_id=message.request_id,
+                connection=connection,
+            )
         )
+
+        chat = await chat_mutator.read()
 
         if message.chat_id in connection.open_chats_ids:
             await connection.send(
@@ -150,7 +172,10 @@ async def _handle_open_chat_ws_message(connection: AICConnection, json: dict):
                     chat=chat,
                 )
             )
-    except Exception:
+    except Exception as e:
+        _log.error(f"Error during opening chat {message.chat_id}: {e}")
+        _log.exception(e)
+
         await connection.send(
             ResponseServerMessage(
                 request_id=message.request_id,
@@ -158,8 +183,6 @@ async def _handle_open_chat_ws_message(connection: AICConnection, json: dict):
                 is_error=True,
             )
         )
-    finally:
-        await release_lock(chat_id=message.chat_id, request_id=temporary_request_id)
 
 
 async def _handle_stop_chat_ws_message(connection: AICConnection, json: dict):
@@ -190,7 +213,10 @@ async def _handle_close_chat_ws_message(connection: AICConnection, json: dict):
 
 async def _handle_init_chat_mutation_ws_message(connection: AICConnection | None, json: dict):
     message = InitChatMutationClientMessage(**json)
-    mutator = DefaultChatMutator(chat_id=message.chat_id, request_id=message.request_id, connection=connection)
+
+    mutator = SequentialChatMutator(
+        DefaultChatMutator(chat_id=message.chat_id, request_id=message.request_id, connection=connection)
+    )
 
     await mutator.mutate(message.mutation)
 
@@ -212,11 +238,15 @@ async def _handle_accept_code_ws_message(connection: AICConnection, json: dict):
             _notify,
         )
 
-        chat_mutator = DefaultChatMutator(
-            chat_id=message.chat_id,
-            request_id=message.request_id,
-            connection=None,  # Source connection is None because the originating mutations come from server
+        chat_mutator = SequentialChatMutator(
+            DefaultChatMutator(
+                chat_id=message.chat_id,
+                request_id=message.request_id,
+                connection=None,  # Source connection is None because the originating mutations come from server
+            )
         )
+
+        await chat_mutator.wait_for_all_mutations()
 
         tool_call_location = chat.get_tool_call_location(message.tool_call_id)
 
@@ -250,13 +280,21 @@ async def _handle_accept_code_ws_message(connection: AICConnection, json: dict):
 async def _handle_process_chat_ws_message(connection: AICConnection, json: dict):
     message = ProcessChatClientMessage(**json)
     try:
-        await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
 
-        chat_mutator = DefaultChatMutator(
-            chat_id=message.chat_id,
-            request_id=message.request_id,
-            connection=None,  # Source connection is None because the originating mutations come from server
+        chat_mutator = SequentialChatMutator(
+            DefaultChatMutator(
+                chat_id=message.chat_id,
+                request_id=message.request_id,
+                connection=None,  # Source connection is None because the originating mutations come from server
+            )
         )
+
+        async def f():
+            await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
+
+        await chat_mutator.in_sequence(f)
+
+        await chat_mutator.wait_for_all_mutations()
 
         await do_process_chat(chat_mutator)
     finally:

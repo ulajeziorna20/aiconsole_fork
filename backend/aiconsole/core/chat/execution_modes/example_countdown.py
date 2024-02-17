@@ -32,7 +32,10 @@ from aiconsole.core.chat.chat_mutations import (
 )
 from aiconsole.core.chat.chat_mutator import ChatMutator
 from aiconsole.core.chat.execution_modes.execution_mode import ExecutionMode
-from aiconsole.core.code_running.run_code import get_code_interpreter
+from aiconsole.core.code_running.run_code import (
+    get_code_interpreter,
+    run_in_code_interpreter,
+)
 
 
 async def _execution_mode_process(
@@ -91,7 +94,7 @@ async def _execution_mode_process(
 
     try:
         try:
-            async for token in (await get_code_interpreter("python", chat_mutator.chat.id)).run(code, []):
+            async for token in await run_in_code_interpreter("python", chat_mutator.chat.id, code, []):
                 await chat_mutator.mutate(
                     AppendToOutputToolCallMutation(
                         tool_call_id=tool_call_id,
