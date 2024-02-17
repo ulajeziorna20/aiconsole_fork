@@ -67,13 +67,14 @@ export const EditableObjectSchema = z.object({
 export type EditableObject = z.infer<typeof EditableObjectSchema>;
 
 export const AssetSchema = EditableObjectSchema.extend({
+  version: z.string(),
   usage: z.string(),
   usage_examples: z.array(z.string()),
   defined_in: MaterialDefinitionSourceSchema,
-  status: AssetStatusSchema,
-  default_status: AssetStatusSchema,
-  override: z.boolean(),
   type: z.enum(['material', 'agent', 'chat']),
+  default_status: AssetStatusSchema,
+  status: AssetStatusSchema,
+  override: z.boolean(),
 });
 
 export type Asset = z.infer<typeof AssetSchema>;

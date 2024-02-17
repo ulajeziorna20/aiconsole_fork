@@ -87,10 +87,10 @@ export const AgentForm = ({
     // new Date is used to refresh image url
     if (!isAvatarOverwritten) {
       console.log(isAvatarOverwritten, agent.id);
-      const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${agent.id}/image?time=${new Date()}`;
+      const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${agent.id}/image?version=${agent?.version}`;
       setAvatarUrl(userAgentAvatarUrl);
     }
-  }, [agent.id, getBaseURL, isAvatarOverwritten]);
+  }, [agent.id, agent.version, getBaseURL, isAvatarOverwritten]);
 
   return (
     <>
