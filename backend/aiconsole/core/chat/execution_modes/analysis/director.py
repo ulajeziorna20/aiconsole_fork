@@ -52,12 +52,13 @@ to look at, agents are not able to read all of them nor change your choice:
 """.strip()
 
 LAST_SYSTEM_PROMPT = """
-Your job is analyse the situation in the chat.
+Your job is analyse the situation in the chat. You can not ask user questions directly, but you can ask other agents to do so.
 
 1. As part of the thinking_process:
     - What happened in the last few messages in the conversation?
     - Who wrote last? and who should now respond, the user or an agent?
         If an agent: establish a full plan to bring value to the user.
+        If clarification is needed, You must not ask it yourself, use any available agent to ask the user.
     - Be brief, and to the point, make this step short and actionable.
     - Use one or two short sentences if possible.
 
