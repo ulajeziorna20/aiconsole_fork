@@ -23,7 +23,8 @@ export function useDeleteEditableObjectWithUserInteraction(editableObjectType: E
         setSelectedAsset(newAsset);
         setLastSavedSelectedAsset(newAsset);
       } else {
-        navigate(`/${editableObjectType}s`);
+        //This causes the asset list to be fully reloaded, and is probably not really needed:
+        //navigate(`/${editableObjectType}s`);
       }
     }
   }
