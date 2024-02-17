@@ -14,6 +14,7 @@ import json
 import re
 import uuid
 from datetime import datetime, timezone
+from typing import Any
 
 import requests
 
@@ -63,7 +64,7 @@ def extract_and_format_chat_data(chat_link: str) -> dict:
     chat_data = json.loads(chat_data_json)
 
     # Format the chat data
-    formatted_chat_data = {
+    formatted_chat_data: dict[str, Any] = {
         "id": str(uuid.uuid4()),
         "lock_id": None,
         "title_edited": False,
