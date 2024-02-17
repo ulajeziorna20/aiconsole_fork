@@ -186,4 +186,6 @@ class SequentialChatMutator(ChatMutator):
             if running_mutation.exception():
                 _log.exception(running_mutation.exception())
 
+            await asyncio.sleep(0)
+
         return await _read_chat_outside_of_lock(chat_id=self.mutator.chat_id)
