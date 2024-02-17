@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Type
 from uuid import uuid4
 
-from litellm import ModelResponse
+from litellm import ModelResponse  # type: ignore
 
 from aiconsole.core.assets.agents.agent import AICAgent
 from aiconsole.core.chat.chat_mutations import (

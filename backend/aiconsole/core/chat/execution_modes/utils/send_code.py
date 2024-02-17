@@ -18,6 +18,11 @@ from aiconsole.core.gpt.partial import GPTPartialToolsCall
 _log = logging.getLogger(__name__)
 
 
+def name_to_language(name: str) -> str:
+    # convert python_tool to python
+    return name.split("_")[0]
+
+
 async def send_code(
     tool_calls: list[GPTPartialToolsCall],
     chat_mutator: ChatMutator,
@@ -27,7 +32,7 @@ async def send_code(
 ):
 
     for index, tool_call in enumerate(tool_calls):
-        default_language = LanguageStr(language_classes[0].__name__)
+        default_language = LanguageStr(name_to_language(language_classes[0].__name__))
 
         # All tool calls with lower indexes are finished
         prev_tool = tool_calls[index - 1] if index > 0 else None

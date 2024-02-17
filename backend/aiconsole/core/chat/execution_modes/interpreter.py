@@ -47,10 +47,11 @@ class CodeTask(OpenAISchema):
     )
 
 
-class python(CodeTask):
+class python_tool(CodeTask):
     """
     Execute python code in a stateful Jupyter notebook environment.
     You can execute shell commands by prefixing code lines with "!".
+    Make sure to pass the code and headline as json and not python variables.
     """
 
     code: str = Field(
@@ -60,7 +61,7 @@ class python(CodeTask):
     )
 
 
-class applescript(CodeTask):
+class applescript_tool(CodeTask):
     """
     This function executes the given code on the user's system using the local environment and returns the output. Only use this if it can not be done in Python.
     """
@@ -82,7 +83,7 @@ async def _execution_mode_process(
         materials=rendered_materials,
     )
 
-    await generate_response_message_with_code(chat_mutator, agent, system_message, [python, applescript])
+    await generate_response_message_with_code(chat_mutator, agent, system_message, [python_tool, applescript_tool])
 
     last_message = last_message_group.messages[-1]
 

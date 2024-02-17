@@ -22,7 +22,10 @@ from pydantic import BaseModel
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.assets.types import AssetLocation, AssetStatus, EditableObject
 
-type EditableObjectType = str
+
+class EditableObjectType(str):
+    pass
+
 
 """
 Prototye Work in Progress
