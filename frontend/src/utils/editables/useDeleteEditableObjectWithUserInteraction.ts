@@ -7,7 +7,6 @@ import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import { EditablesAPI } from '@/api/api/EditablesAPI';
 
 export function useDeleteEditableObjectWithUserInteraction(editableObjectType: EditableObjectType) {
-  const navigate = useNavigate();
   const deleteEditableObject = useEditablesStore((state) => state.deleteEditableObject);
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
@@ -23,6 +22,7 @@ export function useDeleteEditableObjectWithUserInteraction(editableObjectType: E
         setSelectedAsset(newAsset);
         setLastSavedSelectedAsset(newAsset);
       } else {
+        //const navigate = useNavigate();
         //This causes the asset list to be fully reloaded, and is probably not really needed:
         //navigate(`/${editableObjectType}s`);
       }
