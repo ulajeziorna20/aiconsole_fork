@@ -278,20 +278,22 @@ export function ProjectCard({ name, path, recentChats, incorrectPath, stats }: P
         </div>
 
         <div className="flex gap-2 justify-between w-full mt-[15px] mb-0">
-          <CounterItem icon={MessageSquare} count={chats_count} className="text-purple-400" />
-          <CounterItem icon={StickyNote} count={materials_note_count} />
-          <CounterItem icon={ScanText} count={materials_dynamic_note_count} />
-          <CounterItem icon={Blocks} count={materials_python_api_count} />
-          <div className="flex items-center text-[15px] text-gray-300">
-            <ActorAvatar actorType="agent" actorId={agents.agent_ids[0] || '1'} type="extraSmall" className="mb-0" />
-            <ActorAvatar
-              actorType="agent"
-              actorId={agents.agent_ids[1] || '2'}
-              type="extraSmall"
-              className="relative -left-[12px] mb-0"
-            />
-            <span className="-ml-[2px]">{agents.count}</span>
-          </div>
+          {chats_count ? <CounterItem icon={MessageSquare} count={chats_count} className="text-purple-400" /> : null}
+          {materials_note_count ? <CounterItem icon={StickyNote} count={materials_note_count} /> : null}
+          {materials_dynamic_note_count ? <CounterItem icon={ScanText} count={materials_dynamic_note_count} /> : null}
+          {materials_python_api_count ? <CounterItem icon={Blocks} count={materials_python_api_count} /> : null}
+          {agents.count ? (
+            <div className="flex items-center text-[15px] text-gray-300">
+              <ActorAvatar actorType="agent" actorId={agents.agent_ids[0] || '1'} type="extraSmall" className="mb-0" />
+              <ActorAvatar
+                actorType="agent"
+                actorId={agents.agent_ids[1] || '2'}
+                type="extraSmall"
+                className="relative -left-[12px] mb-0"
+              />
+              <span className="-ml-[2px]">{agents.count}</span>
+            </div>
+          ) : null}
         </div>
 
         {isCurrentProjectFetching && (

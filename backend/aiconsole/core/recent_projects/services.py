@@ -26,6 +26,10 @@ class AgentsCount:
 class RecentProjectsStats:
     def get_materials_counts(self, dir: Path) -> MaterialsCounts:
         base_path = dir / "materials"
+
+        if not base_path.exists():
+            return MaterialsCounts(note=0, dynamic_note=0, python_api=0)
+
         core_path = get_core_assets_directory(AssetType.MATERIAL)
 
         base_ids = (base_path, self._get_asset_ids_in_path(base_path))
@@ -56,6 +60,10 @@ class RecentProjectsStats:
 
     def get_agents_count(self, dir: Path) -> AgentsCount:
         base_path = dir / "agents"
+
+        if not base_path.exists():
+            return AgentsCount(count=0, agent_ids=[])
+
         core_path = get_core_assets_directory(AssetType.AGENT)
 
         base_ids = self._get_asset_ids_in_path(base_path)
