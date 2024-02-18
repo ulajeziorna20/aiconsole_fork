@@ -31,7 +31,7 @@ def convert_message(group: AICMessageGroup, message: AICMessage) -> list[GPTRequ
         GPTToolCall(
             id=tool_call.id,
             function=GPTFunctionCall(
-                name=tool_call.language if tool_call.language else "python",
+                name=tool_call.language + "_tool" if tool_call.language else "python_tool",
                 arguments=json.dumps(
                     {
                         "code": tool_call.code,
