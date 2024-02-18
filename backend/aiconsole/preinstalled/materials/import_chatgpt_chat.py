@@ -3,7 +3,7 @@
 Example usage:
 
 chat_link = "https://chat.openai.com/share/5fa0b36f-ac97-4660-a648-e9c1ce935744"
-import_chat_data(extract_and_format_chat_data(chat_link))
+import_chat_gpt_link(chat_link)
 
 Try to avoid calling writing the entire chat data as a literal parameter for import_chat_data, prefer to extract and pass the parameter as a variable.
 
@@ -41,9 +41,10 @@ def extract_and_format_chat_data(chat_link: str) -> dict:
     """
     Function to extract and format chat data from a given chat gpt link
     """
-
-    # Send a GET request to the URL
-    response = requests.get(chat_link)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
+    response = requests.get(chat_link, headers=headers)
 
     # Check if the request was successful
     if response.status_code != 200:
