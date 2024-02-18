@@ -41,6 +41,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
     if (assetType === 'agent') {
       if (id === 'user') {
         const agent: Agent = {
+          version: '0.0.1',
           type: 'agent',
           id: 'user',
           name: 'You',
@@ -62,6 +63,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
         //TODO: There should be only one place where this is defined, right now it's both in backend and frontend
 
         const agent: Agent = {
+          version: '0.0.1',
           type: 'agent',
           id: 'new_agent',
           name: 'New agent',
@@ -89,6 +91,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
     if (assetType === 'material') {
       if (id === 'new') {
         const material: Material = {
+          version: '0.0.1',
           type: 'material',
           id: 'new_material',
           name: 'New material',

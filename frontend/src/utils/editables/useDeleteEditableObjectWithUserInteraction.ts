@@ -1,6 +1,5 @@
 import { useEditablesStore } from '@/store/editables/useEditablesStore';
 import { Asset, EditableObjectType } from '@/types/editables/assetTypes';
-import { useNavigate } from 'react-router-dom';
 import { useSelectedEditableObject } from './useSelectedEditableObject';
 import { isAsset } from './isAsset';
 import { useAssetStore } from '@/store/editables/asset/useAssetStore';
