@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import asyncio
+from collections import defaultdict
 from typing import AsyncGenerator, cast
 
 from aiconsole.core.assets.materials.material import Material
@@ -47,27 +48,23 @@ async def get_code_interpreter(language_raw: str, chat_id: str) -> BaseCodeInter
 
     if chat_id not in code_interpreters:
         code_interpreters[chat_id] = {}
+
     if language not in code_interpreters[chat_id]:
         code_interpreters[chat_id][language] = language_map[language]()
         await code_interpreters[chat_id][language].initialize()
+
     return code_interpreters[chat_id][language]
 
 
 def reset_code_interpreters(chat_id: str | None = None):
     global code_interpreters
 
-    interpreters: list[BaseCodeInterpreter] = []
     if chat_id is not None:
-        if chat_id in code_interpreters:
-            interpreters = list(code_interpreters[chat_id].values())
-    else:
-        for chat_interpreters in code_interpreters.values():
-            for interpreter in chat_interpreters.values():
-                interpreters.append(interpreter)
-    for code_interpreter in interpreters:
-        code_interpreter.terminate()
-
-    if chat_id is not None and chat_id in code_interpreters:
+        for code_interpreter in list(code_interpreters.get(chat_id, {}).values()):
+            code_interpreter.terminate()
         code_interpreters[chat_id] = {}
     else:
+        for chat_interpreters in code_interpreters.values():
+            for code_interpreter in chat_interpreters.values():
+                code_interpreter.terminate()
         code_interpreters = {}
