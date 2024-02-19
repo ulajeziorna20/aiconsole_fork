@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import asyncio
-from collections import defaultdict
 from typing import AsyncGenerator, cast
 
 from aiconsole.core.assets.materials.material import Material
@@ -59,7 +58,7 @@ async def get_code_interpreter(language_raw: str, chat_id: str) -> BaseCodeInter
 def reset_code_interpreters(chat_id: str | None = None):
     global code_interpreters
 
-    if chat_id is not None:
+    if chat_id:
         for code_interpreter in list(code_interpreters.get(chat_id, {}).values()):
             code_interpreter.terminate()
         code_interpreters[chat_id] = {}
