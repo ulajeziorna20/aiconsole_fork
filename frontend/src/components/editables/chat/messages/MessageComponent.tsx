@@ -33,8 +33,8 @@ export function MessageComponent({ message, group }: MessageProps) {
   }, [message.id, userMutateChat]);
 
   const handleSaveClick = useCallback(
-    (content: string) => {
-      userMutateChat({
+    async (content: string) => {
+      await userMutateChat({
         type: 'SetContentMessageMutation',
         message_id: message.id,
         content,

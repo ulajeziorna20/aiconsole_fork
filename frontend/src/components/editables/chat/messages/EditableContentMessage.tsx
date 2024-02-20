@@ -25,7 +25,7 @@ interface EditableContentMessageProps {
   language?: string;
   children?: React.ReactNode;
   handleRemoveClick?: () => void;
-  handleAcceptedContent: (content: string) => void;
+  handleAcceptedContent: (content: string) => Promise<void>;
   className?: string;
   hideControls?: boolean;
   isEditing: boolean;
@@ -61,8 +61,8 @@ export function EditableContentMessage({
 
   const handleOnChange = (value: string) => setContent(value);
 
-  const handleSaveClick = useCallback(() => {
-    handleAcceptedContent(content);
+  const handleSaveClick = useCallback(async () => {
+    await handleAcceptedContent(content);
     setIsEditing(false);
   }, [content, handleAcceptedContent, setIsEditing]);
 
