@@ -14,19 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import traceback
+from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from aiconsole.core.assets.materials.documentation_from_code import (
     documentation_from_code,
 )
 from aiconsole.core.assets.materials.rendered_material import RenderedMaterial
 from aiconsole.core.assets.types import Asset, AssetLocation, AssetStatus, AssetType
+from aiconsole.utils.events import InternalEvent, internal_events
 
 if TYPE_CHECKING:
     from aiconsole.core.assets.materials.content_evaluation_context import (
         ContentEvaluationContext,
     )
+
+
+@dataclass(frozen=True, slots=True)
+class MaterialRenderErrorEvent(InternalEvent):
+    pass
 
 
 class MaterialContentType(str, Enum):
@@ -84,37 +91,41 @@ class Material(Asset):
     async def render(self, context: "ContentEvaluationContext"):
         header = f"# {self.name}\n\n"
 
-        inline_content = self.inlined_content
+        match self.content_type:
+            case MaterialContentType.STATIC_TEXT:
+                return RenderedMaterial(id=self.id, content=header + self.inlined_content, error="")
+            case MaterialContentType.DYNAMIC_TEXT:
+                return await self._handle_dynamic_text_content(context, header)
+            case MaterialContentType.API:
+                return await self._handle_api_content(context, header)
+            case _:
+                raise ValueError("Material has no content")
 
+    async def _handle_dynamic_text_content(self, context, header):
         try:
-            if self.content_type == MaterialContentType.DYNAMIC_TEXT:
-                # Try compiling the python code and run it
-                source_code = compile(inline_content, "<string>", "exec")
-                local_vars: dict[str, Any] = {}
-                exec(source_code, local_vars)
-                # currently, getting the python object from another interpreter is quite limited, and
-                # using the dedicated local_vars is the easiest way (otherwise we would need to pickle
-                # the object and send it to the other interpreter or use stdin/stdout)
-                content_func = local_vars.get("content")
-                if callable(content_func):
-                    return RenderedMaterial(
-                        id=self.id,
-                        content=header + await content_func(context),
-                        error="",
-                    )
-                return RenderedMaterial(id=self.id, content="", error="No callable content function found!")
-            elif self.content_type == MaterialContentType.STATIC_TEXT:
-                return RenderedMaterial(id=self.id, content=header + inline_content, error="")
-            elif self.content_type == MaterialContentType.API:
-                return RenderedMaterial(
-                    id=self.id,
-                    content=header + documentation_from_code(self, inline_content)(context),
-                    error="",
-                )
+            source_code = compile(self.inlined_content, "<string>", "exec")
+            local_vars = {}
+            exec(source_code, local_vars)
+            content_func = local_vars.get("content")
+            if callable(content_func):
+                content = await content_func(context)
+                return RenderedMaterial(id=self.id, content=header + content, error="")
+            else:
+                raise ValueError("No callable content function found!")
         except Exception:
-            return RenderedMaterial(id=self.id, content="", error=traceback.format_exc())
+            await internal_events().emit(MaterialRenderErrorEvent(), details=f"Error in DYNAMIC_TEXT material `{self.id}`")
+            error_details = RenderedMaterial(id=self.id, content="", error=traceback.format_exc())
+            raise ValueError("Error in Dynamic Note material", error_details)
 
-        raise ValueError("Material has no content")
+    async def _handle_api_content(self, context, header):
+        try:
+            compile(self.inlined_content, "temp_module", "exec")
+            content = documentation_from_code(self, self.inlined_content)(context)
+            return RenderedMaterial(id=self.id, content=header + content, error="")
+        except Exception:
+            await internal_events().emit(MaterialRenderErrorEvent(), details=f"Error in API material `{self.id}`")
+            error_details = RenderedMaterial(id=self.id, content="", error=traceback.format_exc())
+            raise ValueError("Error in Python API material", error_details)
 
 
 class MaterialWithStatus(Material):

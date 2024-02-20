@@ -132,7 +132,6 @@ def _check_mutation_queue(chat_id: str):
 
     def clear_task(future):
         if _running_mutations[chat_id] == future:
-            _log.debug(f"Clearing task {chat_id}")
             _running_mutations[chat_id] = None
             _check_mutation_queue(chat_id)
         else:
@@ -162,8 +161,6 @@ class SequentialChatMutator(ChatMutator):
     async def wait_for_all_mutations(self):
         chat_id = self.mutator.chat_id
         while _waiting_mutations[chat_id] or _running_mutations[chat_id] is not None:
-            _log.debug(f"Waiting for all mutations {chat_id}")
-
             running_mutation = _running_mutations[chat_id]
             if running_mutation:
                 await running_mutation

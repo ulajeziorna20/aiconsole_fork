@@ -28,9 +28,9 @@ class InternalEvents:
         if handler in self._handlers[event_type]:
             self._handlers[event_type].remove(handler)
 
-    async def emit(self, event: InternalEvent) -> None:
+    async def emit(self, event: InternalEvent, **kwargs) -> None:
         for handler in self._handlers[type(event)]:
-            await handler(event)
+            await handler(event, **kwargs)
 
 
 @lru_cache

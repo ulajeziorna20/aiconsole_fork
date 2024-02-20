@@ -36,8 +36,8 @@ from aiconsole.api.websockets.connection_manager import (
     connection_manager,
 )
 from aiconsole.api.websockets.do_process_chat import do_process_chat
-from aiconsole.api.websockets.render_materials_from_message_group import (
-    render_materials_from_message_group,
+from aiconsole.api.websockets.render_materials import (
+    render_materials,
 )
 from aiconsole.api.websockets.server_messages import (
     ChatOpenedServerMessage,
@@ -45,6 +45,7 @@ from aiconsole.api.websockets.server_messages import (
     ResponseServerMessage,
 )
 from aiconsole.core.assets.agents.agent import AICAgent
+from aiconsole.core.assets.materials.material import MaterialRenderErrorEvent
 from aiconsole.core.chat.execution_modes.utils.import_and_validate_execution_mode import (
     import_and_validate_execution_mode,
 )
@@ -59,7 +60,7 @@ from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
     WaitForEnvEvent,
 )
 from aiconsole.core.project import project
-from aiconsole.utils.events import internal_events
+from aiconsole.utils.events import InternalEvent, internal_events
 
 _log = logging.getLogger(__name__)
 
@@ -222,21 +223,25 @@ async def _handle_init_chat_mutation_ws_message(connection: AICConnection | None
 
 
 async def _handle_accept_code_ws_message(connection: AICConnection, json: dict):
+    events_to_sub: list[type[InternalEvent]] = [WaitForEnvEvent, ]
+
     message = AcceptCodeClientMessage(**json)
 
     async def _notify(event):
-        await connection_manager().send_to_chat(
-            NotificationServerMessage(title="Wait", message="Environment is still being created"),
-            message.chat_id,
-        )
+        if isinstance(event, WaitForEnvEvent):
+            await connection_manager().send_to_chat(
+                NotificationServerMessage(title="Wait", message="Environment is still being created"),
+                message.chat_id,
+            )
 
     try:
-        chat = await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
+        for event in events_to_sub:
+            internal_events().subscribe(
+                event,
+                _notify,
+            )
 
-        internal_events().subscribe(
-            WaitForEnvEvent,
-            _notify,
-        )
+        chat = await acquire_lock(chat_id=message.chat_id, request_id=message.request_id)
 
         chat_mutator = SequentialChatMutator(
             DefaultChatMutator(
@@ -264,7 +269,7 @@ async def _handle_accept_code_ws_message(connection: AICConnection, json: dict):
 
         execution_mode = await import_and_validate_execution_mode(agent)
 
-        mats = await render_materials_from_message_group(tool_call_location.message_group, chat_mutator.chat, agent)
+        mats = await render_materials(tool_call_location.message_group.materials_ids, chat_mutator.chat, agent)
 
         await execution_mode.accept_code(
             chat_mutator=chat_mutator,
@@ -274,6 +279,11 @@ async def _handle_accept_code_ws_message(connection: AICConnection, json: dict):
             tool_call_id=tool_call_location.tool_call.id,
         )
     finally:
+        for event in events_to_sub:
+            internal_events().unsubscribe(
+                event,
+                _notify,
+            )
         await release_lock(chat_id=message.chat_id, request_id=message.request_id)
 
 

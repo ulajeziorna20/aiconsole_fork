@@ -58,6 +58,9 @@ async def materials_preview(material: Material):
         relevant_materials=[],
     )
 
-    rendered_material = await material.render(content_context)
+    try:
+        rendered_material = await material.render(content_context)
+    except ValueError as e:
+        return JSONResponse(e.args[1].model_dump(exclude_none=True))
 
     return JSONResponse(rendered_material.model_dump(exclude_none=True))
