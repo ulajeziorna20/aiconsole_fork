@@ -85,7 +85,7 @@ async def _execution_mode_process(
             await material.render(content_context) for material in content_context.relevant_materials
         ]
 
-        execution_mode = await import_and_validate_execution_mode(analysis.agent)
+        execution_mode = await import_and_validate_execution_mode(analysis.agent, chat_mutator.chat.id)
 
         await execution_mode.process_chat(
             chat_mutator=chat_mutator,

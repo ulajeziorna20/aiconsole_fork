@@ -267,7 +267,7 @@ async def _handle_accept_code_ws_message(connection: AICConnection, json: dict):
 
         agent = cast(AICAgent, agent)
 
-        execution_mode = await import_and_validate_execution_mode(agent)
+        execution_mode = await import_and_validate_execution_mode(agent, chat_mutator.chat.id)
 
         mats = await render_materials(tool_call_location.message_group.materials_ids, chat_mutator.chat, agent)
 

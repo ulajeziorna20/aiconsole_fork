@@ -73,7 +73,8 @@ async def do_process_chat(chat_mutator: ChatMutator):
         )
     )
 
-    execution_mode = await import_and_validate_execution_mode(agent)
+    execution_mode = await import_and_validate_execution_mode(agent, chat_mutator.chat.id)
+
     await execution_mode.process_chat(
         chat_mutator=chat_mutator,
         agent=agent,
