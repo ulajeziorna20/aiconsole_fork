@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import asyncio
 import logging
 from collections import defaultdict
@@ -45,7 +44,6 @@ from aiconsole.api.websockets.server_messages import (
     ResponseServerMessage,
 )
 from aiconsole.core.assets.agents.agent import AICAgent
-from aiconsole.core.assets.materials.material import MaterialRenderErrorEvent
 from aiconsole.core.chat.execution_modes.utils.import_and_validate_execution_mode import (
     import_and_validate_execution_mode,
 )

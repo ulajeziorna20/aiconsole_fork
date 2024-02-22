@@ -26,18 +26,10 @@ from aiconsole.core.chat.execution_modes.utils.generate_response_message_with_co
 from aiconsole.core.chat.execution_modes.utils.get_agent_system_message import (
     get_agent_system_message,
 )
-from aiconsole.core.chat.execution_modes.utils.import_and_validate_execution_mode import (
-    ExecutionModeWarningEvent,
-)
 from aiconsole.core.gpt.create_full_prompt_with_materials import (
     create_full_prompt_with_materials,
 )
 from aiconsole.core.gpt.function_calls import OpenAISchema
-from aiconsole.utils.events import internal_events
-
-
-async def emit_warning_event():
-    await internal_events().emit(ExecutionModeWarningEvent(), title="GenUI", message="Experimental mode!")
 
 
 class react_ui(OpenAISchema):
