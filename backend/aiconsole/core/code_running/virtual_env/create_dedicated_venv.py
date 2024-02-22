@@ -86,7 +86,7 @@ def create_dedicated_venv():
 
         _log.info(f"Creating venv in {venv_path}, using {sys.executable}")
 
-        run_subprocess(sys.executable, "-m", "venv", str(venv_path), "--system-site-packages")
+        run_subprocess(sys.executable, "-m", "virtualenv", str(venv_path), "--system-site-packages")
 
         install_and_update_pip(venv_path)
 
