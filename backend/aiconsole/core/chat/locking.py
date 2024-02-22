@@ -115,27 +115,24 @@ class DefaultChatMutator(ChatMutator):
 
 
 # This lock is responsible for sequencing the mutations and reads on a given chat
-_waiting_mutations: dict[str, list[Coroutine]] = defaultdict(lambda: [])
+_waiting_mutations: dict[str, list[Coroutine]] = defaultdict(list)
 _running_mutations: dict[str, asyncio.Task | None] = defaultdict(lambda: None)
+_mutation_complete_events: dict[str, asyncio.Event] = defaultdict(asyncio.Event)
 
 
 def _check_mutation_queue(chat_id: str):
-    if _running_mutations[chat_id] is not None:
+    if _running_mutations[chat_id] is not None or not _waiting_mutations[chat_id]:
         return
 
-    if not _waiting_mutations[chat_id]:
-        return
-
-    h = _waiting_mutations[chat_id].pop()
+    h = _waiting_mutations[chat_id].pop(0)
     task = asyncio.create_task(h)
     _running_mutations[chat_id] = task
 
     def clear_task(future):
-        if _running_mutations[chat_id] == future:
-            _running_mutations[chat_id] = None
-            _check_mutation_queue(chat_id)
-        else:
-            _log.error(f"Task {chat_id} already cleared")
+        _running_mutations[chat_id] = None
+        _mutation_complete_events[chat_id].set()
+        _mutation_complete_events[chat_id].clear()
+        _check_mutation_queue(chat_id)
 
     task.add_done_callback(clear_task)
 
@@ -151,7 +148,11 @@ class SequentialChatMutator(ChatMutator):
 
     async def mutate(self, mutation: ChatMutation) -> None:
         async def h():
-            await self.mutator.mutate(mutation)
+            try:
+                await self.mutator.mutate(mutation)
+            except Exception as e:
+                _log.exception(f"Error during mutation: {e}")
+                raise
 
         _waiting_mutations[self.mutator.chat_id].append(h())
         _check_mutation_queue(self.mutator.chat_id)
@@ -161,28 +162,12 @@ class SequentialChatMutator(ChatMutator):
     async def wait_for_all_mutations(self):
         chat_id = self.mutator.chat_id
         while _waiting_mutations[chat_id] or _running_mutations[chat_id] is not None:
-            running_mutation = _running_mutations[chat_id]
-            if running_mutation:
-                await running_mutation
-            else:
-                await asyncio.sleep(0)
+            await _mutation_complete_events[chat_id].wait()
 
     async def in_sequence(self, f: Callable[[], Coroutine]):
         _waiting_mutations[self.mutator.chat_id].append(f())
         _check_mutation_queue(self.mutator.chat_id)
 
     async def read(self) -> Chat:
-        while True:
-            running_mutation = _running_mutations[self.mutator.chat_id]
-
-            if running_mutation is None:
-                break
-
-            await running_mutation
-
-            if running_mutation.exception():
-                _log.exception(running_mutation.exception())
-
-            await asyncio.sleep(0)
-
+        await self.wait_for_all_mutations()
         return await _read_chat_outside_of_lock(chat_id=self.mutator.chat_id)
