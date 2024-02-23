@@ -13,11 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime
+from uuid import uuid4
+
 from pydantic import Field
 
 from aiconsole.core.assets.agents.agent import AICAgent
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.assets.materials.rendered_material import RenderedMaterial
+from aiconsole.core.chat.chat_mutations import CreateMessageMutation
 from aiconsole.core.chat.chat_mutator import ChatMutator
 from aiconsole.core.chat.execution_modes.execution_mode import ExecutionMode
 from aiconsole.core.chat.execution_modes.utils.generate_response_message_with_code import (
@@ -50,6 +54,22 @@ class react_ui(OpenAISchema):
     )
 
 
+async def show_prototype_warning(chat_mutator):
+    # TODO: remove after GenUI is fully implemented
+    last_message_group = chat_mutator.chat.message_groups[-1]
+
+    GENUI_WARNING_MESSAGE = "**WARNING!** The GenUI execution mode is currently in an early prototype phase. "
+
+    await chat_mutator.mutate(
+        CreateMessageMutation(
+            message_group_id=last_message_group.id,
+            message_id=str(uuid4()),
+            timestamp=datetime.now().isoformat(),
+            content=GENUI_WARNING_MESSAGE,
+        )
+    )
+
+
 async def _execution_mode_process(
     chat_mutator: ChatMutator,
     agent: AICAgent,
@@ -60,6 +80,8 @@ async def _execution_mode_process(
         intro=get_agent_system_message(agent),
         materials=rendered_materials,
     )
+
+    await show_prototype_warning(chat_mutator)
 
     await generate_response_message_with_code(
         chat_mutator, agent, system_message, language_classes=[react_ui], enforced_language=react_ui

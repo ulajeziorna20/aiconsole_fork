@@ -44,25 +44,6 @@ async def generate_response_message_with_code(
 
     tools_requiring_closing_parenthesis: list[str] = []
 
-    # TODO: remove after GenUI is fully implemented
-    from aiconsole.core.chat.execution_modes.genui import react_ui
-
-    if language_classes == [react_ui]:
-        GENUI_WARNING_MESSAGE = (
-            "**WARNING!** The GenUI execution mode is currently in an early prototype phase. "
-            "Please adjust your expectations accordingly, as it may not yet be fully functional."
-        )
-        message_id = str(uuid4())
-
-        await chat_mutator.mutate(
-            CreateMessageMutation(
-                message_group_id=last_message_group.id,
-                message_id=message_id,
-                timestamp=datetime.now().isoformat(),
-                content=GENUI_WARNING_MESSAGE,
-            )
-        )
-
     message_id = str(uuid4())
     await chat_mutator.mutate(
         CreateMessageMutation(
