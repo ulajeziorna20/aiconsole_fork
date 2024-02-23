@@ -253,7 +253,10 @@ def preprocess_python(code: str, materials: list[Material]):
     code = "\n".join(
         [
             (
-                f"import subprocess; out = subprocess.check_output({line[1:]!r}, shell=True, encoding='utf-8'); print(out)"
+                # Modified line to decode and strip ANSI color codes
+                "import subprocess, re, os; out = subprocess.check_output("
+                f"{line[1:]!r}, shell=True, env={{**os.environ, 'TERM': 'dumb'}}).decode('utf-8'); "
+                "print(out)"
                 if line.startswith("!")
                 else line
             )
