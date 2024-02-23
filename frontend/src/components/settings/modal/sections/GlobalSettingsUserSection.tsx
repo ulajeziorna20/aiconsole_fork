@@ -62,7 +62,9 @@ const GlobalSettingsUserSection = ({ onImageSelected, avatarUrl, control }: Glob
             />
           ) : (
             <div className="flex gap-5 items-center">
-              <h2 className="text-white text-[32px] font-extrabold">{watchName || 'Your name'}</h2>
+              <h2 className="text-white text-[32px] font-extrabold truncate max-w-[30dvw] md:max-w-sm">
+                {watchName || 'Your name'}
+              </h2>
               <button onClick={() => setIsEditMode(true)}>
                 <Icon icon={Pencil} className="text-gray-400 h-6 w-6" />
               </button>
