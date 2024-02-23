@@ -31,7 +31,7 @@ export function ToolOutput({ tool_call, syntaxHighlighterCustomStyles }: OutputP
   const [isEditing, setIsEditing] = useState(false);
 
   const handleAcceptedContent = useCallback(
-    (content: string) => {
+    async (content: string) => {
       userMutateChat({
         type: 'SetOutputToolCallMutation',
         tool_call_id: tool_call.id,
