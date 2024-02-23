@@ -26,6 +26,7 @@ from aiconsole.core.chat.chat_mutations import (
     SetIsExecutingToolCallMutation,
     SetIsStreamingMessageMutation,
     SetIsStreamingToolCallMutation,
+    SetIsSuccessfulToolCallMutation,
     SetLanguageToolCallMutation,
     SetMaterialsIdsMessageGroupMutation,
     SetOutputToolCallMutation,
@@ -160,6 +161,9 @@ def _handle_CreateToolCallMutation(chat, mutation: CreateToolCallMutation) -> No
         code=mutation.code,
         headline=mutation.headline,
         output=mutation.output,
+        is_executing=mutation.is_executing,
+        is_successful=mutation.is_successful,
+        is_streaming=mutation.is_streaming,
     )
     message.tool_calls.append(tool_call)
 
@@ -216,6 +220,10 @@ def _handle_SetToolCallIsStreamingMutation(chat, mutation: SetIsStreamingToolCal
 
 def _handle_SetIsExecutingToolCallMutation(chat, mutation: SetIsExecutingToolCallMutation) -> None:
     _get_tool_call_location(chat, mutation.tool_call_id).tool_call.is_executing = mutation.is_executing
+
+
+def _handle_SetIsSuccessfulToolCallMutation(chat, mutation: SetIsSuccessfulToolCallMutation) -> None:
+    _get_tool_call_location(chat, mutation.tool_call_id).tool_call.is_successful = mutation.is_successful
 
 
 # Utils
@@ -276,6 +284,7 @@ MUTATION_HANDLERS: dict[str, Callable[[Chat, Any], None]] = {
     AppendToOutputToolCallMutation.__name__: _handle_AppendToToolCallOutputMutation,
     SetIsStreamingToolCallMutation.__name__: _handle_SetToolCallIsStreamingMutation,
     SetIsExecutingToolCallMutation.__name__: _handle_SetIsExecutingToolCallMutation,
+    SetIsSuccessfulToolCallMutation.__name__: _handle_SetIsSuccessfulToolCallMutation,
 }
 
 # Entry point

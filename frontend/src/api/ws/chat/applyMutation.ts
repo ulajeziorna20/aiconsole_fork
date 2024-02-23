@@ -102,11 +102,13 @@ export function applyMutation(chat: Chat, mutation: ChatMutation) {
         code: mutation.code,
         headline: mutation.headline,
         output: mutation.output,
-        is_streaming: false,
-        is_executing: false,
+        is_successful: mutation.is_successful,
+        is_streaming: mutation.is_streaming,
+        is_executing: mutation.is_executing,
       });
       break;
     }
+
     case 'DeleteToolCallMutation': {
       const tool_call = getToolCallLocation(chat, mutation.tool_call_id);
       tool_call.message.tool_calls = tool_call.message.tool_calls.filter((tc) => tc.id !== tool_call.tool_call.id);
@@ -152,13 +154,15 @@ export function applyMutation(chat: Chat, mutation: ChatMutation) {
       tool_call.output += mutation.output_delta;
       break;
     }
+    case 'SetIsSuccessfulToolCallMutation':
+      getToolCallLocation(chat, mutation.tool_call_id).tool_call.is_successful = mutation.is_successful;
+      break;
     case 'SetIsStreamingToolCallMutation':
       getToolCallLocation(chat, mutation.tool_call_id).tool_call.is_streaming = mutation.is_streaming;
       break;
     case 'SetIsExecutingToolCallMutation':
       getToolCallLocation(chat, mutation.tool_call_id).tool_call.is_executing = mutation.is_executing;
       break;
-
     default:
       console.error('Unknown mutation type: ', mutation);
   }

@@ -40,6 +40,7 @@ import { ToolOutput } from './ToolOutput';
 import { transpileCode } from '@/utils/transpilation/transpileCode';
 import { createSandbox } from '@/utils/transpilation/createSandbox';
 import { MessageControls } from './MessageControls';
+import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
 
 interface MessageProps {
   group: AICMessageGroup;
@@ -62,7 +63,7 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
   const [uiResult, setUIResult] = useState<ReactNode | null>(null);
 
   const handleAcceptedContent = useCallback(
-    (content: string) => {
+    async (content: string) => {
       userMutateChat({
         type: 'SetCodeToolCallMutation',
         tool_call_id: tool_call.id,
@@ -80,9 +81,8 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
     });
   }, [tool_call.id, userMutateChat]);
 
-  const runCode = () => {
-    doAcceptCode(tool_call.id);
-    tool_call.output = '';
+  const runCode = async () => {
+    await doAcceptCode(tool_call.id);
     setIsEditing(false);
   };
   const renderUIResult = async () => {
@@ -116,13 +116,6 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
   //Either executing or streaming while there are still no output messages
   const shouldDisplaySpinner = tool_call.is_executing || tool_call.is_streaming;
 
-  const isError =
-    tool_call.output?.toLowerCase().includes('traceback') ||
-    tool_call.output?.toLowerCase().includes('syntax error:') ||
-    tool_call.output?.toLowerCase().includes('execution error:') ||
-    tool_call.output?.toLowerCase().includes('an error occurred on line') ||
-    tool_call.output?.toLowerCase().match(/file\s*".*",\s*line/g);
-
   const customVs2015 = {
     ...vs2015,
     'pre[class*="language-"]': {
@@ -145,7 +138,13 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
           },
         )}
         onClick={async () => {
-          if (folded && alwaysExecuteCode && isViableForRunningCode(tool_call.id) && !shouldDisplaySpinner) {
+          if (
+            folded &&
+            alwaysExecuteCode &&
+            isViableForRunningCode(tool_call.id) &&
+            !shouldDisplaySpinner &&
+            language === 'react_ui'
+          ) {
             await renderUIResult();
           } else {
             setUIResult(null);
@@ -157,16 +156,16 @@ export function ToolCall({ group, toolCall: tool_call }: MessageProps) {
           <div className="flex-grow flex flex-row gap-3 items-center">
             {shouldDisplaySpinner && <Spinner width={20} height={20} />}
             {!shouldDisplaySpinner &&
-              !isError &&
+              tool_call.is_successful &&
               !(tool_call.output != undefined || tool_call.language == 'react_ui') && (
                 <Icon icon={CircleDashedIcon} width={20} height={20} className="text-success flex-shrink-0" />
               )}
             {!shouldDisplaySpinner &&
-              !isError &&
+              tool_call.is_successful &&
               (tool_call.output != undefined || tool_call.language == 'react_ui') && (
                 <Icon icon={CheckCircle2Icon} width={20} height={20} className="text-success flex-shrink-0" />
               )}
-            {!shouldDisplaySpinner && isError && (
+            {!shouldDisplaySpinner && !tool_call.is_successful && (
               <Icon icon={AlertCircleIcon} width={20} height={20} className="text-danger flex-shrink-0" />
             )}
 

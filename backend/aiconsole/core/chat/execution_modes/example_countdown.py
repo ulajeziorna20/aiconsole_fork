@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import asyncio
-import traceback
 from datetime import datetime
 from uuid import uuid4
 
@@ -29,9 +28,13 @@ from aiconsole.core.chat.chat_mutations import (
     AppendToOutputToolCallMutation,
     CreateMessageMutation,
     CreateToolCallMutation,
+    SetIsSuccessfulToolCallMutation,
 )
 from aiconsole.core.chat.chat_mutator import ChatMutator
 from aiconsole.core.chat.execution_modes.execution_mode import ExecutionMode
+from aiconsole.core.code_running.code_interpreters.base_code_interpreter import (
+    CodeExecutionError,
+)
 from aiconsole.core.code_running.run_code import (
     get_code_interpreter,
     run_in_code_interpreter,
@@ -89,31 +92,32 @@ async def _execution_mode_process(
             headline="",
             language="python",
             output="",
+            is_streaming=False,
+            is_executing=False,
+            is_successful=False,
         )
     )
 
     try:
         try:
-            async for token in await run_in_code_interpreter("python", chat_mutator.chat.id, code, []):
+            async for token in run_in_code_interpreter("python", chat_mutator.chat.id, code, []):
                 await chat_mutator.mutate(
                     AppendToOutputToolCallMutation(
                         tool_call_id=tool_call_id,
                         output_delta=token,
                     )
                 )
+            await chat_mutator.mutate(
+                SetIsSuccessfulToolCallMutation(
+                    tool_call_id=tool_call_id,
+                    is_successful=True,
+                ),
+            )
+        except CodeExecutionError:
+            pass
         except asyncio.CancelledError:
             (await get_code_interpreter("python", chat_mutator.chat.id)).terminate()
             raise
-        except Exception:
-            await connection_manager().send_to_chat(
-                ErrorServerMessage(error=traceback.format_exc().strip()), chat_mutator.chat.id
-            )
-            await chat_mutator.mutate(
-                AppendToOutputToolCallMutation(
-                    tool_call_id=tool_call_id,
-                    output_delta=traceback.format_exc().strip(),
-                )
-            )
     except Exception as e:
         await connection_manager().send_to_chat(ErrorServerMessage(error=str(e)), chat_mutator.chat.id)
         raise e

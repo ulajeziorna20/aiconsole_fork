@@ -7,7 +7,6 @@ from aiconsole.core.chat.chat_mutations import (
     CreateToolCallMutation,
     SetCodeToolCallMutation,
     SetHeadlineToolCallMutation,
-    SetIsStreamingToolCallMutation,
     SetLanguageToolCallMutation,
 )
 from aiconsole.core.chat.chat_mutator import ChatMutator
@@ -57,6 +56,9 @@ async def send_code(
                     headline="",
                     language=None,
                     output=None,
+                    is_streaming=True,
+                    is_executing=False,
+                    is_successful=False,
                 )
             )
 
@@ -69,14 +71,6 @@ async def send_code(
 
         if not tool_call_data:
             raise Exception(f"Tool call {tool_call.id} not found")
-
-        if not tool_call_data.is_streaming:
-            await chat_mutator.mutate(
-                SetIsStreamingToolCallMutation(
-                    tool_call_id=tool_call.id,
-                    is_streaming=True,
-                )
-            )
 
         async def send_language_if_needed(lang: LanguageStr):
             if tool_call_data.language is None:

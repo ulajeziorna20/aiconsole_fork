@@ -33,6 +33,7 @@ class AICToolCall(BaseModel):
     code: str
     headline: str
     output: str | None = None
+    is_successful: bool = False
 
     is_streaming: bool = False
     is_executing: bool = False

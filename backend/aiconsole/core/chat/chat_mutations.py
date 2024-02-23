@@ -129,6 +129,9 @@ class CreateToolCallMutation(BaseModel):
     language: LanguageStr | None = None
     headline: str
     output: str | None = None
+    is_streaming: bool
+    is_executing: bool
+    is_successful: bool
 
 
 class DeleteToolCallMutation(BaseModel):
@@ -178,6 +181,12 @@ class AppendToOutputToolCallMutation(BaseModel):
     output_delta: str
 
 
+class SetIsSuccessfulToolCallMutation(BaseModel):
+    type: Literal["SetIsSuccessfulToolCallMutation"] = "SetIsSuccessfulToolCallMutation"
+    tool_call_id: str
+    is_successful: bool
+
+
 class SetIsStreamingToolCallMutation(BaseModel):
     type: Literal["SetIsStreamingToolCallMutation"] = "SetIsStreamingToolCallMutation"
     tool_call_id: str
@@ -218,6 +227,7 @@ ChatMutation = (
     | SetLanguageToolCallMutation
     | SetOutputToolCallMutation
     | AppendToOutputToolCallMutation
+    | SetIsSuccessfulToolCallMutation
     | SetIsStreamingToolCallMutation
     | SetIsExecutingToolCallMutation
 )

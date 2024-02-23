@@ -169,6 +169,14 @@ export const AppendToOutputToolCallMutationSchema = z.object({
 
 export type AppendToOutputToolCallMutation = z.infer<typeof AppendToOutputToolCallMutationSchema>;
 
+export const SetIsSuccessfulToolCallMutationSchema = z.object({
+  type: z.literal('SetIsSuccessfulToolCallMutation'),
+  tool_call_id: z.string(),
+  is_successful: z.boolean(),
+});
+
+export type SetHasErrorToolCallMutation = z.infer<typeof SetIsSuccessfulToolCallMutationSchema>;
+
 export const SetIsStreamingToolCallMutationSchema = z.object({
   type: z.literal('SetIsStreamingToolCallMutation'),
   tool_call_id: z.string(),
@@ -234,6 +242,9 @@ export const CreateToolCallMutationSchema = z.object({
   headline: z.string(),
   output: z.string().optional(),
   language: LanguageStrSchema.optional(),
+  is_successful: z.boolean(),
+  is_streaming: z.boolean(),
+  is_executing: z.boolean(),
 });
 
 export const ChatMutationSchema = z.union([
@@ -264,6 +275,7 @@ export const ChatMutationSchema = z.union([
   SetLanguageToolCallMutationSchema,
   SetOutputToolCallMutationSchema,
   AppendToOutputToolCallMutationSchema,
+  SetIsSuccessfulToolCallMutationSchema,
   SetIsStreamingToolCallMutationSchema,
   SetIsExecutingToolCallMutationSchema,
 ]);

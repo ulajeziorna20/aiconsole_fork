@@ -34,7 +34,8 @@ async def run_in_code_interpreter(
 ) -> AsyncGenerator[str, None]:
     async with _global_code_running_lock:
         interpreter = await get_code_interpreter(language, chat_id)
-        return interpreter.run(code, materials)
+        async for x in interpreter.run(code, materials):
+            yield x
 
 
 async def get_code_interpreter(language_raw: str, chat_id: str) -> BaseCodeInterpreter:

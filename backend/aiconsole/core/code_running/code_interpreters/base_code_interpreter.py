@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import AsyncGenerator, Protocol
 
 from aiconsole.core.assets.materials.material import Material
-from aiconsole.core.code_running.virtual_env.create_dedicated_venv import WaitForEnvEvent
+from aiconsole.core.code_running.virtual_env.create_dedicated_venv import (
+    WaitForEnvEvent,
+)
 from aiconsole.utils.events import internal_events
 from aiconsole_toolkit.env import (
     get_current_project_venv_bin_path,
@@ -13,6 +15,14 @@ from aiconsole_toolkit.env import (
 )
 
 _log = logging.getLogger(__name__)
+
+
+class CodeExecutionError(Exception):
+    """Exception raised for errors during code execution in the interpreter."""
+
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
 
 
 class BaseCodeInterpreter(Protocol):
@@ -24,6 +34,7 @@ class BaseCodeInterpreter(Protocol):
         ...
 
     def run(self, code: str, materials: list[Material]) -> AsyncGenerator[str, None]:  # fmt: off
+        """Raises CodeExecutionError"""
         ...
 
     def terminate(self) -> None:  # fmt: off

@@ -1,14 +1,16 @@
-import traceback
-
 from aiconsole.api.websockets.connection_manager import connection_manager
 from aiconsole.api.websockets.server_messages import ErrorServerMessage
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.chat.chat_mutations import (
     AppendToOutputToolCallMutation,
     SetIsExecutingToolCallMutation,
+    SetIsSuccessfulToolCallMutation,
     SetOutputToolCallMutation,
 )
 from aiconsole.core.chat.chat_mutator import ChatMutator
+from aiconsole.core.code_running.code_interpreters.base_code_interpreter import (
+    CodeExecutionError,
+)
 from aiconsole.core.code_running.run_code import run_in_code_interpreter
 
 
@@ -39,9 +41,16 @@ async def run_code(
             )
         )
 
+        await chat_mutator.mutate(
+            SetIsSuccessfulToolCallMutation(
+                tool_call_id=tool_call_id,
+                is_successful=False,
+            ),
+        )
+
         try:
             assert tool_call.language is not None
-            async for token in await run_in_code_interpreter(
+            async for token in run_in_code_interpreter(
                 tool_call.language, chat_mutator.chat.id, tool_call.code, materials
             ):
                 await chat_mutator.mutate(
@@ -50,17 +59,14 @@ async def run_code(
                         output_delta=token,
                     )
                 )
-        except Exception:
-            await connection_manager().send_to_chat(
-                ErrorServerMessage(error=traceback.format_exc().strip()), chat_mutator.chat.id
-            )
-
             await chat_mutator.mutate(
-                AppendToOutputToolCallMutation(
+                SetIsSuccessfulToolCallMutation(
                     tool_call_id=tool_call_id,
-                    output_delta=traceback.format_exc().strip(),
-                )
+                    is_successful=True,
+                ),
             )
+        except CodeExecutionError:
+            pass  # The code will not be successful, but we don't want to raise an error
     finally:
         await chat_mutator.mutate(
             SetIsExecutingToolCallMutation(

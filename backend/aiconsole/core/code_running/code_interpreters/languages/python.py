@@ -47,6 +47,7 @@ from jupyter_client.manager import AsyncKernelManager
 from aiconsole.core.assets.materials.material import Material
 from aiconsole.core.code_running.code_interpreters.base_code_interpreter import (
     BaseCodeInterpreter,
+    CodeExecutionError,
 )
 from aiconsole_toolkit.env import get_current_project_venv_python_path
 
@@ -88,6 +89,7 @@ class Python(BaseCodeInterpreter):
         )
         self.listener_thread = None
         self.finish_flag = False
+        self.has_error = False
 
         # DISABLED because sometimes this bypasses sending it up to us for some reason!
         # Give it our same matplotlib backend
@@ -110,14 +112,21 @@ matplotlib.use('{backend}')
 
     async def run(self, code: str, materials: list[Material]) -> AsyncGenerator[str, None]:
         self.finish_flag = False
+        self.has_error = False
+
         try:
             preprocessed_code = preprocess_python(code, materials)
             message_queue: queue.Queue[Any] = queue.Queue()
             self._execute_code(preprocessed_code, message_queue)
             async for output in self._capture_output(message_queue):
                 yield output
+            if self.has_error:
+                raise CodeExecutionError("Error during code execution")
         except GeneratorExit:
-            raise  # gotta pass this up!
+            yield "Code execution stopped by user."
+            raise
+        except CodeExecutionError:
+            raise
         except Exception:
             content = traceback.format_exc()
             yield content
@@ -155,11 +164,12 @@ matplotlib.use('{backend}')
                     content = ansi_escape.sub("", content)
                     message_queue.put(
                         {
-                            "type": "console",
+                            "type": "error",
                             "format": "output",
                             "content": content,
                         }
                     )
+                    self.has_error = True
                 elif msg["msg_type"] in ["display_data", "execute_result"]:
                     data = content["data"]
                     if "image/png" in data:
@@ -243,7 +253,7 @@ def preprocess_python(code: str, materials: list[Material]):
     code = "\n".join(
         [
             (
-                f"import subprocess; out = subprocess.check_output({line[1:]!r}, shell=True); print(out.decode('utf-8'))"
+                f"import subprocess; out = subprocess.check_output({line[1:]!r}, shell=True, encoding='utf-8'); print(out)"
                 if line.startswith("!")
                 else line
             )

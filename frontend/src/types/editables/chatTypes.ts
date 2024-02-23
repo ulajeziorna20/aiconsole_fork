@@ -4,11 +4,12 @@ import { EditableObjectSchema, GPTRoleSchema } from './assetTypes'; // Import ne
 export const AICToolCallSchema = z.object({
   id: z.string(),
   language: z.string().optional(),
-  is_executing: z.boolean(),
-  is_streaming: z.boolean(),
   code: z.string(),
   headline: z.string(),
   output: z.string().optional(),
+  is_successful: z.boolean(),
+  is_executing: z.boolean(),
+  is_streaming: z.boolean(),
 });
 
 export type AICToolCall = z.infer<typeof AICToolCallSchema>;
