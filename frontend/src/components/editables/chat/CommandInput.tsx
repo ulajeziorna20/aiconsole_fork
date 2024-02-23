@@ -34,16 +34,9 @@ interface MessageInputProps {
   className?: string;
   actionLabel: string;
   onSubmit?: (command: string) => void;
-  setCommandInputHeight: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export const CommandInput = ({
-  className,
-  onSubmit,
-  actionIcon,
-  actionLabel,
-  setCommandInputHeight,
-}: MessageInputProps) => {
+export const CommandInput = ({ className, onSubmit, actionIcon, actionLabel }: MessageInputProps) => {
   const ActionIcon = actionIcon;
   const [showChatOptions, setShowChatOptions] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
@@ -287,7 +280,6 @@ export const CommandInput = ({
             onKeyDown={handleKeyDown}
             placeholder={`Type "@" to select a specific agent or materials`}
             rows={1}
-            onHeightChange={(height) => setCommandInputHeight(height + 40)}
             maxRows={4}
           />
         </div>

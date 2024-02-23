@@ -29,7 +29,7 @@ import { Chat } from '@/types/editables/chatTypes';
 import { cn } from '@/utils/common/cn';
 import { useEditableObjectContextMenu } from '@/utils/editables/useContextMenuForEditable';
 import { ArrowDown, ReplyIcon, Square } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { unstable_useBlocker as useBlocker, useParams, useSearchParams } from 'react-router-dom';
 import ScrollToBottom, { useAnimating, useScrollToBottom, useSticky } from 'react-scroll-to-bottom';
 import { v4 as uuidv4 } from 'uuid';
@@ -81,7 +81,6 @@ export function ChatPage() {
   const copyId = searchParams.get('copy');
   const forceRefresh = searchParams.get('forceRefresh'); // used to force a refresh
   const command = useChatStore((state) => state.commandHistory[state.commandIndex]);
-  const [commandInputHeight, setCommandInputHeight] = useState(80);
 
   const chat = useChatStore((state) => state.chat);
   const setLastUsedChat = useChatStore((state) => state.setLastUsedChat);
@@ -279,7 +278,6 @@ export function ChatPage() {
           actionIcon={ActionButtonIcon}
           actionLabel={actionButtonLabel}
           onSubmit={actionButtonAction}
-          setCommandInputHeight={setCommandInputHeight}
         />
       </div>
       <AlertDialog
