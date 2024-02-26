@@ -38,6 +38,7 @@ import { AssetInfoBar } from './AssetInfoBar';
 import { MaterialForm } from './MaterialForm';
 import { ErrorObject, checkErrors } from './TextInput';
 import { useAssetEditor } from './useAssetEditor';
+import { getBaseURL } from '@/store/useAPIStore';
 
 const { setItem } = localStorageTyped<boolean>('isAssetChanged');
 
@@ -60,9 +61,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
   const [errors, setErrors] = useState<ErrorObject>({
     executionMode: '',
   });
+
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
+
   const [avatarData, setAvatarData] = useState<File | null>(null);
   const [isAvatarOverwritten, setIsAvatarOverwritten] = useState(false);
   const [isVisibleInfoBar, setIsVisibleInfoBar] = useState(true);
+  const [avatarIsSaved, setAvatarIsSaved] = useState<Boolean>(false);
   const asset = useAssetStore((state) => state.selectedAsset);
   const lastSavedAsset = useAssetStore((state) => state.lastSavedSelectedAsset);
   const setLastSavedSelectedAsset = useAssetStore((state) => state.setLastSavedSelectedAsset);
@@ -148,7 +153,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     if (asset && isSystemAsset && wasAssetChangedInitially) {
       EditablesAPI.doesEdibleExist(assetType, asset?.id, 'aiconsole').then((exists) => {
         setHasCore(exists);
-        setSelectedAsset({ ...asset, defined_in: 'project', override: exists } as Asset);
+        // setSelectedAsset({ ...asset, defined_in: 'project', override: exists } as Asset);
         // setLastSavedSelectedAsset(undefined);
       });
     }
@@ -166,6 +171,9 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     if (asset === undefined) {
       return;
     }
+
+    const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${asset.id}/image?version=${asset?.version}`;
+    setAvatarUrl(userAgentAvatarUrl);
 
     if (lastSavedAsset === undefined) {
       if (!asset.override && isNew) {
@@ -218,6 +226,7 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       });
       setSelectedAsset(newAsset);
       useAssetStore.setState({ lastSavedSelectedAsset: newAsset });
+      setAvatarIsSaved(true);
     }
 
     let avatarFormData: FormData | null = null;
@@ -242,6 +251,13 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
     setSelectedAsset,
     isNew,
   ]);
+
+  useEffect(() => {
+    if (asset) {
+      const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${asset.id}/image?version=${asset?.version}`;
+      setAvatarUrl(userAgentAvatarUrl);
+    }
+  }, [asset?.version]);
 
   const getSubmitButtonLabel = useCallback((): SubmitButtonLabels => {
     if (lastSavedAsset === undefined) {
@@ -335,8 +351,11 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
                   <MaterialForm material={asset as Material} />
                 ) : (
                   <AgentForm
+                    avatarUrl={avatarUrl}
+                    setAvatarUrl={setAvatarUrl}
                     agent={asset as Agent}
                     setErrors={setErrors}
+                    avatarIsSaved={avatarIsSaved}
                     errors={errors}
                     avatarData={avatarData}
                     setAvatarData={setAvatarData}

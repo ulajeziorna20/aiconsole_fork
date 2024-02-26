@@ -66,13 +66,16 @@ async function fetchEditableObject<T extends EditableObject>({
   if (editableObjectType === 'chat') {
     const response: ChatOpenedServerMessage = (await useWebSocketStore
       .getState()
-      .sendMessageAndWaitForResponse({ type: 'OpenChatClientMessage', chat_id: id, request_id: uuidv4() }, (response: ServerMessage) => {
-        if (response.type === 'ChatOpenedServerMessage') {
-          return response.chat.id === id;
-        } else {
-          return false;
-        }
-      })) as ChatOpenedServerMessage;
+      .sendMessageAndWaitForResponse(
+        { type: 'OpenChatClientMessage', chat_id: id, request_id: uuidv4() },
+        (response: ServerMessage) => {
+          if (response.type === 'ChatOpenedServerMessage') {
+            return response.chat.id === id;
+          } else {
+            return false;
+          }
+        },
+      )) as ChatOpenedServerMessage;
 
     return response.chat as unknown as T;
   }
@@ -90,7 +93,7 @@ async function closeChat(id: string): Promise<ServerMessage> {
     {
       type: 'CloseChatClientMessage',
       chat_id: id,
-      request_id: uuidv4()
+      request_id: uuidv4(),
     },
     (response: ServerMessage) => {
       return response.type === 'NotifyAboutChatMutationServerMessage';
@@ -172,7 +175,9 @@ async function getPathForEditableObject(editableObjectType: EditableObjectType, 
 }
 
 async function setAgentAvatar(agentId: string, avatar: FormData) {
-  return ky.post(`${getBaseURL()}/api/agents/${agentId}/avatar`, { body: avatar, hooks: API_HOOKS });
+  return ky.post(`${getBaseURL()}/api/agents/${agentId}/avatar`, { body: avatar, hooks: API_HOOKS }).then((params) => {
+    console.log(params);
+  });
 }
 
 export const EditablesAPI = {

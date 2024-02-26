@@ -26,7 +26,6 @@ export const MaterialForm = ({ material }: MaterialFormProps) => {
     if (!material) {
       return;
     }
-
     EditablesAPI.previewMaterial(material).then((preview) => {
       setPreview(preview);
     });

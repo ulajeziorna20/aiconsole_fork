@@ -27,6 +27,8 @@ const executionModes = [
 ];
 
 interface AgentFormProps {
+  avatarUrl: string;
+  setAvatarUrl: (state: string) => void;
   agent: Agent;
   avatarData: File | null;
   setAvatarData: React.Dispatch<React.SetStateAction<File | null>>;
@@ -35,10 +37,13 @@ interface AgentFormProps {
   errors?: ErrorObject;
   setErrors?: React.Dispatch<React.SetStateAction<ErrorObject>>;
   onRevert: () => void;
+  avatarIsSaved: Boolean;
 }
 
 // TODO: all commented lines are ready UI - integrate it with backend when ready
 export const AgentForm = ({
+  avatarUrl,
+  setAvatarUrl,
   agent,
   errors,
   setErrors,
@@ -46,11 +51,12 @@ export const AgentForm = ({
   setAvatarData,
   isAvatarOverwritten,
   setIsAvatarOverwritten,
+  avatarIsSaved,
   onRevert,
 }: AgentFormProps) => {
   const [executionMode, setExecutionMode] = useState('');
   const [customExecutionMode, setCustomExecutionMode] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string>('');
+
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
   const handleUsageChange = (value: string) => setSelectedAsset({ ...agent, usage: value });
   const setExecutionModeState = (value: string) => setSelectedAsset({ ...agent, execution_mode: value } as Asset);
@@ -82,14 +88,6 @@ export const AgentForm = ({
     setAvatarData(avatar);
     setIsAvatarOverwritten(true);
   };
-
-  useEffect(() => {
-    // new Date is used to refresh image url
-    if (!isAvatarOverwritten) {
-      const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${agent.id}/image?version=${agent?.version}`;
-      setAvatarUrl(userAgentAvatarUrl);
-    }
-  }, [agent.id, agent.version, getBaseURL, isAvatarOverwritten]);
 
   return (
     <>
