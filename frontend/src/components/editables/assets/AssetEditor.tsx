@@ -172,9 +172,6 @@ export function AssetEditor({ assetType }: { assetType: AssetType }) {
       return;
     }
 
-    const userAgentAvatarUrl = `${getBaseURL()}/api/agents/${asset.id}/image?version=${asset?.version}`;
-    setAvatarUrl(userAgentAvatarUrl);
-
     if (lastSavedAsset === undefined) {
       if (!asset.override && isNew) {
         await EditablesAPI.saveNewEditableObject(editableObjectType, asset.id, asset);

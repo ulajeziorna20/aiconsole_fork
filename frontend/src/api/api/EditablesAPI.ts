@@ -175,9 +175,7 @@ async function getPathForEditableObject(editableObjectType: EditableObjectType, 
 }
 
 async function setAgentAvatar(agentId: string, avatar: FormData) {
-  return ky.post(`${getBaseURL()}/api/agents/${agentId}/avatar`, { body: avatar, hooks: API_HOOKS }).then((params) => {
-    console.log(params);
-  });
+  return ky.post(`${getBaseURL()}/api/agents/${agentId}/avatar`, { body: avatar, hooks: API_HOOKS });
 }
 
 export const EditablesAPI = {
