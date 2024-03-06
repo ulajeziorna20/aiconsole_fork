@@ -54,7 +54,7 @@ export const AgentForm = ({
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
   const handleUsageChange = (value: string) => setSelectedAsset({ ...agent, usage: value });
   const setExecutionModeState = (value: string) => setSelectedAsset({ ...agent, execution_mode: value } as Asset);
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<string>('');
   const getBaseURL = useAPIStore((state) => state.getBaseURL);
   const isCustomMode = useMemo(() => executionMode === 'custom', [executionMode]);
 
