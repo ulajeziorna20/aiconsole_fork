@@ -10,13 +10,14 @@ interface SelectOption {
 }
 
 interface SelectProps {
+  value: string;
+  setValue: (state: string) => void;
   placeholder: string;
   options: SelectOption[];
   onChange?: (value: string) => void;
 }
 
-export const Select = ({ placeholder, options, onChange }: SelectProps) => {
-  const [value, setValue] = useState('');
+export const Select = ({ value, setValue, placeholder, options, onChange }: SelectProps) => {
   const [open, setOpen] = useState(false);
 
   const notSelectedOptions = options.filter((option) => option.value !== value);

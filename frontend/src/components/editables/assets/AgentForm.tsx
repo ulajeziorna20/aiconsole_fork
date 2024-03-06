@@ -54,16 +54,21 @@ export const AgentForm = ({
   const setSelectedAsset = useAssetStore((state) => state.setSelectedAsset);
   const handleUsageChange = (value: string) => setSelectedAsset({ ...agent, usage: value });
   const setExecutionModeState = (value: string) => setSelectedAsset({ ...agent, execution_mode: value } as Asset);
+  const [value, setValue] = useState('');
   const getBaseURL = useAPIStore((state) => state.getBaseURL);
-
   const isCustomMode = useMemo(() => executionMode === 'custom', [executionMode]);
 
   const handleSetExecutionMode = (value: string) => {
-    setExecutionMode(value);
+    if (value === agent.execution_mode) {
+      setExecutionMode(value);
+    } else {
+      setExecutionModeState(value);
+      setExecutionMode(value);
+    }
+
     if (!isCustomMode) {
       setCustomExecutionMode('');
       setErrors?.((prev) => ({ ...prev, executionMode: '' }));
-      setExecutionModeState(value);
     }
   };
 
@@ -127,6 +132,8 @@ export const AgentForm = ({
               hidden={!isCustomMode}
               labelChildren={
                 <Select
+                  value={value}
+                  setValue={setValue}
                   options={executionModes}
                   placeholder="Choose execution mode"
                   onChange={handleSetExecutionMode}
